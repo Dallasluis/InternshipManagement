@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="InternshipManagement.Api/InternshipManagement.Api.csproj" Id="f74ee224-0f63-4b4e-ab91-5b17206608fe" />
+    <Project Path="InternshipManagement.Application/InternshipManagement.Application.csproj" />
+    <Project Path="InternshipManagement.Domain/InternshipManagement.Domain.csproj" />
+    <Project Path="InternshipManagement.Infrastructure/InternshipManagement.Infrastructure.csproj" />
+    <Project Path="InternshipManagement.Web/InternshipManagement.Web.csproj" Id="b6ef566b-bc5f-47d4-848f-11da351924df" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="InternshipManagement.IntegrationTests/InternshipManagement.IntegrationTests.csproj" />
+    <Project Path="InternshipManagement.UnitTests/InternshipManagement.UnitTests.csproj" />
+  </Folder>
+</Solution>

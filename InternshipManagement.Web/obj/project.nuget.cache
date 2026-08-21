@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ofpw7dLVVTY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.11\\microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}

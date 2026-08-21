@@ -1,0 +1,17 @@
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Application.deps.json
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Application.runtimeconfig.json
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Application.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Application.pdb
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\bin\Debug\net10.0\InternshipManagement.Domain.pdb
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.csproj.AssemblyReference.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.AssemblyInfoInputs.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.AssemblyInfo.cs
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\Internsh.D8FDD04B.Up2Date
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\refint\InternshipManagement.Application.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.pdb
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\InternshipManagement.Application.genruntimeconfig.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Application\obj\Debug\net10.0\ref\InternshipManagement.Application.dll

@@ -1,0 +1,11 @@
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\bin\Debug\net10.0\InternshipManagement.IntegrationTests.deps.json
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\bin\Debug\net10.0\InternshipManagement.IntegrationTests.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\bin\Debug\net10.0\InternshipManagement.IntegrationTests.pdb
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.AssemblyInfoInputs.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.AssemblyInfo.cs
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\refint\InternshipManagement.IntegrationTests.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\InternshipManagement.IntegrationTests.pdb
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.IntegrationTests\obj\Debug\net10.0\ref\InternshipManagement.IntegrationTests.dll

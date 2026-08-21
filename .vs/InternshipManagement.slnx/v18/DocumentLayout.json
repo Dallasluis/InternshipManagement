@@ -1,0 +1,898 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\iidentityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\iidentityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\iapplicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\iapplicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\identity\\identityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\identity\\identityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F74EE224-0F63-4B4E-AB91-5B17206608FE}|InternshipManagement.Api\\InternshipManagement.Api.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F74EE224-0F63-4B4E-AB91-5B17206608FE}|InternshipManagement.Api\\InternshipManagement.Api.csproj|solutionrelative:internshipmanagement.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\identity\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\identity\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\identity\\identityseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\identity\\identityseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\internshipmanagement.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\internshipmanagement.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\entities\\companyprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\entities\\companyprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\entities\\studentprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\entities\\studentprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\auth\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\auth\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:InternshipManagement.Domain\\Entities\\Reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\CompanyService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:InternshipManagement.Application\\Interfaces\\CompanyService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\ApplicationService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:InternshipManagement.Application\\Interfaces\\ApplicationService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\iapplicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\iapplicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\icompanyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\icompanyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F74EE224-0F63-4B4E-AB91-5B17206608FE}|InternshipManagement.Api\\InternshipManagement.Api.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.api\\internshipmanagement.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{F74EE224-0F63-4B4E-AB91-5B17206608FE}|InternshipManagement.Api\\InternshipManagement.Api.csproj|solutionrelative:internshipmanagement.api\\internshipmanagement.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\repositories\\companyrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\repositories\\companyrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\repositories\\studentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\repositories\\studentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\repositories\\applicationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\repositories\\applicationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\repositories\\internshiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\repositories\\internshiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\persistence\\configurations\\companyprofileconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\persistence\\configurations\\companyprofileconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\persistence\\configurations\\studentprofileconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\persistence\\configurations\\studentprofileconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\persistence\\configurations\\applicationconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\persistence\\configurations\\applicationconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\persistence\\configurations\\internshipconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\persistence\\configurations\\internshipconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\persistence\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\persistence\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\validators\\applicationvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\validators\\applicationvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\validators\\internshipvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\validators\\internshipvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\validators\\registervalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\validators\\registervalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\services\\companyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\services\\companyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\services\\studentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\services\\studentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\services\\applicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\services\\applicationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\services\\internshipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\services\\internshipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\istudentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\istudentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\iinternshipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\iinternshipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\interfaces\\iauthservice.cs||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\interfaces\\iauthservice.cs||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\company\\companyprofileresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\company\\companyprofileresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\student\\studentprofileresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\student\\studentprofileresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\application\\applicationresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\application\\applicationresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\application\\applyrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\application\\applyrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\internship\\internshipresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\internship\\internshipresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\internship\\updateinternshiprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\internship\\updateinternshiprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\internship\\createinternshiprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\internship\\createinternshiprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.application\\dtos\\auth\\registerrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{327C1B52-E4C2-1045-BCB1-E2FAB132966F}|InternshipManagement.Application\\InternshipManagement.Application.csproj|solutionrelative:internshipmanagement.application\\dtos\\auth\\registerrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\common\\baseentiry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\common\\baseentiry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\enums\\internshipstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\enums\\internshipstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\enums\\applicationstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\enums\\applicationstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\entities\\application.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\entities\\application.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.domain\\entities\\internship.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D845E119-E2A3-6BE7-85A2-24C1406DBCDE}|InternshipManagement.Domain\\InternshipManagement.Domain.csproj|solutionrelative:internshipmanagement.domain\\entities\\internship.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.infrastructure\\internshipmanagement.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{2D9B5273-7770-C2AE-F8CF-F0F900164A60}|InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj|solutionrelative:internshipmanagement.infrastructure\\internshipmanagement.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E6F6362F-9CDA-A168-9E03-9A486F5E602F}|InternshipManagement.IntegrationTests\\InternshipManagement.IntegrationTests.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.integrationtests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F6362F-9CDA-A168-9E03-9A486F5E602F}|InternshipManagement.IntegrationTests\\InternshipManagement.IntegrationTests.csproj|solutionrelative:internshipmanagement.integrationtests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A4A23C08-7A05-1748-6559-4561E55C6900}|InternshipManagement.UnitTests\\InternshipManagement.UnitTests.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.unittests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A4A23C08-7A05-1748-6559-4561E55C6900}|InternshipManagement.UnitTests\\InternshipManagement.UnitTests.csproj|solutionrelative:internshipmanagement.unittests\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B6EF566B-BC5F-47D4-848F-11DA351924DF}|InternshipManagement.Web\\InternshipManagement.Web.csproj|c:\\users\\lenovo\\source\\repos\\internshipmanagement\\internshipmanagement.web\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B6EF566B-BC5F-47D4-848F-11DA351924DF}|InternshipManagement.Web\\InternshipManagement.Web.csproj|solutionrelative:internshipmanagement.web\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Api\\Program.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Api\\Program.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Api\\Program.cs",
+              "RelativeToolTip": "InternshipManagement.Api\\Program.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAADwv4gAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T12:14:25.124Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IdentityService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\IdentityService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Identity\\IdentityService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\IdentityService.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Identity\\IdentityService.cs",
+              "ViewState": "AgIAAK0AAAAAAAAAAAAuwMwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T12:13:44.676Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "IIdentityService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IIdentityService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IIdentityService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IIdentityService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IIdentityService.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAswDMAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T12:11:14.111Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IApplicationDbContext.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T12:09:43.191Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "StudentProfile.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\StudentProfile.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Entities\\StudentProfile.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\StudentProfile.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Entities\\StudentProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:58:36.863Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\AuthService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Services\\AuthService.cs",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAuwPsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:11:53.585Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IdentitySeeder.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\IdentitySeeder.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Identity\\IdentitySeeder.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\IdentitySeeder.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Identity\\IdentitySeeder.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:19:25.107Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Identity\\ApplicationUser.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Identity\\ApplicationUser.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Identity\\ApplicationUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:35:58.013Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "LoginRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Auth\\LoginRequest.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Auth\\LoginRequest.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Auth\\LoginRequest.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Auth\\LoginRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:02:38.262Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\DependencyInjection.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\DependencyInjection.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\DependencyInjection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:22:46.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "InternshipManagement.Api.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Api\\InternshipManagement.Api.csproj",
+              "RelativeDocumentMoniker": "InternshipManagement.Api\\InternshipManagement.Api.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Api\\InternshipManagement.Api.csproj",
+              "RelativeToolTip": "InternshipManagement.Api\\InternshipManagement.Api.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-08-20T06:39:52.727Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CompanyProfile.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\CompanyProfile.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Entities\\CompanyProfile.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\CompanyProfile.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Entities\\CompanyProfile.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAgwCsAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:58:57.439Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "InternshipManagement.Application.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\InternshipManagement.Application.csproj",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\InternshipManagement.Application.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\InternshipManagement.Application.csproj",
+              "RelativeToolTip": "InternshipManagement.Application\\InternshipManagement.Application.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-08-19T12:07:01.253Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Reports.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Reports.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Entities\\Reports.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Reports.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Entities\\Reports.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T06:39:53.04Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "ICompanyService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\ICompanyService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\ICompanyService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\ICompanyService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\ICompanyService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T06:39:53.826Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "IApplicationService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IApplicationService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IApplicationService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IApplicationService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IApplicationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-20T06:39:53.853Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "CompanyRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\CompanyRepository.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Repositories\\CompanyRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\CompanyRepository.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Repositories\\CompanyRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:21:49.994Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "StudentRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\StudentRepository.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Repositories\\StudentRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\StudentRepository.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Repositories\\StudentRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:21:33.871Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ApplicationRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\ApplicationRepository.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Repositories\\ApplicationRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\ApplicationRepository.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Repositories\\ApplicationRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:21:17.504Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "InternshipRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\InternshipRepository.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Repositories\\InternshipRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Repositories\\InternshipRepository.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Repositories\\InternshipRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:21:02.673Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "CompanyProfileConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\CompanyProfileConfiguration.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\CompanyProfileConfiguration.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\CompanyProfileConfiguration.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\CompanyProfileConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:18:53.746Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "StudentProfileConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\StudentProfileConfiguration.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\StudentProfileConfiguration.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\StudentProfileConfiguration.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\StudentProfileConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:18:33.62Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "ApplicationConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\ApplicationConfiguration.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\ApplicationConfiguration.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\ApplicationConfiguration.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\ApplicationConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:18:08.731Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "InternshipConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\InternshipConfiguration.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\InternshipConfiguration.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\Configurations\\InternshipConfiguration.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Persistence\\Configurations\\InternshipConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:17:49.989Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\Persistence\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\Persistence\\ApplicationDbContext.cs",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\Persistence\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:16:48.039Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "ApplicationValidator.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\ApplicationValidator.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Validators\\ApplicationValidator.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\ApplicationValidator.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Validators\\ApplicationValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:15:20.92Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "InternshipValidator.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\InternshipValidator.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Validators\\InternshipValidator.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\InternshipValidator.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Validators\\InternshipValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:15:05.509Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "RegisterValidator.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\RegisterValidator.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Validators\\RegisterValidator.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Validators\\RegisterValidator.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Validators\\RegisterValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:14:50.325Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "CompanyService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\CompanyService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Services\\CompanyService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\CompanyService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Services\\CompanyService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:13:34.141Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "StudentService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\StudentService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Services\\StudentService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\StudentService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Services\\StudentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:13:14.509Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "ApplicationService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\ApplicationService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Services\\ApplicationService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\ApplicationService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Services\\ApplicationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:12:49.041Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "InternshipService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\InternshipService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Services\\InternshipService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Services\\InternshipService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Services\\InternshipService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:12:30.871Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "CompanyService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\CompanyService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\CompanyService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\CompanyService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\CompanyService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:10:41.432Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "IStudentService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IStudentService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IStudentService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IStudentService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IStudentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:10:16.712Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ApplicationService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\ApplicationService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\ApplicationService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\ApplicationService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\ApplicationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:09:51.034Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "IInternshipService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IInternshipService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IInternshipService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IInternshipService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IInternshipService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:09:15.762Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\Interfaces\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\Interfaces\\IAuthService.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:08:07.22Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "CompanyProfileResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Company\\CompanyProfileResponse.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Company\\CompanyProfileResponse.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Company\\CompanyProfileResponse.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Company\\CompanyProfileResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:06:55.146Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "StudentProfileResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Student\\StudentProfileResponse.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Student\\StudentProfileResponse.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Student\\StudentProfileResponse.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Student\\StudentProfileResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:06:17.862Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "ApplicationResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Application\\ApplicationResponse.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Application\\ApplicationResponse.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Application\\ApplicationResponse.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Application\\ApplicationResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:05:42.482Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "ApplyRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Application\\ApplyRequest.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Application\\ApplyRequest.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Application\\ApplyRequest.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Application\\ApplyRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:05:25.362Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "InternshipResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\InternshipResponse.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Internship\\InternshipResponse.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\InternshipResponse.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Internship\\InternshipResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:04:23.159Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "UpdateInternshipRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\UpdateInternshipRequest.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Internship\\UpdateInternshipRequest.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\UpdateInternshipRequest.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Internship\\UpdateInternshipRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:04:06.314Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "CreateInternshipRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\CreateInternshipRequest.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Internship\\CreateInternshipRequest.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Internship\\CreateInternshipRequest.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Internship\\CreateInternshipRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:03:43.865Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "RegisterRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Auth\\RegisterRequest.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Application\\DTOs\\Auth\\RegisterRequest.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Application\\DTOs\\Auth\\RegisterRequest.cs",
+              "RelativeToolTip": "InternshipManagement.Application\\DTOs\\Auth\\RegisterRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:02:22.151Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "BaseEntiry.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Common\\BaseEntiry.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Common\\BaseEntiry.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Common\\BaseEntiry.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Common\\BaseEntiry.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:00:47.165Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "InternshipStatus.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Enums\\InternshipStatus.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Enums\\InternshipStatus.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Enums\\InternshipStatus.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Enums\\InternshipStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T12:00:05.902Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "ApplicationStatus.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Enums\\ApplicationStatus.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Enums\\ApplicationStatus.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Enums\\ApplicationStatus.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Enums\\ApplicationStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:59:49.632Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "Application.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Application.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Entities\\Application.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Application.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Entities\\Application.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:58:11.883Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "Internship.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Internship.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Domain\\Entities\\Internship.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Domain\\Entities\\Internship.cs",
+              "RelativeToolTip": "InternshipManagement.Domain\\Entities\\Internship.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:55:59.404Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "InternshipManagement.Infrastructure.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+              "RelativeDocumentMoniker": "InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+              "RelativeToolTip": "InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-08-19T10:48:26.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 51,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.IntegrationTests\\Class1.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.IntegrationTests\\Class1.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.IntegrationTests\\Class1.cs",
+              "RelativeToolTip": "InternshipManagement.IntegrationTests\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T10:41:43.09Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 52,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.UnitTests\\Class1.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.UnitTests\\Class1.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.UnitTests\\Class1.cs",
+              "RelativeToolTip": "InternshipManagement.UnitTests\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T10:41:21.027Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 53,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\Class1.cs",
+              "RelativeDocumentMoniker": "InternshipManagement.Web\\Class1.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\Class1.cs",
+              "RelativeToolTip": "InternshipManagement.Web\\Class1.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T10:39:22.546Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
