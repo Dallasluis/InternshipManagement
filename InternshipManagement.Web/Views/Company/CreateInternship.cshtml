@@ -1,0 +1,166 @@
+﻿@model InternshipManagement.Web.Models.Internship.CreateInternshipRequest
+@{
+    ViewData["Title"] = "Post New Internship";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h1 class="h2 mb-3">Post New Internship</h1>
+        <p class="text-muted mb-4">Fill in the details below to create a new internship opportunity.</p>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                <form asp-controller="Company" asp-action="CreateInternship" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label"></label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g., Software Developer Intern" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"
+                                  placeholder="Describe the internship role and responsibilities..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Responsibilities" class="form-label"></label>
+                        <textarea asp-for="Responsibilities" class="form-control" rows="3"
+                                  placeholder="List the key responsibilities..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Requirements" class="form-label"></label>
+                        <textarea asp-for="Requirements" class="form-control" rows="3"
+                                  placeholder="List the requirements..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Industry" class="form-label"></label>
+                            <input asp-for="Industry" class="form-control" placeholder="e.g., Technology, Healthcare" />
+                            <span asp-validation-for="Industry" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Location" class="form-label"></label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g., New York, USA" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="IsRemote" class="form-check-input" />
+                        <label asp-for="IsRemote" class="form-check-label"></label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="InternshipType" class="form-label"></label>
+                            <select asp-for="InternshipType" class="form-select">
+                                <option value="FullTime">Full Time</option>
+                                <option value="PartTime">Part Time</option>
+                                <option value="Summer">Summer</option>
+                                <option value="Winter">Winter</option>
+                                <option value="YearRound">Year Round</option>
+                                <option value="Flexible">Flexible</option>
+                            </select>
+                            <span asp-validation-for="InternshipType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Duration" class="form-label"></label>
+                            <select asp-for="Duration" class="form-select">
+                                <option value="LessThan3Months">Less than 3 months</option>
+                                <option value="ThreeToSixMonths">3 to 6 months</option>
+                                <option value="SixToTwelveMonths">6 to 12 months</option>
+                                <option value="MoreThanTwelveMonths">More than 12 months</option>
+                            </select>
+                            <span asp-validation-for="Duration" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="StartDate" class="form-label"></label>
+                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="EndDate" class="form-label"></label>
+                            <input asp-for="EndDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ApplicationDeadline" class="form-label"></label>
+                            <input asp-for="ApplicationDeadline" type="date" class="form-control" />
+                            <span asp-validation-for="ApplicationDeadline" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NumberOfPositions" class="form-label"></label>
+                            <input asp-for="NumberOfPositions" type="number" class="form-control" min="1" />
+                            <span asp-validation-for="NumberOfPositions" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Compensation" class="form-label"></label>
+                            <select asp-for="Compensation" class="form-select">
+                                <option value="">Select compensation type</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Stipend">Stipend</option>
+                                <option value="Unpaid">Unpaid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="stipendFields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StipendAmount" class="form-label"></label>
+                                <input asp-for="StipendAmount" type="number" class="form-control" step="0.01" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Currency" class="form-label"></label>
+                                <input asp-for="Currency" class="form-control" placeholder="USD" value="USD" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Skills" class="form-label"></label>
+                        <input asp-for="Skills" class="form-control" placeholder="e.g., C#, JavaScript, React, .NET Core" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EligibleProgrammes" class="form-label">Eligible Programmes</label>
+                        <input asp-for="EligibleProgrammes" class="form-control" placeholder="e.g., Computer Science, Engineering, Business (comma separated)" />
+                        <small class="text-muted">Enter the academic programmes eligible for this internship.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Create Internship
+                    </button>
+                    <a asp-controller="Company" asp-action="ManageInternships" class="btn btn-outline-secondary ms-2">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelector('#Compensation').addEventListener('change', function () {
+            const stipendFields = document.querySelector('#stipendFields');
+            stipendFields.style.display = this.value === 'Stipend' ? 'block' : 'none';
+        });
+    </script>
+}

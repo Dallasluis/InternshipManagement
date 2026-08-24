@@ -1,0 +1,196 @@
+﻿@model InternshipManagement.Web.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">Admin Dashboard</h1>
+            <p class="text-muted">Platform overview and management</p>
+        </div>
+        <button class="btn btn-outline-secondary" onclick="location.reload()">
+            <i class="fas fa-sync-alt me-1"></i> Refresh
+        </button>
+    </div>
+
+    @if (Model.Stats == null)
+    {
+        <div class="alert alert-warning">Unable to load statistics.</div>
+    }
+    else
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card" style="border-left-color: #2563eb;">
+                    <div class="stat-number">@Model.Stats.TotalUsers</div>
+                    <div class="stat-label">Total Users</div>
+                    <small class="text-muted">
+                        <i class="fas fa-user-graduate me-1"></i> @Model.Stats.TotalStudents Students
+                        <span class="mx-1">|</span>
+                        <i class="fas fa-building me-1"></i> @Model.Stats.TotalCompanies Companies
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card" style="border-left-color: #059669;">
+                    <div class="stat-number">@Model.Stats.TotalInternships</div>
+                    <div class="stat-label">Total Internships</div>
+                    <small class="text-muted">
+                        <i class="fas fa-check-circle text-success me-1"></i> @Model.Stats.ActiveInternships Active
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card" style="border-left-color: #d97706;">
+                    <div class="stat-number">@Model.Stats.TotalApplications</div>
+                    <div class="stat-label">Applications</div>
+                    <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i> @Model.Stats.PendingReviews Pending
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card" style="border-left-color: #dc2626;">
+                    <div class="stat-number">@Model.Stats.PendingVerifications</div>
+                    <div class="stat-label">Pending Verifications</div>
+                    <small class="text-muted">
+                        <i class="fas fa-flag me-1"></i> @Model.Stats.PendingReports Reports
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Recent Companies</h6>
+                        <a asp-controller="Admin" asp-action="Companies" class="text-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.RecentCompanies.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Company</th>
+                                            <th>Industry</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var company in Model.RecentCompanies)
+                                        {
+                                            <tr>
+                                                <td>@company.CompanyName</td>
+                                                <td>@company.Industry</td>
+                                                <td>
+                                                    <span class="badge @GetVerificationBadgeClass(company.VerificationStatus)">
+                                                        @company.VerificationStatus
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4 text-muted">No companies registered yet.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Recent Reports</h6>
+                        <a asp-controller="Admin" asp-action="Reports" class="text-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.RecentReports.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Internship</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var report in Model.RecentReports)
+                                        {
+                                            <tr>
+                                                <td><span class="badge bg-warning">@report.Type</span></td>
+                                                <td>@report.InternshipTitle</td>
+                                                <td>
+                                                    <span class="badge @GetReportBadgeClass(report.Status)">
+                                                        @report.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4 text-muted">No reports submitted yet.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    private string GetVerificationBadgeClass(string status) => status switch
+    {
+        "Verified" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderReview" => "bg-info",
+        "Rejected" => "bg-danger",
+        "Suspended" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+
+    private string GetReportBadgeClass(string status) => status switch
+    {
+        "Resolved" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderInvestigation" => "bg-info",
+        "Dismissed" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+<style>
+    .stat-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid #2563eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>

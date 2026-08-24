@@ -1,0 +1,118 @@
+﻿@model List<InternshipManagement.Web.Models.Admin.ReportListResponse>
+@{
+    ViewData["Title"] = "Manage Reports";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Reports</h1>
+        <p class="text-muted">Review and resolve fraud and content reports</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Internship</th>
+                        <th>Reported By</th>
+                        <th>Status</th>
+                        <th>Reported</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var report in Model.OrderByDescending(r => r.CreatedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-warning">@report.Type</span>
+                                </td>
+                                <td>
+                                    <a asp-controller="Internships" asp-action="Details" asp-route-id="@report.Id" class="text-decoration-none">
+                                        @report.InternshipTitle
+                                    </a>
+                                </td>
+                                <td>@report.ReporterName</td>
+                                <td>
+                                    <span class="badge @GetReportBadgeClass(report.Status)">
+                                        @report.Status
+                                    </span>
+                                </td>
+                                <td>@report.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if (report.Status == "Pending" || report.Status == "UnderInvestigation")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="resolveReport(@report.Id, true)">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="resolveReport(@report.Id, false)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    }
+                                    @if (report.Status == "Resolved" || report.Status == "Dismissed")
+                                    {
+                                        <span class="text-muted">Resolved</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No reports submitted yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetReportBadgeClass(string status) => status switch
+    {
+        "Resolved" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderInvestigation" => "bg-info",
+        "Dismissed" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function resolveReport(id, resolved) {
+            const action = resolved ? 'resolve' : 'dismiss';
+            if (confirm(`Are you sure you want to ${action} this report?`)) {
+                fetch(`/api/admin/reports/${id}/resolve`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ response: `${action} by admin`, resolved: resolved })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        alert('Failed to resolve report.');
+                    });
+            }
+        }
+    </script>
+}

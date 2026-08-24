@@ -1,0 +1,106 @@
+﻿@model InternshipManagement.Web.Models.Internship.PagedInternshipResult
+@{
+    ViewData["Title"] = "Browse Internships";
+    var filters = ViewBag.Filters as InternshipManagement.Web.Models.Internship.InternshipSearchViewModel
+                  ?? new InternshipManagement.Web.Models.Internship.InternshipSearchViewModel();
+}
+
+@functions {
+    string SplitWords(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        return System.Text.RegularExpressions.Regex.Replace(value, "(?<!^)([A-Z])", " $1");
+    }
+}
+
+<div class="mb-4">
+    <h1>Browse Internships</h1>
+    <p class="text-muted">@Model.TotalCount opportunities found</p>
+</div>
+
+<form method="get" asp-action="Index" class="row g-2 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="Keyword" value="@filters.Keyword" class="form-control" placeholder="Title or keyword" />
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="Location" value="@filters.Location" class="form-control" placeholder="Location" />
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="Industry" value="@filters.Industry" class="form-control" placeholder="Industry" />
+    </div>
+    <div class="col-md-2">
+        <select name="InternshipType" class="form-select">
+            <option value="">Any type</option>
+            @foreach (var type in new[] { "FullTime", "PartTime", "Summer", "Winter", "YearRound", "Flexible" })
+            {
+                <option value="@type" selected="@(filters.InternshipType == type)">@SplitWords(type)</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+        <div class="form-check">
+            <input type="checkbox" name="IsRemote" value="true" class="form-check-input" id="isRemote"
+                   checked="@(filters.IsRemote == true)" />
+            <label class="form-check-label" for="isRemote">Remote only</label>
+        </div>
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-dark w-100">Search</button>
+    </div>
+</form>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-light border">No internships match your search right now. Try adjusting your filters.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var internship in Model.Items)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-1">@internship.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@internship.CompanyName</h6>
+                        <p class="card-text small text-muted mb-2">
+                            @internship.Industry &middot;
+                            @(internship.IsRemote ? "Remote" : internship.Location)
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-light text-dark border">@SplitWords(internship.InternshipType)</span>
+                            <span class="badge bg-light text-dark border">@SplitWords(internship.Duration)</span>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Apply by @internship.ApplicationDeadline.ToString("MMM d, yyyy")
+                        </p>
+                        <a asp-action="Details" asp-route-id="@internship.Id" class="btn btn-outline-dark mt-auto">
+                            View details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-Keyword="@filters.Keyword"
+                           asp-route-Location="@filters.Location"
+                           asp-route-Industry="@filters.Industry"
+                           asp-route-InternshipType="@filters.InternshipType"
+                           asp-route-IsRemote="@filters.IsRemote"
+                           asp-route-PageNumber="@p">@p</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}

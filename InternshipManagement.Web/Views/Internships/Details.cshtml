@@ -1,0 +1,119 @@
+﻿@model InternshipManagement.Web.Models.Internship.InternshipResponse
+@{
+    ViewData["Title"] = Model.Title;
+    var isLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserFullName"));
+    var userType = Context.Session.GetString("UserType");
+}
+
+@functions {
+    string SplitWords(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        return System.Text.RegularExpressions.Regex.Replace(value, "(?<!^)([A-Z])", " $1");
+    }
+}
+
+<div class="mb-3">
+    <a asp-action="Index" class="text-muted">&larr; Back to all internships</a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-1">@Model.Title</h1>
+        <h5 class="text-muted mb-3">@Model.CompanyName</h5>
+
+        <div class="mb-4">
+            <span class="badge bg-light text-dark border me-1">@SplitWords(Model.InternshipType)</span>
+            <span class="badge bg-light text-dark border me-1">@SplitWords(Model.Duration)</span>
+            <span class="badge bg-light text-dark border me-1">@Model.Industry</span>
+            @if (Model.IsRemote)
+            {
+                <span class="badge bg-light text-dark border">Remote</span>
+            }
+        </div>
+
+        <h5>Description</h5>
+        <p style="white-space: pre-line;">@Model.Description</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Responsibilities))
+        {
+            <h5>Responsibilities</h5>
+            <p style="white-space: pre-line;">@Model.Responsibilities</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Requirements))
+        {
+            <h5>Requirements</h5>
+            <p style="white-space: pre-line;">@Model.Requirements</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
+        {
+            <h5>Qualifications</h5>
+            <p style="white-space: pre-line;">@Model.Qualifications</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Skills))
+        {
+            <h5>Skills</h5>
+            <p style="white-space: pre-line;">@Model.Skills</p>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-6">Location</dt>
+                    <dd class="col-6">@(Model.IsRemote ? "Remote" : Model.Location)</dd>
+
+                    <dt class="col-6">Positions</dt>
+                    <dd class="col-6">@Model.NumberOfPositions</dd>
+
+                    <dt class="col-6">Start date</dt>
+                    <dd class="col-6">@Model.StartDate.ToString("MMM d, yyyy")</dd>
+
+                    @if (Model.EndDate.HasValue)
+                    {
+                        <dt class="col-6">End date</dt>
+                        <dd class="col-6">@Model.EndDate.Value.ToString("MMM d, yyyy")</dd>
+                    }
+
+                    <dt class="col-6">Apply by</dt>
+                    <dd class="col-6">@Model.ApplicationDeadline.ToString("MMM d, yyyy")</dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Compensation))
+                    {
+                        <dt class="col-6">Compensation</dt>
+                        <dd class="col-6">
+                            @Model.Compensation
+                            @if (Model.StipendAmount.HasValue)
+                            {
+                                <text> &mdash; @Model.Currency @Model.StipendAmount.Value.ToString("N0")</text>
+                            }
+                        </dd>
+                    }
+                </dl>
+
+                <hr />
+
+                @if (Model.HasApplied)
+                {
+                    <button class="btn btn-secondary w-100" disabled>Already applied</button>
+                }
+                else if (isLoggedIn && userType == "Student")
+                {
+                    <form asp-controller="Applications" asp-action="Apply" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="InternshipId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-dark w-100">Apply now</button>
+                    </form>
+                }
+                else if (!isLoggedIn)
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-dark w-100">Log in to apply</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

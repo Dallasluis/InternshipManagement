@@ -210,3 +210,4 @@ C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Api\obj\D
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Api\obj\Debug\net10.0\InternshipManagement.Api.pdb
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Api\obj\Debug\net10.0\InternshipManagement.Api.genruntimeconfig.cache
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Api\obj\Debug\net10.0\ref\InternshipManagement.Api.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Api\obj\Debug\net10.0\InternshipManagement.Api.sourcelink.json

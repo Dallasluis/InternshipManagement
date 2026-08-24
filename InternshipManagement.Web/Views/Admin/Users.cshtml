@@ -1,0 +1,145 @@
+﻿@model List<InternshipManagement.Web.Models.Admin.UserListResponse>
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Users</h1>
+        <p class="text-muted">Manage all users on the platform</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Last Login</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var user in Model.OrderByDescending(u => u.CreatedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">@user.FirstName.FirstOrDefault()</div>
+                                        <div>
+                                            <div class="fw-bold">@user.FirstName @user.LastName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>
+                                    <span class="badge @GetUserTypeBadgeClass(user.UserType)">
+                                        @user.UserType
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                        @(user.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td>@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>@(user.LastLoginAt?.ToString("MMM dd, yyyy") ?? "Never")</td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <button class="btn btn-sm btn-warning" onclick="suspendUser(@user.Id, true)">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="suspendUser(@user.Id, false)">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    }
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(@user.Id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No users registered yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetUserTypeBadgeClass(string userType) => userType switch
+    {
+        "Student" => "bg-info",
+        "Company" => "bg-primary",
+        "Admin" => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function suspendUser(id, suspend) {
+            const action = suspend ? 'suspend' : 'activate';
+            if (confirm(`Are you sure you want to ${action} this user?`)) {
+                fetch(`/api/admin/users/${id}/suspend?suspend=${suspend}`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        alert('Failed to update user status.');
+                    });
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                // Implement delete endpoint if needed
+                alert('Delete functionality coming soon.');
+            }
+        }
+    </script>
+}
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        background: #e0f2fe;
+        color: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+</style>

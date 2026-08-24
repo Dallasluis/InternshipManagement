@@ -9,3 +9,4 @@ C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Domain\ob
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Domain\obj\Debug\net10.0\refint\InternshipManagement.Domain.dll
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Domain\obj\Debug\net10.0\InternshipManagement.Domain.pdb
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Domain\obj\Debug\net10.0\ref\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Domain\obj\Debug\net10.0\InternshipManagement.Domain.sourcelink.json

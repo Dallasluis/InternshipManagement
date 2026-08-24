@@ -52,14 +52,14 @@ namespace InternshipManagement.Application.Services
             }
 
             // Assign role
-            var role = request.UserType == "Company" ? "Company" : "Student";
+            var role = request.UserType == "Company" ? "Company" : request.UserType == "Admin" ? "Admin" : "Student";
             if (!await _identityService.RoleExistsAsync(role))
             {
                 await _identityService.CreateRoleAsync(role);
             }
             await _identityService.AddToRoleAsync(result.UserId, role);
 
-            // Create profile based on user type
+            // Create profile based on user type (only for Company and Student)
             var userId = int.Parse(result.UserId);
             if (request.UserType == "Company")
             {
@@ -73,7 +73,7 @@ namespace InternshipManagement.Application.Services
                 };
                 _context.CompanyProfiles.Add(companyProfile);
             }
-            else
+            else if (request.UserType == "Student" || string.IsNullOrEmpty(request.UserType))
             {
                 var studentProfile = new StudentProfile
                 {

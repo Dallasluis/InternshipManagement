@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "InternshipManagement.Web\\InternshipManagement.Web.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "InternshipManagement.UnitTests\\InternshipManagement.UnitTests.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

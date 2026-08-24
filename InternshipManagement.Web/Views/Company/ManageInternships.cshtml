@@ -1,0 +1,143 @@
+﻿@model List<InternshipManagement.Web.Models.Internship.InternshipResponse>
+@{
+    ViewData["Title"] = "Manage Internships";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">My Internships</h1>
+        <p class="text-muted">Manage all your internship postings</p>
+    </div>
+    <a asp-controller="Company" asp-action="CreateInternship" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Post New Internship
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-briefcase fa-4x text-muted mb-3"></i>
+        <h5>No Internships Posted</h5>
+        <p class="text-muted">You haven't posted any internships yet.</p>
+        <a asp-controller="Company" asp-action="CreateInternship" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Post Your First Internship
+        </a>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Applications</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var internship in Model.OrderByDescending(i => i.CreatedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Internships" asp-action="Details" asp-route-id="@internship.Id" class="text-decoration-none">
+                                        @internship.Title
+                                    </a>
+                                </td>
+                                <td>@internship.InternshipType</td>
+                                <td>@internship.ApplicationsCount</td>
+                                <td>
+                                    <span class="badge @GetStatusBadgeClass(internship.Status)">
+                                        @internship.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-controller="Internships" asp-action="Details" asp-route-id="@internship.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (internship.Status == "Draft")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="publishInternship(@internship.Id)">
+                                            <i class="fas fa-rocket"></i>
+                                        </button>
+                                    }
+                                    @if (internship.Status == "Published")
+                                    {
+                                        <button class="btn btn-sm btn-warning" onclick="closeInternship(@internship.Id)">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    }
+                                    <a asp-controller="Company" asp-action="EditInternship" asp-route-id="@internship.Id"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteInternship(@internship.Id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Draft" => "bg-secondary",
+        "Published" => "bg-success",
+        "Closed" => "bg-danger",
+        "Filled" => "bg-info",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function publishInternship(id) {
+            if (confirm('Are you sure you want to publish this internship?')) {
+                fetch(`/api/internships/${id}/publish`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function closeInternship(id) {
+            if (confirm('Are you sure you want to close this internship?')) {
+                fetch(`/api/internships/${id}/close`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function deleteInternship(id) {
+            if (confirm('Are you sure you want to delete this internship? This action cannot be undone.')) {
+                fetch(`/api/internships/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+    </script>
+}

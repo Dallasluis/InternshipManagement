@@ -1,0 +1,145 @@
+﻿@model List<InternshipManagement.Web.Models.Admin.InternshipListResponse>
+@{
+    ViewData["Title"] = "Manage Internships";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Internships</h1>
+        <p class="text-muted">Moderate all internship postings</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Industry</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                        <th>Moderation</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var internship in Model.OrderByDescending(i => i.CreatedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Internships" asp-action="Details" asp-route-id="@internship.Id" class="text-decoration-none">
+                                        @internship.Title
+                                    </a>
+                                </td>
+                                <td>@internship.CompanyName</td>
+                                <td>@internship.Industry</td>
+                                <td>@internship.ApplicationsCount</td>
+                                <td>
+                                    <span class="badge @GetStatusBadgeClass(internship.Status)">
+                                        @internship.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @GetModerationBadgeClass(internship.ModerationStatus)">
+                                        @internship.ModerationStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (internship.ModerationStatus == "Pending" || internship.ModerationStatus == "Flagged")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="moderateInternship(@internship.Id, 'Approved')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="moderateInternship(@internship.Id, 'Rejected')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" onclick="moderateInternship(@internship.Id, 'Flagged')">
+                                            <i class="fas fa-flag"></i>
+                                        </button>
+                                    }
+                                    @if (internship.ModerationStatus == "Approved")
+                                    {
+                                        <button class="btn btn-sm btn-warning" onclick="moderateInternship(@internship.Id, 'Flagged')">
+                                            <i class="fas fa-flag"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="moderateInternship(@internship.Id, 'Removed')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    }
+                                    @if (internship.ModerationStatus == "Removed")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="moderateInternship(@internship.Id, 'Approved')">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No internships posted yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Draft" => "bg-secondary",
+        "Published" => "bg-success",
+        "Closed" => "bg-danger",
+        "Filled" => "bg-info",
+        _ => "bg-secondary"
+    };
+
+    private string GetModerationBadgeClass(string status) => status switch
+    {
+        "Approved" => "bg-success",
+        "Pending" => "bg-warning",
+        "Rejected" => "bg-danger",
+        "Flagged" => "bg-warning",
+        "Removed" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function moderateInternship(id, status) {
+            if (confirm(`Are you sure you want to ${status} this internship?`)) {
+                fetch(`/api/admin/internships/${id}/moderate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status, notes: '' })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        alert('Failed to moderate internship.');
+                    });
+            }
+        }
+    </script>
+}

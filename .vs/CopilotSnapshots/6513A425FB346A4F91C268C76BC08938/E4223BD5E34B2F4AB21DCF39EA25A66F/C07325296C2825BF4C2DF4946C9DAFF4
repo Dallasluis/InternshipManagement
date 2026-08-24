@@ -1,0 +1,6 @@
+﻿namespace InternshipManagement.Web.Services
+{
+    public class AuthApiClient
+    {
+    }
+}

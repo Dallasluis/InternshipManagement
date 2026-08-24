@@ -1,0 +1,170 @@
+﻿@model List<InternshipManagement.Web.Models.Admin.CompanyListResponse>
+@{
+    ViewData["Title"] = "Manage Companies";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Companies</h1>
+        <p class="text-muted">Manage all companies on the platform</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Industry</th>
+                        <th>Email</th>
+                        <th>Internships</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var company in Model.OrderByDescending(c => c.CreatedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="company-avatar-sm me-2">@company.CompanyName.FirstOrDefault()</div>
+                                        <span class="fw-bold">@company.CompanyName</span>
+                                    </div>
+                                </td>
+                                <td>@company.Industry</td>
+                                <td>@company.Email</td>
+                                <td>@company.InternshipCount</td>
+                                <td>
+                                    <span class="badge @GetVerificationBadgeClass(company.VerificationStatus)">
+                                        @company.VerificationStatus
+                                    </span>
+                                </td>
+                                <td>@company.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <a asp-controller="Admin" asp-action="CompanyDetails" asp-route-id="@company.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (company.VerificationStatus == "Pending" || company.VerificationStatus == "UnderReview")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="verifyCompany(@company.Id, true)">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="verifyCompany(@company.Id, false)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    }
+                                    @if (company.VerificationStatus == "Verified")
+                                    {
+                                        <button class="btn btn-sm btn-warning" onclick="suspendCompany(@company.Id)">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                    }
+                                    @if (company.VerificationStatus == "Suspended")
+                                    {
+                                        <button class="btn btn-sm btn-success" onclick="unsuspendCompany(@company.Id)">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No companies registered yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetVerificationBadgeClass(string status) => status switch
+    {
+        "Verified" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderReview" => "bg-info",
+        "Rejected" => "bg-danger",
+        "Suspended" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function verifyCompany(id, approved) {
+            const action = approved ? 'approve' : 'reject';
+            if (confirm(`Are you sure you want to ${action} this company?`)) {
+                fetch(`/api/admin/companies/${id}/verification`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ approved: approved, notes: '' })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        alert('Failed to update verification status.');
+                    });
+            }
+        }
+
+        function suspendCompany(id) {
+            if (confirm('Are you sure you want to suspend this company?')) {
+                fetch(`/api/admin/users/${id}/suspend?suspend=true`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function unsuspendCompany(id) {
+            if (confirm('Are you sure you want to activate this company?')) {
+                fetch(`/api/admin/users/${id}/suspend?suspend=false`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+    </script>
+}
+
+<style>
+    .company-avatar-sm {
+        width: 32px;
+        height: 32px;
+        background: #e0f2fe;
+        color: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+</style>

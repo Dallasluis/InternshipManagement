@@ -17,3 +17,4 @@ C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Infrastru
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Infrastructure\obj\Debug\net10.0\InternshipManagement.Infrastructure.pdb
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Infrastructure\obj\Debug\net10.0\InternshipManagement.Infrastructure.genruntimeconfig.cache
 C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Infrastructure\obj\Debug\net10.0\ref\InternshipManagement.Infrastructure.dll
+C:\Users\Lenovo\source\repos\InternshipManagement\InternshipManagement.Infrastructure\obj\Debug\net10.0\InternshipManagement.Infrastructure.sourcelink.json

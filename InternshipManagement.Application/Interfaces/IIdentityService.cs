@@ -45,7 +45,7 @@ namespace InternshipManagement.Application.Interfaces
         public bool Succeeded { get; set; }
         public bool IsLockedOut { get; set; }
         public bool IsNotAllowed { get; set; }
-        public bool RequiresTwoFactor { get; set; }
+                public bool RequiresTwoFactor { get; set; }
 
         public static SignInResult Success() => new() { Succeeded = true };
         public static SignInResult Failed() => new() { Succeeded = false };
@@ -63,6 +63,7 @@ namespace InternshipManagement.Application.Interfaces
         public string UserType { get; set; }
         public string? PhoneNumber { get; set; }
         public bool IsActive { get; set; }
+        
         public bool EmailConfirmed { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }

@@ -4,10 +4,10 @@
     <Project Path="InternshipManagement.Application/InternshipManagement.Application.csproj" />
     <Project Path="InternshipManagement.Domain/InternshipManagement.Domain.csproj" />
     <Project Path="InternshipManagement.Infrastructure/InternshipManagement.Infrastructure.csproj" />
-    <Project Path="InternshipManagement.Web/InternshipManagement.Web.csproj" Id="b6ef566b-bc5f-47d4-848f-11da351924df" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="InternshipManagement.IntegrationTests/InternshipManagement.IntegrationTests.csproj" />
     <Project Path="InternshipManagement.UnitTests/InternshipManagement.UnitTests.csproj" />
   </Folder>
+  <Project Path="InternshipManagement.Web/InternshipManagement.Web.csproj" Id="cb5914bc-6a30-45d0-bf1b-f99dd7d2084d" />
 </Solution>

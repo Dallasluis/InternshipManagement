@@ -1,0 +1,118 @@
+﻿@model InternshipManagement.Web.Models.Company.CompanyProfileResponse
+@{
+    ViewData["Title"] = "Company Profile";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Company Profile</h1>
+        <p class="text-muted">Manage your company information</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="company-avatar-large mx-auto mb-3">@Model?.CompanyName?.FirstOrDefault()</div>
+                <h5>@Model?.CompanyName</h5>
+                <p class="text-muted">@Model?.Industry</p>
+                <span class="badge @GetVerificationBadgeClass(Model?.VerificationStatus)">
+                    @Model?.VerificationStatus
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Edit Company Profile</h6>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Company" asp-action="Profile" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="Description" class="form-control" rows="3">@Model?.Description</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Industry</label>
+                        <input type="text" name="Industry" class="form-control" value="@Model?.Industry" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Website</label>
+                        <input type="url" name="Website" class="form-control" value="@Model?.Website" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">LinkedIn URL</label>
+                        <input type="url" name="LinkedInUrl" class="form-control" value="@Model?.LinkedInUrl" placeholder="https://linkedin.com/company/..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <input type="text" name="Address" class="form-control" value="@Model?.Address" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" name="City" class="form-control" value="@Model?.City" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Country</label>
+                            <input type="text" name="Country" class="form-control" value="@Model?.Country" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" name="PhoneNumber" class="form-control" value="@Model?.PhoneNumber" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetVerificationBadgeClass(string? status) => status switch
+    {
+        "Verified" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderReview" => "bg-info",
+        "Rejected" => "bg-danger",
+        "Suspended" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+<style>
+    .company-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+</style>

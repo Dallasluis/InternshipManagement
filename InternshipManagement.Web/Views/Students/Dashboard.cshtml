@@ -1,0 +1,162 @@
+﻿@model InternshipManagement.Web.ViewModels.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">Welcome back, @(Model.Profile?.FirstName ?? "Student")!</h1>
+            <p class="text-muted">Track your applications and manage your profile</p>
+        </div>
+        <a asp-controller="Internships" asp-action="Index" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i> Find Internships
+        </a>
+    </div>
+
+    @if (Model.Profile == null)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Complete your profile to get better matches.
+            <a asp-controller="Student" asp-action="Profile" class="alert-link">Update Profile</a>
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #2563eb;">
+                <div class="stat-number">@Model.TotalApplications</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #d97706;">
+                <div class="stat-number">@Model.PendingApplications</div>
+                <div class="stat-label">Under Review</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #059669;">
+                <div class="stat-number">@Model.ShortlistedCount</div>
+                <div class="stat-label">Shortlisted</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #dc2626;">
+                <div class="stat-number">@Model.RejectedCount</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h6 class="mb-1">Profile Completion</h6>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: @Model.ProfileCompletion%">
+                            @Model.ProfileCompletion%
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        @(100 - Model.ProfileCompletion)% remaining
+                    </small>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a asp-controller="Student" asp-action="Profile" class="btn btn-outline-primary">
+                        <i class="fas fa-user-edit me-1"></i> Update
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Recent Applications</h6>
+            <a asp-controller="Student" asp-action="Applications" class="text-primary">View All</a>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.RecentApplications.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Internship</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var app in Model.RecentApplications)
+                            {
+                                <tr>
+                                    <td>@app.InternshipTitle</td>
+                                    <td>@app.CompanyName</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(app.Status)">
+                                            @app.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Student" asp-action="ApplicationDetails" asp-route-id="@app.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">No applications yet.</p>
+                    <a asp-controller="Internships" asp-action="Index" class="btn btn-primary">Browse Internships</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Applied" => "bg-info",
+        "UnderReview" => "bg-warning",
+        "Shortlisted" => "bg-success",
+        "Rejected" => "bg-danger",
+        "Withdrawn" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+<style>
+    .stat-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid #2563eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>

@@ -1,0 +1,142 @@
+﻿@model InternshipManagement.Web.ViewModels.CompanyDashboardViewModel
+@{
+    ViewData["Title"] = "Company Dashboard";
+}
+
+<div class="dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">Company Dashboard</h1>
+            <p class="text-muted">Manage internships and review applicants</p>
+        </div>
+        <a asp-controller="Company" asp-action="CreateInternship" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Post New Internship
+        </a>
+    </div>
+
+    @if (!Model.IsVerified)
+    {
+        <div class="alert alert-warning mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Company not verified.</strong>
+            <a asp-controller="Company" asp-action="Verification" class="alert-link">Submit Verification</a>
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #2563eb;">
+                <div class="stat-number">@Model.TotalInternships</div>
+                <div class="stat-label">Total Internships</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #059669;">
+                <div class="stat-number">@Model.ActiveInternships</div>
+                <div class="stat-label">Active</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #d97706;">
+                <div class="stat-number">@Model.TotalApplications</div>
+                <div class="stat-label">Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card" style="border-left-color: #8b5cf6;">
+                <div class="stat-number">@Model.ShortlistedCount</div>
+                <div class="stat-label">Shortlisted</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Recent Internships</h6>
+            <a asp-controller="Company" asp-action="ManageInternships" class="text-primary">View All</a>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.RecentInternships.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Applications</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var internship in Model.RecentInternships)
+                            {
+                                <tr>
+                                    <td>@internship.Title</td>
+                                    <td>@internship.InternshipType</td>
+                                    <td>@internship.ApplicationsCount</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(internship.Status)">
+                                            @internship.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Internships" asp-action="Details" asp-route-id="@internship.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">No internships posted yet.</p>
+                    <a asp-controller="Company" asp-action="CreateInternship" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Post First Internship
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Draft" => "bg-secondary",
+        "Published" => "bg-success",
+        "Closed" => "bg-danger",
+        "Filled" => "bg-info",
+        _ => "bg-secondary"
+    };
+}
+
+<style>
+    .stat-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid #2563eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>

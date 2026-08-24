@@ -1,0 +1,112 @@
+﻿@model InternshipManagement.Web.Models.Student.StudentProfileResponse
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">My Profile</h1>
+        <p class="text-muted">Manage your personal and academic information</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="avatar-circle-large mx-auto mb-3">@Model?.FirstName?.FirstOrDefault()</div>
+                <h5>@Model?.FirstName @Model?.LastName</h5>
+                <p class="text-muted">@Model?.Programme</p>
+                <p class="text-muted small">@Model?.University</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Edit Profile</h6>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Student" asp-action="Profile" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="Bio" class="form-control" rows="3">@Model?.Bio</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="Location" class="form-control" value="@Model?.Location" placeholder="City, Country" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="PhoneNumber" class="form-control" value="@Model?.PhoneNumber" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input type="url" name="LinkedInUrl" class="form-control" value="@Model?.LinkedInUrl" placeholder="https://linkedin.com/in/..." />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Portfolio URL</label>
+                            <input type="url" name="PortfolioUrl" class="form-control" value="@Model?.PortfolioUrl" placeholder="https://..." />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">University</label>
+                            <input type="text" name="University" class="form-control" value="@Model?.University" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Programme</label>
+                            <input type="text" name="Programme" class="form-control" value="@Model?.Programme" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Year of Study</label>
+                            <input type="text" name="YearOfStudy" class="form-control" value="@Model?.YearOfStudy" placeholder="e.g., 3rd Year" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expected Graduation</label>
+                            <input type="text" name="ExpectedGraduationYear" class="form-control" value="@Model?.ExpectedGraduationYear" placeholder="e.g., 2026" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle-large {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+</style>

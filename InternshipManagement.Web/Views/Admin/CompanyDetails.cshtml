@@ -1,0 +1,163 @@
+﻿@model InternshipManagement.Web.Models.Admin.CompanyListResponse
+@{
+    ViewData["Title"] = "Company Details";
+}
+
+<div class="mb-3">
+    <a asp-controller="Admin" asp-action="Companies" class="text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to Companies
+    </a>
+</div>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning">Company not found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="company-avatar-large mx-auto mb-3">@Model.CompanyName.FirstOrDefault()</div>
+                    <h5>@Model.CompanyName</h5>
+                    <p class="text-muted">@Model.Industry</p>
+                    <span class="badge @GetVerificationBadgeClass(Model.VerificationStatus)">
+                        @Model.VerificationStatus
+                    </span>
+                    <hr />
+                    <div class="text-start">
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                        <p><strong>Joined:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                        <p><strong>Internships:</strong> @Model.InternshipCount</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Verification Actions</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.VerificationStatus == "Pending" || Model.VerificationStatus == "UnderReview")
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-clock me-2"></i>
+                            This company is waiting for verification.
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success" onclick="verifyCompany(@Model.Id, true)">
+                                <i class="fas fa-check me-1"></i> Approve
+                            </button>
+                            <button class="btn btn-danger" onclick="verifyCompany(@Model.Id, false)">
+                                <i class="fas fa-times me-1"></i> Reject
+                            </button>
+                        </div>
+                    }
+                    else if (Model.VerificationStatus == "Verified")
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            This company is verified.
+                        </div>
+                        <button class="btn btn-warning" onclick="suspendCompany(@Model.Id)">
+                            <i class="fas fa-pause me-1"></i> Suspend Company
+                        </button>
+                    }
+                    else if (Model.VerificationStatus == "Suspended")
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            This company is suspended.
+                        </div>
+                        <button class="btn btn-success" onclick="unsuspendCompany(@Model.Id)">
+                            <i class="fas fa-play me-1"></i> Activate Company
+                        </button>
+                    }
+                    else if (Model.VerificationStatus == "Rejected")
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            This company was rejected.
+                        </div>
+                        <button class="btn btn-warning" onclick="verifyCompany(@Model.Id, true)">
+                            <i class="fas fa-undo me-1"></i> Reconsider
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    private string GetVerificationBadgeClass(string status) => status switch
+    {
+        "Verified" => "bg-success",
+        "Pending" => "bg-warning",
+        "UnderReview" => "bg-info",
+        "Rejected" => "bg-danger",
+        "Suspended" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        function verifyCompany(id, approved) {
+            const action = approved ? 'approve' : 'reject';
+            if (confirm(`Are you sure you want to ${action} this company?`)) {
+                fetch(`/api/admin/companies/${id}/verification`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ approved: approved, notes: '' })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function suspendCompany(id) {
+            if (confirm('Are you sure you want to suspend this company?')) {
+                fetch(`/api/admin/users/${id}/suspend?suspend=true`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function unsuspendCompany(id) {
+            if (confirm('Are you sure you want to activate this company?')) {
+                fetch(`/api/admin/users/${id}/suspend?suspend=false`, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+    </script>
+}
+
+<style>
+    .company-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0 auto;
+    }
+</style>
