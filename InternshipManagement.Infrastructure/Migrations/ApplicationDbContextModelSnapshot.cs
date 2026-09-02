@@ -400,11 +400,45 @@ namespace InternshipManagement.Infrastructure.Migrations
                     b.Property<int>("InternshipId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("InterviewDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InterviewLocationOrLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("InterviewNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("InterviewType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsShortlisted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("OfferAcceptedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OfferDeclinedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OfferDetails")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("OfferExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OfferStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("OfferStipendAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ShortlistNotes")
                         .HasMaxLength(500)
@@ -556,9 +590,21 @@ namespace InternshipManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AcademicTranscriptUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("Bio")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("CertificatesUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CoverLetterUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -574,6 +620,10 @@ namespace InternshipManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IdentificationDocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -591,6 +641,10 @@ namespace InternshipManagement.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("OtherSupportingDocumentsUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -606,6 +660,10 @@ namespace InternshipManagement.Infrastructure.Migrations
                     b.Property<string>("Programme")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("QualificationDocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ResumeUrl")
                         .HasMaxLength(500)
@@ -705,6 +763,9 @@ namespace InternshipManagement.Infrastructure.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("AccountPreferencesJson")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

@@ -20,6 +20,12 @@ namespace InternshipManagement.Application.DTOs.Student
         public string? ExpectedGraduationYear { get; set; }
 
         public string? ResumeUrl { get; set; }
+        public string? CoverLetterUrl { get; set; }
+        public string? AcademicTranscriptUrl { get; set; }
+        public string? QualificationDocumentUrl { get; set; }
+        public string? IdentificationDocumentUrl { get; set; }
+        public string? CertificatesUrl { get; set; }
+        public string? OtherSupportingDocumentsUrl { get; set; }
         public string? ProfilePictureUrl { get; set; }
 
         public List<EducationDto> Education { get; set; }
@@ -40,6 +46,13 @@ namespace InternshipManagement.Application.DTOs.Student
         public string? Programme { get; set; }
         public string? YearOfStudy { get; set; }
         public string? ExpectedGraduationYear { get; set; }
+        public string? ResumeUrl { get; set; }
+        public string? CoverLetterUrl { get; set; }
+        public string? AcademicTranscriptUrl { get; set; }
+        public string? QualificationDocumentUrl { get; set; }
+        public string? IdentificationDocumentUrl { get; set; }
+        public string? CertificatesUrl { get; set; }
+        public string? OtherSupportingDocumentsUrl { get; set; }
     }
 
     public class EducationDto

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj": {}
+    "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj": {
+    "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj",
+        "projectUniqueName": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj",
         "projectName": "InternshipManagement.Web",
-        "projectPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj",
+        "projectPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Web\\InternshipManagement.Web.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Web\\obj\\",
+        "outputPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

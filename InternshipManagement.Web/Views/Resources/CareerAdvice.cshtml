@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "Career Advice";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Career Advice</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> Career Advice</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Choosing the Right Internship</h4>
+                    <ul>
+                        <li><strong>Consider your career goals:</strong> Choose internships that align with your interests.</li>
+                        <li><strong>Research the company:</strong> Look at their mission, values, and reputation.</li>
+                        <li><strong>Think about what you'll learn:</strong> Will you gain valuable skills and experience?</li>
+                        <li><strong>Consider the culture:</strong> Will you fit in with the team and environment?</li>
+                        <li><strong>Look at the location and flexibility:</strong> Is it remote, hybrid, or in-person?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Building Skills</h4>
+                    <ul>
+                        <li><strong>Take on new challenges:</strong> Don't be afraid to step out of your comfort zone.</li>
+                        <li><strong>Seek feedback:</strong> Ask for feedback to improve and grow.</li>
+                        <li><strong>Learn continuously:</strong> Take courses, read, and stay up to date in your field.</li>
+                        <li><strong>Work on projects:</strong> Apply what you learn to real-world projects.</li>
+                        <li><strong>Build your network:</strong> Connect with professionals in your field.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Networking Tips</h4>
+                    <ul>
+                        <li><strong>Connect with people you meet:</strong> Add them on LinkedIn.</li>
+                        <li><strong>Attend events:</strong> Go to industry conferences, webinars, and networking events.</li>
+                        <li><strong>Reach out to mentors:</strong> Find experienced professionals who can guide you.</li>
+                        <li><strong>Be genuine:</strong> Build real relationships, not just transactional ones.</li>
+                        <li><strong>Stay in touch:</strong> Maintain your professional network over time.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Professional Behaviour</h4>
+                    <ul>
+                        <li><strong>Be punctual:</strong> Arrive on time and meet deadlines.</li>
+                        <li><strong>Communicate clearly:</strong> Use professional and respectful language.</li>
+                        <li><strong>Take initiative:</strong> Show that you're proactive and motivated.</li>
+                        <li><strong>Be a team player:</strong> Collaborate and support your colleagues.</li>
+                        <li><strong>Be open to feedback:</strong> Accept criticism and use it to improve.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipGuide" class="text-decoration-none">
+                                <i class="fas fa-book me-2"></i> Internship Guide
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipTips" class="text-decoration-none">
+                                <i class="fas fa-lightbulb me-2"></i> Internship Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CVTips" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i> CV & Resume Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="ApplicationTips" class="text-decoration-none">
+                                <i class="fas fa-pen-fancy me-2"></i> Application Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InterviewTips" class="text-decoration-none">
+                                <i class="fas fa-handshake me-2"></i> Interview Tips
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -28,6 +28,18 @@ namespace InternshipManagement.Domain.Configurations
             builder.Property(a => a.ShortlistNotes)
                 .HasMaxLength(500);
 
+            builder.Property(a => a.InterviewType)
+                .HasMaxLength(50);
+
+            builder.Property(a => a.InterviewLocationOrLink)
+                .HasMaxLength(500);
+
+            builder.Property(a => a.InterviewNotes)
+                .HasMaxLength(1000);
+
+            builder.Property(a => a.OfferDetails)
+                .HasMaxLength(2000);
+
             builder.HasOne(a => a.StudentProfile)
                 .WithMany(s => s.InternshipApplications)
                 .HasForeignKey(a => a.StudentProfileId)

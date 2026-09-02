@@ -1,0 +1,183 @@
+﻿@model InternshipManagement.Web.Models.Student.StudentProfileResponse
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">My Profile</h1>
+        <p class="text-muted">Manage your personal and academic information</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="avatar-circle-large mx-auto mb-3">@Model?.FirstName?.FirstOrDefault()</div>
+                <h5>@Model?.FirstName @Model?.LastName</h5>
+                <p class="text-muted">@Model?.Programme</p>
+                <p class="text-muted small">@Model?.University</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Edit Profile</h6>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Student" asp-action="Profile" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="Bio" class="form-control" rows="3">@Model?.Bio</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="Location" class="form-control" value="@Model?.Location" placeholder="City, Country" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="PhoneNumber" class="form-control" value="@Model?.PhoneNumber" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input type="url" name="LinkedInUrl" class="form-control" value="@Model?.LinkedInUrl" placeholder="https://linkedin.com/in/..." />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Portfolio URL</label>
+                            <input type="url" name="PortfolioUrl" class="form-control" value="@Model?.PortfolioUrl" placeholder="https://..." />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">University</label>
+                            <input type="text" name="University" class="form-control" value="@Model?.University" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Programme</label>
+                            <input type="text" name="Programme" class="form-control" value="@Model?.Programme" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Year of Study</label>
+                            <input type="text" name="YearOfStudy" class="form-control" value="@Model?.YearOfStudy" placeholder="e.g., 3rd Year" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expected Graduation</label>
+                            <input type="text" name="ExpectedGraduationYear" class="form-control" value="@Model?.ExpectedGraduationYear" placeholder="e.g., 2026" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ResumeFile" class="form-label">Upload CV / Resume (Required)</label>
+                        <input id="ResumeFile" name="ResumeFile" type="file" class="form-control" accept=".pdf,.doc,.docx" />
+                        <small class="text-muted">PDF, DOC, or DOCX up to 5 MB.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">CV / Resume URL</label>
+                        <input type="url" name="ResumeUrl" class="form-control" value="@Model?.ResumeUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CoverLetterFile" class="form-label">Upload Cover Letter (Required)</label>
+                        <input id="CoverLetterFile" name="CoverLetterFile" type="file" class="form-control" accept=".pdf,.doc,.docx" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cover Letter URL</label>
+                        <input type="url" name="CoverLetterUrl" class="form-control" value="@Model?.CoverLetterUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="AcademicTranscriptFile" class="form-label">Academic Record / Transcript</label>
+                        <input id="AcademicTranscriptFile" name="AcademicTranscriptFile" type="file" class="form-control" accept=".pdf,.doc,.docx" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Academic Transcript URL</label>
+                        <input type="url" name="AcademicTranscriptUrl" class="form-control" value="@Model?.AcademicTranscriptUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="QualificationDocumentFile" class="form-label">Proof of Qualification / Diploma</label>
+                        <input id="QualificationDocumentFile" name="QualificationDocumentFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Qualification Document URL</label>
+                        <input type="url" name="QualificationDocumentUrl" class="form-control" value="@Model?.QualificationDocumentUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="IdentificationDocumentFile" class="form-label">ID / Passport</label>
+                        <input id="IdentificationDocumentFile" name="IdentificationDocumentFile" type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">ID / Passport URL</label>
+                        <input type="url" name="IdentificationDocumentUrl" class="form-control" value="@Model?.IdentificationDocumentUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CertificatesFile" class="form-label">Certificates / Short Courses</label>
+                        <input id="CertificatesFile" name="CertificatesFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Certificates URL</label>
+                        <input type="url" name="CertificatesUrl" class="form-control" value="@Model?.CertificatesUrl" placeholder="https://..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="OtherSupportingDocumentsFile" class="form-label">Other Supporting Documents</label>
+                        <input id="OtherSupportingDocumentsFile" name="OtherSupportingDocumentsFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Supporting Documents URL</label>
+                        <input type="url" name="OtherSupportingDocumentsUrl" class="form-control" value="@Model?.OtherSupportingDocumentsUrl" placeholder="https://..." />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle-large {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+</style>

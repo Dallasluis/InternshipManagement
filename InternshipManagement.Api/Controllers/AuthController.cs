@@ -2,6 +2,7 @@
 using InternshipManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InternshipManagement.Api.Controllers
 {
@@ -11,9 +12,50 @@ namespace InternshipManagement.Api.Controllers
     {
         private readonly IAuthService _authService;
 
+        private int CurrentUserId => int.Parse(User.FindFirstValue("userId") ?? User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+        }
+
+        [HttpPost("change-password")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var result = await _authService.ChangePasswordAsync(CurrentUserId, request);
+            return result.Succeeded ? Ok(new { Success = true }) : BadRequest(result);
+        }
+
+        [HttpPost("change-email")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
+        {
+            var result = await _authService.ChangeEmailAsync(CurrentUserId, request);
+            return result.Succeeded ? Ok(new { Success = true, Message = "Email changed. Please log in again." }) : BadRequest(result);
+        }
+
+        [HttpGet("preferences")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> GetPreferences()
+        {
+            return Ok(await _authService.GetAccountPreferencesAsync(CurrentUserId));
+        }
+
+        [HttpPut("preferences")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> UpdatePreferences([FromBody] UpdateAccountPreferencesRequest request)
+        {
+            var result = await _authService.UpdateAccountPreferencesAsync(CurrentUserId, request);
+            return result.Succeeded ? Ok(new { Success = true }) : BadRequest(result);
+        }
+
+        [HttpPost("deactivate")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> Deactivate()
+        {
+            var result = await _authService.DeactivateAccountAsync(CurrentUserId);
+            return result.Succeeded ? Ok(new { Success = true }) : BadRequest(result);
         }
 
         [HttpPost("register")]

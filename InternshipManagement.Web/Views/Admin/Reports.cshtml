@@ -99,14 +99,13 @@
         function resolveReport(id, resolved) {
             const action = resolved ? 'resolve' : 'dismiss';
             if (confirm(`Are you sure you want to ${action} this report?`)) {
-                fetch(`/api/admin/reports/${id}/resolve`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ response: `${action} by admin`, resolved: resolved })
-                })
-                    .then(response => {
-                        if (response.ok) {
+                fetch(`/Admin/ResolveReport?id=${id}&resolved=${resolved}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                             location.reload();
+                        } else {
+                            alert('Failed to resolve report.');
                         }
                     })
                     .catch(error => {

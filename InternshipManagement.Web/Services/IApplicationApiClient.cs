@@ -10,6 +10,10 @@ namespace InternshipManagement.Web.Services
         Task<ApplicationResponse?> GetApplicationByIdAsync(string token, int id);
         Task<bool> UpdateStatusAsync(string token, int id, UpdateApplicationStatusRequest request);
         Task<bool> ShortlistAsync(string token, int id, string? notes);
+        Task<bool> ScheduleInterviewAsync(string token, int id, ScheduleInterviewRequest request);
+        Task<bool> MarkInterviewCompletedAsync(string token, int id);
+        Task<bool> MakeOfferAsync(string token, int id, MakeOfferRequest request);
+        Task<bool> RespondToOfferAsync(string token, int id, RespondToOfferRequest request);
         Task<bool> WithdrawAsync(string token, int id);
         Task<List<ApplicationResponse>> GetShortlistedAsync(string token, int internshipId);
         Task<StudentStatsResponse?> GetStudentStatsAsync(string token, int studentId);

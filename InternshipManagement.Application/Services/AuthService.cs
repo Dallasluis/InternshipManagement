@@ -216,6 +216,25 @@ namespace InternshipManagement.Application.Services
             return result.Succeeded;
         }
 
+        public Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordRequest request) =>
+            _identityService.ChangePasswordAsync(userId.ToString(), request.CurrentPassword, request.NewPassword);
+
+        public Task<IdentityResult> ChangeEmailAsync(int userId, ChangeEmailRequest request) =>
+            _identityService.ChangeEmailAsync(userId.ToString(), request.CurrentPassword, request.NewEmail);
+
+        public Task<AccountPreferencesDto> GetAccountPreferencesAsync(int userId) =>
+            _identityService.GetAccountPreferencesAsync(userId.ToString());
+
+        public Task<IdentityResult> UpdateAccountPreferencesAsync(int userId, UpdateAccountPreferencesRequest request) =>
+            _identityService.UpdateAccountPreferencesAsync(userId.ToString(), new AccountPreferencesDto
+            {
+                EmailNotifications = request.EmailNotifications,
+                InternshipAlerts = request.InternshipAlerts
+            });
+
+        public Task<IdentityResult> DeactivateAccountAsync(int userId) =>
+            _identityService.DeactivateAccountAsync(userId.ToString());
+
         // Helper methods
         private static string GenerateJwtToken(string userId, string email, string userType)
         {

@@ -21,7 +21,7 @@ namespace InternshipManagement.Web.Services
         public async Task<StudentProfileResponse?> GetProfileAsync(string token, int userId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Student/profile?userId={userId}");
+            var response = await _httpClient.GetAsync("api/Students/profile");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<StudentProfileResponse>();
@@ -32,7 +32,7 @@ namespace InternshipManagement.Web.Services
         public async Task<StudentProfileResponse?> UpdateProfileAsync(string token, int userId, UpdateStudentProfileRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PutAsJsonAsync($"api/Student/profile?userId={userId}", request);
+            var response = await _httpClient.PutAsJsonAsync("api/Students/profile", request);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<StudentProfileResponse>();
@@ -43,28 +43,28 @@ namespace InternshipManagement.Web.Services
         public async Task<bool> UploadResumeAsync(string token, int userId, string resumeUrl)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/Student/resume?userId={userId}", new { ResumeUrl = resumeUrl });
+            var response = await _httpClient.PostAsJsonAsync("api/Students/resume", new { ResumeUrl = resumeUrl });
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> AddEducationAsync(string token, int userId, AddEducationRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/Student/education?userId={userId}", request);
+            var response = await _httpClient.PostAsJsonAsync("api/Students/education", request);
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> AddWorkExperienceAsync(string token, int userId, AddWorkExperienceRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/Student/experience?userId={userId}", request);
+            var response = await _httpClient.PostAsJsonAsync("api/Students/experience", request);
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> AddSkillAsync(string token, int userId, AddSkillRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/Student/skill?userId={userId}", request);
+            var response = await _httpClient.PostAsJsonAsync("api/Students/skill", request);
             return response.IsSuccessStatusCode;
         }
     }

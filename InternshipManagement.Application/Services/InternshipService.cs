@@ -3,6 +3,7 @@ using InternshipManagement.Application.DTOs.Internship;
 using InternshipManagement.Application.Interfaces;
 using InternshipManagement.Domain.Entities;
 using InternshipManagement.Domain.Enums;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace InternshipManagement.Application.Services
@@ -10,10 +11,12 @@ namespace InternshipManagement.Application.Services
     public class InternshipService : IInternshipService
     {
         private readonly IApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public InternshipService(IApplicationDbContext context)
+        public InternshipService(IApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<InternshipResponse> CreateInternshipAsync(int userId, CreateInternshipRequest request)
@@ -27,7 +30,7 @@ namespace InternshipManagement.Application.Services
             if (companyProfile.VerificationStatus != CompanyVerificationStatus.Verified)
                 throw new Exception("Company must be verified to create internships.");
 
-            if (!companyProfile.IsSubscribed)
+            if (_configuration.GetValue<bool>("Internships:RequireSubscription") && !companyProfile.IsSubscribed)
                 throw new Exception("Active subscription required.");
 
             var eligibleProgrammesJson = request.EligibleProgrammes != null && request.EligibleProgrammes.Any()

@@ -28,14 +28,24 @@ body {
     }
 
 .hero-illustration {
-    background: linear-gradient(160deg, #1f3d33 60%, #f4f6f5 60%);
-    border-radius: 24px;
-    min-height: 320px;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 4rem;
+}
+
+    .hero-illustration img {
+        display: block;
+        width: 100%;
+        max-height: 440px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+@media (max-width: 991.98px) {
+    .hero-illustration {
+        margin-top: 1rem;
+    }
 }
 
 .search-pill {
@@ -247,4 +257,33 @@ body {
     main {
         margin-left: 0 !important;
     }
+}
+/* ===== Resources Page ===== */
+.resource-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 12px;
+}
+
+/* ===== About Us Page ===== */
+.card h4 {
+    color: #0f172a;
+}
+
+/* ===== Breadcrumb ===== */
+.breadcrumb-item a {
+    text-decoration: none;
+    color: #2563eb;
+}
+
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+
+.breadcrumb-item.active {
+    color: #64748b;
 }

@@ -7,5 +7,10 @@ namespace InternshipManagement.Web.Services
         Task<CompanyProfileResponse?> GetProfileAsync(string token, int userId);
         Task<CompanyProfileResponse?> UpdateProfileAsync(string token, int userId, UpdateCompanyProfileRequest request);
         Task<bool> SubmitVerificationAsync(string token, int userId, SubmitVerificationRequest request);
+        
+        // ✅ ADD THIS
+        Task<CompanyStatsResponse?> GetCompanyStatsAsync(string token, int userId);
     }
+
+    
 }

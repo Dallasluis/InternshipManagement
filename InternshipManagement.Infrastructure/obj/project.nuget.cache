@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9xJQ7OyUZ1o=",
+  "dgSpecHash": "8cECWqDbNl8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
@@ -71,9 +71,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'EntityFramework 6.1.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net10.0'. This package may not be fully compatible with your project.",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "filePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "libraryId": "EntityFramework",
       "targetGraphs": [
         "net10.0"
@@ -83,9 +83,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'Microsoft.AspNet.Identity.Core 2.2.4' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net10.0'. This package may not be fully compatible with your project.",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "filePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "libraryId": "Microsoft.AspNet.Identity.Core",
       "targetGraphs": [
         "net10.0"
@@ -95,9 +95,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'Microsoft.AspNet.Identity.EntityFramework 2.2.4' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net10.0'. This package may not be fully compatible with your project.",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "filePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "libraryId": "Microsoft.AspNet.Identity.EntityFramework",
       "targetGraphs": [
         "net10.0"
@@ -107,9 +107,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'Microsoft.AspNet.Identity.EntityFramework.ko 2.2.4' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net10.0'. This package may not be fully compatible with your project.",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Lenovo\\source\\repos\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
+      "filePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.Infrastructure\\InternshipManagement.Infrastructure.csproj",
       "libraryId": "Microsoft.AspNet.Identity.EntityFramework.ko",
       "targetGraphs": [
         "net10.0"

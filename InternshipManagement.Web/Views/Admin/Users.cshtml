@@ -107,10 +107,13 @@
         function suspendUser(id, suspend) {
             const action = suspend ? 'suspend' : 'activate';
             if (confirm(`Are you sure you want to ${action} this user?`)) {
-                fetch(`/api/admin/users/${id}/suspend?suspend=${suspend}`, { method: 'POST' })
-                    .then(response => {
-                        if (response.ok) {
+                fetch(`/Admin/SuspendUser?id=${id}&suspend=${suspend}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                             location.reload();
+                        } else {
+                            alert('Failed to update user status.');
                         }
                     })
                     .catch(error => {

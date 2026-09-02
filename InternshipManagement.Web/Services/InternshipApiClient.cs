@@ -68,7 +68,10 @@ namespace InternshipManagement.Web.Services
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<InternshipResponse>();
 
-            return null;
+            var error = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(error)
+                ? $"The API returned {(int)response.StatusCode} ({response.ReasonPhrase})."
+                : error);
         }
 
         public async Task<InternshipResponse?> UpdateInternshipAsync(string token, int id, UpdateInternshipRequest request)
@@ -79,7 +82,10 @@ namespace InternshipManagement.Web.Services
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<InternshipResponse>();
 
-            return null;
+            var error = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(error)
+                ? $"The API returned {(int)response.StatusCode} ({response.ReasonPhrase})."
+                : error);
         }
 
         public async Task<bool> PublishInternshipAsync(string token, int id)

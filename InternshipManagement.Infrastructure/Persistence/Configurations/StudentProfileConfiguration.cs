@@ -50,6 +50,24 @@ namespace InternshipManagement.Domain.Configurations
             builder.Property(s => s.ResumeUrl)
                 .HasMaxLength(500);
 
+            builder.Property(s => s.CoverLetterUrl)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.AcademicTranscriptUrl)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.QualificationDocumentUrl)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.IdentificationDocumentUrl)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.CertificatesUrl)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.OtherSupportingDocumentsUrl)
+                .HasMaxLength(500);
+
             builder.Property(s => s.ProfilePictureUrl)
                 .HasMaxLength(500);
 

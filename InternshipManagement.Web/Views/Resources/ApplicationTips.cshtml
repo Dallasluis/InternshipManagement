@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Application Tips";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Application Tips</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> Application Tips</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Write a Good Application</h4>
+                    <ol>
+                        <li><strong>Read the instructions carefully:</strong> Follow all requirements and guidelines.</li>
+                        <li><strong>Research the company:</strong> Understand their mission, values, and what they do.</li>
+                        <li><strong>Tailor your application:</strong> Customize your CV and cover letter to the specific role.</li>
+                        <li><strong>Be authentic:</strong> Show who you are and what you can bring to the team.</li>
+                        <li><strong>Proofread:</strong> Check for spelling and grammar errors.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">What Employers Look For</h4>
+                    <ul>
+                        <li><strong>Relevant skills and experience:</strong> Match your experience to the role.</li>
+                        <li><strong>Enthusiasm and motivation:</strong> Show that you're genuinely interested.</li>
+                        <li><strong>Communication skills:</strong> Clear and professional writing.</li>
+                        <li><strong>Potential for growth:</strong> Employers want to invest in people who will grow with them.</li>
+                        <li><strong>Cultural fit:</strong> Will you fit into the team and company culture?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Common Mistakes to Avoid</h4>
+                    <ul>
+                        <li><strong>Not following instructions:</strong> Missing required documents or information.</li>
+                        <li><strong>Submitting generic applications:</strong> Sending the same application to everyone.</li>
+                        <li><strong>Being too long or too short:</strong> Keep it concise but comprehensive.</li>
+                        <li><strong>Not checking spelling and grammar:</strong> Careless errors can hurt your chances.</li>
+                        <li><strong>Not showing enthusiasm:</strong> Let them know you're excited about the opportunity.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipGuide" class="text-decoration-none">
+                                <i class="fas fa-book me-2"></i> Internship Guide
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipTips" class="text-decoration-none">
+                                <i class="fas fa-lightbulb me-2"></i> Internship Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CVTips" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i> CV & Resume Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InterviewTips" class="text-decoration-none">
+                                <i class="fas fa-handshake me-2"></i> Interview Tips
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

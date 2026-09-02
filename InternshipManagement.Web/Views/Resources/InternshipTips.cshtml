@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "Internship Tips";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Internship Tips</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> Internship Tips</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Before Your Internship -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Before Your Internship</h4>
+                    <ul>
+                        <li><strong>Research the company:</strong> Understand their mission, values, and culture.</li>
+                        <li><strong>Review the job description:</strong> Know what will be expected of you.</li>
+                        <li><strong>Prepare questions:</strong> Have questions ready for your first day.</li>
+                        <li><strong>Set goals:</strong> What do you want to learn and achieve?</li>
+                        <li><strong>Prepare professionally:</strong> Dress appropriately and be punctual.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- During Your Internship -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">During Your Internship</h4>
+                    <ul>
+                        <li><strong>Be proactive:</strong> Take initiative and ask for more work.</li>
+                        <li><strong>Ask questions:</strong> Don't be afraid to ask for help or clarification.</li>
+                        <li><strong>Build relationships:</strong> Connect with colleagues and mentors.</li>
+                        <li><strong>Seek feedback:</strong> Regularly ask for feedback to improve.</li>
+                        <li><strong>Document your work:</strong> Keep track of your achievements and projects.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- After Your Internship -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">After Your Internship</h4>
+                    <ul>
+                        <li><strong>Send a thank-you note:</strong> Express gratitude to your team and manager.</li>
+                        <li><strong>Ask for a reference:</strong> Request a letter of recommendation if appropriate.</li>
+                        <li><strong>Update your CV:</strong> Add your internship experience and skills.</li>
+                        <li><strong>Stay in touch:</strong> Maintain connections with your colleagues.</li>
+                        <li><strong>Reflect on your experience:</strong> What did you learn? What will you do differently?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipGuide" class="text-decoration-none">
+                                <i class="fas fa-book me-2"></i> Internship Guide
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CVTips" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i> CV & Resume Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="ApplicationTips" class="text-decoration-none">
+                                <i class="fas fa-pen-fancy me-2"></i> Application Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InterviewTips" class="text-decoration-none">
+                                <i class="fas fa-handshake me-2"></i> Interview Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CareerAdvice" class="text-decoration-none">
+                                <i class="fas fa-rocket me-2"></i> Career Advice
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

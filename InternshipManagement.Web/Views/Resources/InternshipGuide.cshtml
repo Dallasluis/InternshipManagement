@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "Internship Guide";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Internship Guide</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> Internship Guide</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">What is an Internship?</h4>
+                    <p>An internship is a professional learning experience that offers meaningful, practical work related to a student's field of study or career interest. It gives you the opportunity to:</p>
+                    <ul>
+                        <li>Apply academic knowledge to real-world situations</li>
+                        <li>Develop professional skills and competencies</li>
+                        <li>Build a network of professional contacts</li>
+                        <li>Explore career paths and industries</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Find an Internship</h4>
+                    <ol>
+                        <li><strong>Start early:</strong> Begin searching 3-6 months before you want to start.</li>
+                        <li><strong>Use multiple platforms:</strong> Check our platform, LinkedIn, company websites, and university career centers.</li>
+                        <li><strong>Network:</strong> Talk to professors, family, friends, and professionals in your field.</li>
+                        <li><strong>Customize your applications:</strong> Tailor your CV and cover letter to each role.</li>
+                        <li><strong>Be persistent:</strong> Don't get discouraged by rejections - keep applying!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Apply</h4>
+                    <ol>
+                        <li><strong>Research the company</strong> and understand what they do.</li>
+                        <li><strong>Tailor your application</strong> to the specific role and company.</li>
+                        <li><strong>Submit your CV, cover letter, and any other required documents.</strong></li>
+                        <li><strong>Follow up</strong> if you haven't heard back within the stated timeframe.</li>
+                        <li><strong>Prepare for interviews</strong> if you are selected.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">What to Expect</h4>
+                    <ul>
+                        <li><strong>Structured learning:</strong> Most internships include training and mentorship.</li>
+                        <li><strong>Meaningful work:</strong> You'll work on real projects that matter.</li>
+                        <li><strong>Feedback and evaluation:</strong> Regular feedback helps you grow.</li>
+                        <li><strong>Networking opportunities:</strong> Meet professionals in your field.</li>
+                        <li><strong>Possible job offer:</strong> Many companies hire their best interns.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipTips" class="text-decoration-none">
+                                <i class="fas fa-lightbulb me-2"></i> Internship Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CVTips" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i> CV & Resume Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="ApplicationTips" class="text-decoration-none">
+                                <i class="fas fa-pen-fancy me-2"></i> Application Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InterviewTips" class="text-decoration-none">
+                                <i class="fas fa-handshake me-2"></i> Interview Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CareerAdvice" class="text-decoration-none">
+                                <i class="fas fa-rocket me-2"></i> Career Advice
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

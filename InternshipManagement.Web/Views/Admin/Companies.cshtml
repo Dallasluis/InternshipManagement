@@ -113,14 +113,13 @@
         function verifyCompany(id, approved) {
             const action = approved ? 'approve' : 'reject';
             if (confirm(`Are you sure you want to ${action} this company?`)) {
-                fetch(`/api/admin/companies/${id}/verification`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ approved: approved, notes: '' })
-                })
-                    .then(response => {
-                        if (response.ok) {
+                fetch(`/Admin/VerifyCompany?id=${id}&approved=${approved}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                             location.reload();
+                        } else {
+                            alert('Failed to update verification status.');
                         }
                     })
                     .catch(error => {
@@ -131,9 +130,10 @@
 
         function suspendCompany(id) {
             if (confirm('Are you sure you want to suspend this company?')) {
-                fetch(`/api/admin/users/${id}/suspend?suspend=true`, { method: 'POST' })
-                    .then(response => {
-                        if (response.ok) {
+                fetch(`/Admin/SuspendCompany?companyId=${id}&suspend=true`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                             location.reload();
                         }
                     });
@@ -142,9 +142,10 @@
 
         function unsuspendCompany(id) {
             if (confirm('Are you sure you want to activate this company?')) {
-                fetch(`/api/admin/users/${id}/suspend?suspend=false`, { method: 'POST' })
-                    .then(response => {
-                        if (response.ok) {
+                fetch(`/Admin/SuspendCompany?companyId=${id}&suspend=false`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                             location.reload();
                         }
                     });

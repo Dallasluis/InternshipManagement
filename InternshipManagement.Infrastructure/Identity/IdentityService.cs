@@ -1,11 +1,14 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using InternshipManagement.Application.DTOs.Auth;
 using InternshipManagement.Application.Interfaces;
 using InternshipManagement.Infrastructure.Persistence;
 
@@ -276,6 +279,103 @@ namespace InternshipManagement.Infrastructure.Identity
             return await FindUserByIdAsync(userId);
         }
 
+        public async Task<List<IdentityUserDto>> GetAllUsersAsync()
+        {
+            return await _userManager.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new IdentityUserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    UserType = u.UserType,
+                    PhoneNumber = u.PhoneNumber,
+                    IsActive = u.IsActive,
+                    EmailConfirmed = u.EmailConfirmed,
+                    CreatedAt = u.CreatedAt,
+                    LastLoginAt = u.LastLoginAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> SetUserActiveStatusAsync(string userId, bool isActive)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsActive = isActive;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found" });
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<IdentityResult> ChangeEmailAsync(string userId, string currentPassword, string newEmail)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found" });
+            if (!await _userManager.CheckPasswordAsync(user, currentPassword))
+                return IdentityResult.Failure(new List<string> { "Current password is incorrect" });
+
+            var emailResult = await _userManager.SetEmailAsync(user, newEmail);
+            if (!emailResult.Succeeded)
+                return IdentityResult.Failure(emailResult.Errors.Select(e => e.Description).ToList());
+
+            var nameResult = await _userManager.SetUserNameAsync(user, newEmail);
+            return nameResult.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(nameResult.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null || string.IsNullOrWhiteSpace(user.AccountPreferencesJson))
+                return new AccountPreferencesDto();
+
+            return JsonSerializer.Deserialize<AccountPreferencesDto>(user.AccountPreferencesJson) ?? new AccountPreferencesDto();
+        }
+
+        public async Task<IdentityResult> UpdateAccountPreferencesAsync(string userId, AccountPreferencesDto preferences)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found" });
+
+            user.AccountPreferencesJson = JsonSerializer.Serialize(preferences);
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<IdentityResult> DeactivateAccountAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found" });
+
+            user.IsActive = false;
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+        }
+
         private IdentityUserDto MapToDto(ApplicationUser user)
         {
             return new IdentityUserDto
@@ -289,7 +389,9 @@ namespace InternshipManagement.Infrastructure.Identity
                 IsActive = user.IsActive,
                 EmailConfirmed = user.EmailConfirmed,
                 RefreshToken = user.RefreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime
+                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
+                CreatedAt = user.CreatedAt,
+                LastLoginAt = user.LastLoginAt
             };
         }
     }

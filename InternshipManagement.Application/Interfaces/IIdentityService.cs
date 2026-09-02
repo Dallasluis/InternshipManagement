@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using InternshipManagement.Application.DTOs.Auth;
 
 namespace InternshipManagement.Application.Interfaces
 {
@@ -25,6 +26,13 @@ namespace InternshipManagement.Application.Interfaces
         Task<bool> UpdateRefreshTokenAsync(string userId, string? refreshToken, DateTime? expiryTime);
         Task<ClaimsPrincipal> GetUserPrincipalAsync();
         Task<IdentityUserDto> GetCurrentUserAsync();
+        Task<List<IdentityUserDto>> GetAllUsersAsync();
+        Task<bool> SetUserActiveStatusAsync(string userId, bool isActive);
+        Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+        Task<IdentityResult> ChangeEmailAsync(string userId, string currentPassword, string newEmail);
+        Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId);
+        Task<IdentityResult> UpdateAccountPreferencesAsync(string userId, AccountPreferencesDto preferences);
+        Task<IdentityResult> DeactivateAccountAsync(string userId);
     }
 
     public class IdentityResult
@@ -67,5 +75,7 @@ namespace InternshipManagement.Application.Interfaces
         public bool EmailConfirmed { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? LastLoginAt { get; set; }
     }
 }

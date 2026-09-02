@@ -13,6 +13,19 @@
                 <form asp-controller="Company" asp-action="EditInternship" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Industry" />
+                    <input type="hidden" asp-for="Location" />
+                    <input type="hidden" asp-for="IsRemote" />
+                    <input type="hidden" asp-for="InternshipType" />
+                    <input type="hidden" asp-for="Duration" />
+                    <input type="hidden" asp-for="StartDate" />
+                    <input type="hidden" asp-for="EndDate" />
+                    <input type="hidden" asp-for="ApplicationDeadline" />
+                    <input type="hidden" asp-for="NumberOfPositions" />
+                    <input type="hidden" asp-for="Compensation" />
+                    <input type="hidden" asp-for="StipendAmount" />
+                    <input type="hidden" asp-for="Currency" />
+                    <input type="hidden" asp-for="Skills" />
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <!-- Same fields as CreateInternship.cshtml -->

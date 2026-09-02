@@ -15,6 +15,12 @@
         public string? YearOfStudy { get; set; }
         public string? ExpectedGraduationYear { get; set; }
         public string? ResumeUrl { get; set; }
+        public string? CoverLetterUrl { get; set; }
+        public string? AcademicTranscriptUrl { get; set; }
+        public string? QualificationDocumentUrl { get; set; }
+        public string? IdentificationDocumentUrl { get; set; }
+        public string? CertificatesUrl { get; set; }
+        public string? OtherSupportingDocumentsUrl { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public List<EducationDto>? Education { get; set; }
         public List<WorkExperienceDto>? WorkExperience { get; set; }

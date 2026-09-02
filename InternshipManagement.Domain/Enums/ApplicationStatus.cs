@@ -5,10 +5,14 @@
         Applied,
         UnderReview,
         Shortlisted,
+        InterviewScheduled,
+        InterviewCompleted,
+        OfferMade,
+        Accepted,
+        OfferDeclined,
         Rejected,
         Withdrawn,
-        WithdrawnAcceptedElsewhere
-        // Note: InterviewScheduled, InterviewCompleted, OfferMade, 
-        // OfferAccepted, OfferDeclined, Placed - Deferred to later releases
+        WithdrawnAcceptedElsewhere,
+        Declined
     }
 }

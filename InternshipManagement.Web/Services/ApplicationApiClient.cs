@@ -26,14 +26,19 @@ namespace InternshipManagement.Web.Services
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ApplicationResponse>();
 
-            return null;
+            var error = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(error)
+                ? $"The API returned {(int)response.StatusCode} ({response.ReasonPhrase})."
+                : error);
         }
 
         public async Task<List<ApplicationResponse>> GetStudentApplicationsAsync(string token, int studentId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Applications/student?studentId={studentId}");
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.GetAsync("api/Applications/student");
+            if (!response.IsSuccessStatusCode)
+                return new List<ApplicationResponse>();
+
             return await response.Content.ReadFromJsonAsync<List<ApplicationResponse>>() ?? new List<ApplicationResponse>();
         }
 
@@ -67,6 +72,34 @@ namespace InternshipManagement.Web.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<bool> ScheduleInterviewAsync(string token, int id, ScheduleInterviewRequest request)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PostAsJsonAsync($"api/Applications/{id}/schedule-interview", request);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> MarkInterviewCompletedAsync(string token, int id)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PostAsync($"api/Applications/{id}/mark-interview-completed", null);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> MakeOfferAsync(string token, int id, MakeOfferRequest request)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PostAsJsonAsync($"api/Applications/{id}/make-offer", request);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> RespondToOfferAsync(string token, int id, RespondToOfferRequest request)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PostAsJsonAsync($"api/Applications/{id}/respond-to-offer", request);
+            return response.IsSuccessStatusCode;
+        }
+
         public async Task<bool> WithdrawAsync(string token, int id)
         {
             AddAuthorization(token);
@@ -85,24 +118,30 @@ namespace InternshipManagement.Web.Services
         public async Task<StudentStatsResponse?> GetStudentStatsAsync(string token, int studentId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Applications/student/stats?studentId={studentId}");
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.GetAsync("api/Applications/student/stats");
+            if (!response.IsSuccessStatusCode)
+                return new StudentStatsResponse();
+
             return await response.Content.ReadFromJsonAsync<StudentStatsResponse>();
         }
 
         public async Task<CompanyStatsResponse?> GetCompanyStatsAsync(string token, int userId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Applications/company/stats?userId={userId}");
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.GetAsync("api/Applications/company/stats");
+            if (!response.IsSuccessStatusCode)
+                return new CompanyStatsResponse();
+
             return await response.Content.ReadFromJsonAsync<CompanyStatsResponse>();
         }
 
         public async Task<List<ApplicationResponse>> GetCompanyApplicationsAsync(string token, int userId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Applications/company?userId={userId}");
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.GetAsync("api/Applications/company");
+            if (!response.IsSuccessStatusCode)
+                return new List<ApplicationResponse>();
+
             return await response.Content.ReadFromJsonAsync<List<ApplicationResponse>>() ?? new List<ApplicationResponse>();
         }
     }

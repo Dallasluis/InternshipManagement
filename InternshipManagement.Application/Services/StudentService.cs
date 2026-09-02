@@ -44,6 +44,13 @@ namespace InternshipManagement.Application.Services
             profile.Programme = request.Programme ?? profile.Programme;
             profile.YearOfStudy = request.YearOfStudy ?? profile.YearOfStudy;
             profile.ExpectedGraduationYear = request.ExpectedGraduationYear ?? profile.ExpectedGraduationYear;
+            profile.ResumeUrl = request.ResumeUrl ?? profile.ResumeUrl;
+            profile.CoverLetterUrl = request.CoverLetterUrl ?? profile.CoverLetterUrl;
+            profile.AcademicTranscriptUrl = request.AcademicTranscriptUrl ?? profile.AcademicTranscriptUrl;
+            profile.QualificationDocumentUrl = request.QualificationDocumentUrl ?? profile.QualificationDocumentUrl;
+            profile.IdentificationDocumentUrl = request.IdentificationDocumentUrl ?? profile.IdentificationDocumentUrl;
+            profile.CertificatesUrl = request.CertificatesUrl ?? profile.CertificatesUrl;
+            profile.OtherSupportingDocumentsUrl = request.OtherSupportingDocumentsUrl ?? profile.OtherSupportingDocumentsUrl;
             profile.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -257,6 +264,12 @@ namespace InternshipManagement.Application.Services
                 YearOfStudy = profile.YearOfStudy,
                 ExpectedGraduationYear = profile.ExpectedGraduationYear,
                 ResumeUrl = profile.ResumeUrl,
+                CoverLetterUrl = profile.CoverLetterUrl,
+                AcademicTranscriptUrl = profile.AcademicTranscriptUrl,
+                QualificationDocumentUrl = profile.QualificationDocumentUrl,
+                IdentificationDocumentUrl = profile.IdentificationDocumentUrl,
+                CertificatesUrl = profile.CertificatesUrl,
+                OtherSupportingDocumentsUrl = profile.OtherSupportingDocumentsUrl,
                 ProfilePictureUrl = profile.ProfilePictureUrl,
                 Education = profile.Education?.Select(e => new EducationDto
                 {

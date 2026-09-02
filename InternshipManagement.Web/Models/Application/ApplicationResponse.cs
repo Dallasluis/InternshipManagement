@@ -11,6 +11,14 @@
         public DateTime? StatusUpdatedAt { get; set; }
         public string? CoverLetter { get; set; }
         public bool IsShortlisted { get; set; }
+        public DateTime? InterviewDateTime { get; set; }
+        public string? InterviewType { get; set; }
+        public string? InterviewLocationOrLink { get; set; }
+        public string? InterviewNotes { get; set; }
+        public decimal? OfferStipendAmount { get; set; }
+        public DateTime? OfferStartDate { get; set; }
+        public string? OfferDetails { get; set; }
+        public DateTime? OfferExpiryDate { get; set; }
         public StudentInfo? Student { get; set; }
     }
 

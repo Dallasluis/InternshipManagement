@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Interview Tips";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Interview Tips</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> Interview Tips</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Prepare for an Interview</h4>
+                    <ol>
+                        <li><strong>Research the company:</strong> Understand their products, services, and culture.</li>
+                        <li><strong>Review the job description:</strong> Know what they're looking for.</li>
+                        <li><strong>Practice common questions:</strong> Prepare answers for typical interview questions.</li>
+                        <li><strong>Prepare your questions:</strong> Have questions to ask the interviewer.</li>
+                        <li><strong>Dress appropriately:</strong> Dress professionally for the interview.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Common Interview Questions</h4>
+                    <ul>
+                        <li><strong>Tell me about yourself:</strong> A brief overview of your background and interests.</li>
+                        <li><strong>Why do you want to work here?</strong> Show your enthusiasm for the company.</li>
+                        <li><strong>What are your strengths and weaknesses?</strong> Be honest but positive.</li>
+                        <li><strong>Tell me about a time you faced a challenge:</strong> Describe a situation and how you handled it.</li>
+                        <li><strong>Where do you see yourself in 5 years?</strong> Show ambition and realistic goals.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Present Yourself</h4>
+                    <ul>
+                        <li><strong>Be confident:</strong> Believe in yourself and your abilities.</li>
+                        <li><strong>Be professional:</strong> Use professional language and body language.</li>
+                        <li><strong>Be positive:</strong> Focus on what you can do, not what you can't.</li>
+                        <li><strong>Be engaged:</strong> Listen carefully and respond thoughtfully.</li>
+                        <li><strong>Follow up:</strong> Send a thank-you note after the interview.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipGuide" class="text-decoration-none">
+                                <i class="fas fa-book me-2"></i> Internship Guide
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipTips" class="text-decoration-none">
+                                <i class="fas fa-lightbulb me-2"></i> Internship Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="CVTips" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-2"></i> CV & Resume Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="ApplicationTips" class="text-decoration-none">
+                                <i class="fas fa-pen-fancy me-2"></i> Application Tips
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

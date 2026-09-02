@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 // HTTP Client for API communication
 builder.Services.AddHttpClient("InternshipApi", client =>
 {
-    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5001/";
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5003/";
     client.BaseAddress = new Uri(baseUrl);
 });
 

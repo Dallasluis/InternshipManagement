@@ -146,6 +146,83 @@ namespace InternshipManagement.Application.Services
             return true;
         }
 
+        public async Task<bool> ScheduleInterviewAsync(int applicationId, ScheduleInterviewRequest request)
+        {
+            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.Shortlisted)
+                throw new Exception("Only shortlisted applications can be scheduled for interview.");
+
+            application.InterviewDateTime = request.InterviewDateTime;
+            application.InterviewType = request.InterviewType;
+            application.InterviewLocationOrLink = request.InterviewLocationOrLink;
+            application.InterviewNotes = request.InterviewNotes;
+            application.Status = ApplicationStatus.InterviewScheduled;
+            application.StatusUpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> MarkInterviewCompletedAsync(int applicationId)
+        {
+            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.InterviewScheduled)
+                throw new Exception("Only scheduled interviews can be marked as completed.");
+
+            application.Status = ApplicationStatus.InterviewCompleted;
+            application.StatusUpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> MakeOfferAsync(int applicationId, MakeOfferRequest request)
+        {
+            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.InterviewCompleted)
+                throw new Exception("Only interview-completed candidates can receive an offer.");
+
+            application.OfferStipendAmount = request.StipendAmount;
+            application.OfferStartDate = request.StartDate;
+            application.OfferDetails = request.OfferDetails;
+            application.OfferExpiryDate = request.ExpiryDate;
+            application.Status = ApplicationStatus.OfferMade;
+            application.StatusUpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RespondToOfferAsync(int applicationId, bool accepted)
+        {
+            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.OfferMade)
+                throw new Exception("Only offered candidates can accept or decline the offer.");
+
+            if (accepted)
+            {
+                application.Status = ApplicationStatus.Accepted;
+                application.OfferAcceptedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                application.Status = ApplicationStatus.OfferDeclined;
+                application.OfferDeclinedAt = DateTime.UtcNow;
+            }
+
+            application.StatusUpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> WithdrawApplicationAsync(int applicationId)
         {
             var application = await _context.InternshipApplications.FindAsync(applicationId);
@@ -189,7 +266,17 @@ namespace InternshipManagement.Application.Services
                                              newStatus == ApplicationStatus.Withdrawn,
                 ApplicationStatus.UnderReview => newStatus == ApplicationStatus.Shortlisted ||
                                                  newStatus == ApplicationStatus.Rejected,
-                ApplicationStatus.Shortlisted => newStatus == ApplicationStatus.Rejected,
+                ApplicationStatus.Shortlisted => newStatus == ApplicationStatus.InterviewScheduled ||
+                                                 newStatus == ApplicationStatus.Rejected,
+                ApplicationStatus.InterviewScheduled => newStatus == ApplicationStatus.InterviewCompleted ||
+                                                        newStatus == ApplicationStatus.Rejected,
+                ApplicationStatus.InterviewCompleted => newStatus == ApplicationStatus.OfferMade ||
+                                                        newStatus == ApplicationStatus.Rejected,
+                ApplicationStatus.OfferMade => newStatus == ApplicationStatus.Accepted ||
+                                              newStatus == ApplicationStatus.OfferDeclined ||
+                                              newStatus == ApplicationStatus.Rejected,
+                ApplicationStatus.Accepted => false,
+                ApplicationStatus.OfferDeclined => false,
                 ApplicationStatus.Rejected => false,
                 ApplicationStatus.Withdrawn => false,
                 _ => false
@@ -210,6 +297,14 @@ namespace InternshipManagement.Application.Services
                 StatusUpdatedAt = application.StatusUpdatedAt,
                 CoverLetter = application.CoverLetter,
                 IsShortlisted = application.IsShortlisted,
+                InterviewDateTime = application.InterviewDateTime,
+                InterviewType = application.InterviewType,
+                InterviewLocationOrLink = application.InterviewLocationOrLink,
+                InterviewNotes = application.InterviewNotes,
+                OfferStipendAmount = application.OfferStipendAmount,
+                OfferStartDate = application.OfferStartDate,
+                OfferDetails = application.OfferDetails,
+                OfferExpiryDate = application.OfferExpiryDate,
                 Student = application.StudentProfile != null ? new StudentInfo
                 {
                     StudentProfileId = application.StudentProfile.Id,

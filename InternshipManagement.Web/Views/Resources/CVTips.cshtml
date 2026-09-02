@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "CV & Resume Tips";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
+            <li class="breadcrumb-item active" aria-current="page">CV & Resume Tips</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-5 fw-bold mb-4"> CV & Resume Tips</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">What to Include in Your CV</h4>
+                    <ul>
+                        <li><strong>Contact Information:</strong> Name, email, phone number, LinkedIn profile, location</li>
+                        <li><strong>Professional Summary:</strong> A brief overview of who you are and what you're looking for</li>
+                        <li><strong>Education:</strong> University, degree, expected graduation, relevant coursework</li>
+                        <li><strong>Work Experience:</strong> Previous jobs, internships, volunteer work (with dates and descriptions)</li>
+                        <li><strong>Projects:</strong> Academic, personal, or professional projects</li>
+                        <li><strong>Skills:</strong> Technical skills, languages, certifications, etc.</li>
+                        <li><strong>Awards & Achievements:</strong> Any recognition or accomplishments</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">How to Structure Your CV</h4>
+                    <ol>
+                        <li><strong>Header:</strong> Name and contact information at the top</li>
+                        <li><strong>Summary:</strong> A short paragraph about your goals and strengths</li>
+                        <li><strong>Education:</strong> List your degrees and coursework</li>
+                        <li><strong>Experience:</strong> Reverse chronological order (most recent first)</li>
+                        <li><strong>Skills:</strong> Bulleted list of skills relevant to the role</li>
+                        <li><strong>Optional sections:</strong> Projects, volunteer work, certifications, languages, etc.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">Common Mistakes to Avoid</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            <strong>Typos and grammar errors:</strong> Always proofread!
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            <strong>Using a generic CV:</strong> Customize it for each job.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            <strong>Being too vague:</strong> Use specific examples and numbers when possible.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            <strong>Including irrelevant information:</strong> Focus on what's relevant to the role.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            <strong>Using an unprofessional email address:</strong> Use a professional email format.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipGuide" class="text-decoration-none">
+                                <i class="fas fa-book me-2"></i> Internship Guide
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InternshipTips" class="text-decoration-none">
+                                <i class="fas fa-lightbulb me-2"></i> Internship Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="ApplicationTips" class="text-decoration-none">
+                                <i class="fas fa-pen-fancy me-2"></i> Application Tips
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a asp-controller="Resources" asp-action="InterviewTips" class="text-decoration-none">
+                                <i class="fas fa-handshake me-2"></i> Interview Tips
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

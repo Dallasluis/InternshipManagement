@@ -1,98 +1,66 @@
-﻿@{
+@{
     var userFullName = Context.Session.GetString("UserFullName");
     var userType = Context.Session.GetString("UserType");
 }
 
-@if (!string.IsNullOrEmpty(userFullName))
-{
-    <aside class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: calc(100vh - 72px);">
-        <div class="position-sticky pt-3">
-            <div class="d-flex align-items-center mb-4 px-3">
-                <div class="avatar-circle me-2">@userFullName.FirstOrDefault()</div>
-                <div>
-                    <div class="fw-bold">@userFullName</div>
-                    <small class="text-muted">@userType</small>
-                </div>
-            </div>
-            <hr />
-            @if (userType == "Student")
-            {
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
-                           asp-controller="Student" asp-action="Dashboard">
-                            <i class="fas fa-chart-pie me-2"></i> Dashboard
-                        </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand text-primary" asp-controller="Home" asp-action="Index">
+            <i class="fas fa-briefcase me-2"></i>InternshipHub
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Resources" asp-action="Index">Resources</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="AboutUs">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Internships" asp-action="Index">Internships</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                @if (!string.IsNullOrEmpty(userFullName))
+                {
+                    <li class="nav-item me-lg-3">
+                        <span class="navbar-text">
+                            @userFullName
+                            @if (!string.IsNullOrEmpty(userType))
+                            {
+                                <small class="text-muted">(@userType)</small>
+                            }
+                        </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Student" asp-action="Profile">
-                            <i class="fas fa-user me-2"></i> My Profile
-                        </a>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </form>
                     </li>
+                }
+                else
+                {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Student" asp-action="Applications">
-                            <i class="fas fa-file-alt me-2"></i> My Applications
-                        </a>
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
                     </li>
-                </ul>
-            }
-            else if (userType == "Company")
-            {
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
-                           asp-controller="Company" asp-action="Dashboard">
-                            <i class="fas fa-chart-pie me-2"></i> Dashboard
-                        </a>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Register">Register</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Company" asp-action="Profile">
-                            <i class="fas fa-building me-2"></i> Company Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Company" asp-action="ManageInternships">
-                            <i class="fas fa-briefcase me-2"></i> My Internships
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Company" asp-action="CreateInternship">
-                            <i class="fas fa-plus me-2"></i> Post New Internship
-                        </a>
-                    </li>
-                </ul>
-            }
-            else if (userType == "Admin")
-            {
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
-                           asp-controller="Admin" asp-action="Dashboard">
-                            <i class="fas fa-chart-pie me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Companies">
-                            <i class="fas fa-building me-2"></i> Companies
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Internships">
-                            <i class="fas fa-briefcase me-2"></i> Internships
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Reports">
-                            <i class="fas fa-flag me-2"></i> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Users">
-                            <i class="fas fa-users me-2"></i> Users
-                        </a>
-                    </li>
-                </ul>
-            }
+                }
+            </ul>
         </div>
-    </aside>
-}
+    </div>
+</nav>

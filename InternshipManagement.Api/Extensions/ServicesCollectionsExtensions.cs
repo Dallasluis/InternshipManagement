@@ -99,6 +99,7 @@ namespace InternshipManagement.Api.Extensions
             services.AddScoped<IApplicationService, ApplicationService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<IAdminService, AdminService>();
 
             return services;
         }

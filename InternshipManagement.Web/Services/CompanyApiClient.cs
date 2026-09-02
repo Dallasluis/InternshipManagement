@@ -21,7 +21,7 @@ namespace InternshipManagement.Web.Services
         public async Task<CompanyProfileResponse?> GetProfileAsync(string token, int userId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.GetAsync($"api/Company/profile?userId={userId}");
+            var response = await _httpClient.GetAsync($"api/Companies/profile?userId={userId}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<CompanyProfileResponse>();
@@ -32,7 +32,7 @@ namespace InternshipManagement.Web.Services
         public async Task<CompanyProfileResponse?> UpdateProfileAsync(string token, int userId, UpdateCompanyProfileRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PutAsJsonAsync($"api/Company/profile?userId={userId}", request);
+            var response = await _httpClient.PutAsJsonAsync($"api/Companies/profile?userId={userId}", request);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<CompanyProfileResponse>();
@@ -43,8 +43,24 @@ namespace InternshipManagement.Web.Services
         public async Task<bool> SubmitVerificationAsync(string token, int userId, SubmitVerificationRequest request)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/Company/verification?userId={userId}", request);
+            var response = await _httpClient.PostAsJsonAsync($"api/Companies/verification?userId={userId}", request);
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<CompanyStatsResponse?> GetCompanyStatsAsync(string token, int userId)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.GetAsync($"api/Applications/company/stats?userId={userId}");
+            
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<CompanyStatsResponse>();
+            
+            return new CompanyStatsResponse { 
+                TotalInternships = 0, 
+                ActiveInternships = 0, 
+                TotalApplications = 0, 
+                ShortlistedCount = 0 
+            };
         }
     }
 }

@@ -87,5 +87,81 @@ namespace InternshipManagement.Web.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Settings()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction(nameof(Login));
+
+            ViewData["Title"] = "Settings";
+            return View(new AccountSettingsViewModel
+            {
+                UserFullName = HttpContext.Session.GetString("UserFullName"),
+                UserEmail = HttpContext.Session.GetString("UserEmail"),
+                UserType = HttpContext.Session.GetString("UserType"),
+                Preferences = await _authApiClient.GetPreferencesAsync(token) ?? new AccountPreferencesViewModel()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (model.NewPassword != model.ConfirmPassword)
+                ModelState.AddModelError(nameof(model.ConfirmPassword), "Passwords do not match.");
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(Settings));
+
+            var result = await _authApiClient.ChangePasswordAsync(HttpContext.Session.GetString("JwtToken") ?? string.Empty, model);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success
+                ? "Password changed successfully."
+                : string.Join(" ", result.Errors ?? new List<string> { "Unable to change password." });
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+        {
+            var result = await _authApiClient.ChangeEmailAsync(HttpContext.Session.GetString("JwtToken") ?? string.Empty, model);
+            if (result.Success)
+            {
+                HttpContext.Session.Clear();
+                TempData["StatusMessage"] = "Email changed successfully. Please log in again.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["ErrorMessage"] = string.Join(" ", result.Errors ?? new List<string> { "Unable to change email." });
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePreferences(AccountPreferencesViewModel model)
+        {
+            var result = await _authApiClient.UpdatePreferencesAsync(HttpContext.Session.GetString("JwtToken") ?? string.Empty, model);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success
+                ? "Preferences saved successfully."
+                : string.Join(" ", result.Errors ?? new List<string> { "Unable to save preferences." });
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Deactivate()
+        {
+            var result = await _authApiClient.DeactivateAsync(HttpContext.Session.GetString("JwtToken") ?? string.Empty);
+            if (result.Success)
+            {
+                HttpContext.Session.Clear();
+                TempData["StatusMessage"] = "Your account has been deactivated.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["ErrorMessage"] = "Unable to deactivate your account.";
+            return RedirectToAction(nameof(Settings));
+        }
     }
 }

@@ -22,5 +22,17 @@ namespace InternshipManagement.Domain.Entities
         public bool IsShortlisted { get; set; }
         public DateTime? ShortlistedAt { get; set; }
         public string? ShortlistNotes { get; set; }
+
+        public DateTime? InterviewDateTime { get; set; }
+        public string? InterviewType { get; set; }
+        public string? InterviewLocationOrLink { get; set; }
+        public string? InterviewNotes { get; set; }
+
+        public decimal? OfferStipendAmount { get; set; }
+        public DateTime? OfferStartDate { get; set; }
+        public string? OfferDetails { get; set; }
+        public DateTime? OfferExpiryDate { get; set; }
+        public DateTime? OfferAcceptedAt { get; set; }
+        public DateTime? OfferDeclinedAt { get; set; }
     }
 }

@@ -1,0 +1,96 @@
+@model InternshipManagement.Web.Models.Auth.AccountSettingsViewModel
+
+<div class="mb-4">
+    <h1 class="h2 mb-1">Settings</h1>
+    <p class="text-muted">Manage your account information and preferences.</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Account Information</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@Model.UserFullName</dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.UserEmail</dd>
+                    <dt class="col-sm-4">Role</dt>
+                    <dd class="col-sm-8">@Model.UserType</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Change Password</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="ChangePassword" method="post">
+                    @Html.AntiForgeryToken()
+                    <input name="CurrentPassword" type="password" class="form-control mb-2" placeholder="Current password" required />
+                    <input name="NewPassword" type="password" class="form-control mb-2" placeholder="New password" minlength="8" required />
+                    <input name="ConfirmPassword" type="password" class="form-control mb-3" placeholder="Confirm new password" minlength="8" required />
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Change Email</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="ChangeEmail" method="post">
+                    @Html.AntiForgeryToken()
+                    <input name="NewEmail" type="email" class="form-control mb-2" placeholder="New email address" required />
+                    <input name="CurrentPassword" type="password" class="form-control mb-3" placeholder="Current password" required />
+                    <button type="submit" class="btn btn-primary">Change Email</button>
+                </form>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Account Preferences</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdatePreferences" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-check mb-2">
+                        <input name="EmailNotifications" value="true" class="form-check-input" type="checkbox" checked="@Model.Preferences.EmailNotifications" />
+                        <label class="form-check-label">Email notifications</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input name="InternshipAlerts" value="true" class="form-check-input" type="checkbox" checked="@Model.Preferences.InternshipAlerts" />
+                        <label class="form-check-label">Internship alerts</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-danger mt-4">
+    <div class="card-body d-flex justify-content-between align-items-center gap-3">
+        <div>
+            <h6 class="text-danger mb-1">Deactivate Account</h6>
+            <p class="text-muted small mb-0">You will be signed out and will not be able to log in until your account is reactivated.</p>
+        </div>
+        <form asp-action="Deactivate" method="post" onsubmit="return confirm('Deactivate your account?');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">Deactivate</button>
+        </form>
+    </div>
+</div>

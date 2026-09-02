@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\InternshipManagement.Infrastructure\\bin",
+    "\\InternshipManagement.Infrastructure\\Migrations",
+    "\\InternshipManagement.Web",
+    "\\InternshipManagement.Web\\Views",
+    "\\InternshipManagement.Web\\Views\\Resources"
+  ],
+  "SelectedNode": "\\InternshipManagement.Web\\Views\\Resources",
+  "PreviewInSolutionExplorer": false
+}

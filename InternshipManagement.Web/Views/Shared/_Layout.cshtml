@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isAuthenticated = !string.IsNullOrEmpty(Context.Session.GetString("JwtToken"));
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,10 +15,13 @@
 </head>
 <body>
     <div class="d-flex flex-column min-vh-100">
-        <partial name="_Navbar" />
+        @if (!isAuthenticated)
+        {
+            <partial name="_Navbar" />
+        }
         <div class="container-fluid flex-grow-1">
             <div class="row">
-                @if (!string.IsNullOrEmpty(Context.Session.GetString("UserFullName")))
+                @if (isAuthenticated)
                 {
                     <partial name="_Sidebar" />
                     <main class="col-md-9 col-lg-10 px-4 py-3">

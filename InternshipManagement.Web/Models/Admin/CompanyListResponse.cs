@@ -3,6 +3,7 @@
     public class CompanyListResponse
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
         public string CompanyName { get; set; } = string.Empty;
         public string Industry { get; set; } = string.Empty;
         public string VerificationStatus { get; set; } = string.Empty;

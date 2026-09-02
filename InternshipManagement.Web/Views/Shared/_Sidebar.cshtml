@@ -5,7 +5,7 @@
 
 @if (!string.IsNullOrEmpty(userFullName))
 {
-    <aside class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: calc(100vh - 72px);">
+    <aside class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: 100vh;">
         <div class="position-sticky pt-3">
             <div class="d-flex align-items-center mb-4 px-3">
                 <div class="avatar-circle me-2">@userFullName.FirstOrDefault()</div>
@@ -30,8 +30,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Internships" asp-action="Index">
+                            <i class="fas fa-search me-2"></i> Browse Internships
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Student" asp-action="Applications">
                             <i class="fas fa-file-alt me-2"></i> My Applications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Settings">
+                            <i class="fas fa-cog me-2"></i> Settings
                         </a>
                     </li>
                 </ul>
@@ -51,13 +61,23 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Company" asp-action="CreateInternship">
+                            <i class="fas fa-plus me-2"></i> Post Internship
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Company" asp-action="ManageInternships">
                             <i class="fas fa-briefcase me-2"></i> My Internships
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Company" asp-action="CreateInternship">
-                            <i class="fas fa-plus me-2"></i> Post New Internship
+                        <a class="nav-link" asp-controller="Company" asp-action="Applications">
+                            <i class="fas fa-users me-2"></i> Applications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Settings">
+                            <i class="fas fa-cog me-2"></i> Settings
                         </a>
                     </li>
                 </ul>
@@ -72,6 +92,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Users">
+                            <i class="fas fa-user-graduate me-2"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="Companies">
                             <i class="fas fa-building me-2"></i> Companies
                         </a>
@@ -83,16 +108,28 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="Reports">
-                            <i class="fas fa-flag me-2"></i> Reports
+                            <i class="fas fa-file-alt me-2"></i> Applications
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Users">
-                            <i class="fas fa-users me-2"></i> Users
+                        <a class="nav-link" asp-controller="Admin" asp-action="Companies">
+                            <i class="fas fa-user-check me-2"></i> Company Verification
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Settings">
+                            <i class="fas fa-cog me-2"></i> Settings
                         </a>
                     </li>
                 </ul>
             }
+            <hr />
+            <form asp-controller="Account" asp-action="Logout" method="post" class="px-3 mt-4">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </button>
+            </form>
         </div>
     </aside>
 }

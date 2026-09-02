@@ -10,6 +10,22 @@
     </div>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 @if (!Model.Any())
 {
     <div class="text-center py-5">
@@ -60,22 +76,37 @@ else
                                     </span>
                                 </td>
                                 <td>
-                                    <a asp-controller="Company" asp-action="ApplicationReview" asp-route-id="@app.Id"
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    @if (app.Status == "Applied" || app.Status == "UnderReview")
-                                    {
-                                        <button class="btn btn-sm btn-success" onclick="shortlistApplication(@app.Id)">
-                                            <i class="fas fa-star"></i>
-                                        </button>
-                                    }
-                                    @if (app.Status != "Rejected" && app.Status != "Withdrawn")
-                                    {
-                                        <button class="btn btn-sm btn-outline-danger" onclick="rejectApplication(@app.Id)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    }
+                                    <div class="btn-group" role="group">
+                                        <!-- View Details -->
+                                        <a asp-controller="Company" asp-action="ApplicationReview" asp-route-id="@app.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <!-- Shortlist (only for Applied or UnderReview) -->
+                                        @if (app.Status == "Applied" || app.Status == "UnderReview")
+                                        {
+                                            <form asp-controller="Company" asp-action="ShortlistApplication" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@app.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Shortlist this applicant?')">
+                                                    <i class="fas fa-star"></i>
+                                                </button>
+                                            </form>
+                                        }
+
+                                        <!-- Reject (only if not already rejected/withdrawn) -->
+                                        @if (app.Status != "Rejected" && app.Status != "Withdrawn")
+                                        {
+                                            <form asp-controller="Company" asp-action="RejectApplication" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@app.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Reject this application?')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -97,46 +128,6 @@ else
         "WithdrawnAcceptedElsewhere" => "bg-secondary",
         _ => "bg-secondary"
     };
-}
-
-@section Scripts {
-    <script>
-        function shortlistApplication(id) {
-            if (confirm('Shortlist this applicant?')) {
-                fetch(`/api/applications/${id}/shortlist`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ notes: '' })
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                        }
-                    })
-                    .catch(error => {
-                        alert('Failed to shortlist. Please try again.');
-                    });
-            }
-        }
-
-        function rejectApplication(id) {
-            if (confirm('Reject this application?')) {
-                fetch(`/api/applications/${id}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'Rejected', notes: '' })
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                        }
-                    })
-                    .catch(error => {
-                        alert('Failed to reject. Please try again.');
-                    });
-            }
-        }
-    </script>
 }
 
 <style>

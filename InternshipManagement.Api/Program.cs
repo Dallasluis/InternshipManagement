@@ -3,6 +3,7 @@ using InternshipManagement.Api.Middleware;
 using InternshipManagement.Infrastructure.Identity;
 using InternshipManagement.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        await dbContext.Database.MigrateAsync();
         await SeedDatabaseAsync(services);
     }
     catch (Exception ex)
