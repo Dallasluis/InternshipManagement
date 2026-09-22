@@ -12,177 +12,177 @@ build_property.EntryPointFilePath =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = InternshipManagement.Web
 build_property.RootNamespace = InternshipManagement.Web
-build_property.ProjectDir = C:\Users\Lenovo\Downloads\InternshipManagement-fixed\InternshipManagement\InternshipManagement.Web\
+build_property.ProjectDir = C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Web\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Lenovo\Downloads\InternshipManagement-fixed\InternshipManagement\InternshipManagement.Web
+build_property.MSBuildProjectDirectory = C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Web
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Account/Login.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Account/Register.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Account/Settings.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Account/Settings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTZXR0aW5ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/Companies.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/Companies.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ29tcGFuaWVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/CompanyDetails.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/CompanyDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ29tcGFueURldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/Dashboard.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/Internships.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/Internships.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW50ZXJuc2hpcHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/Reports.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/Reports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmVwb3J0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Admin/Users.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Admin/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/Application.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/Application.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxBcHBsaWNhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/ApplicationReview.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/ApplicationReview.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxBcHBsaWNhdGlvblJldmlldy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/CreateInternship.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/CreateInternship.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxDcmVhdGVJbnRlcm5zaGlwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/Dashboard.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxEYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/EditInternship.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/EditInternship.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxFZGl0SW50ZXJuc2hpcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/ManageInternships.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/ManageInternships.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxNYW5hZ2VJbnRlcm5zaGlwcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/Profile.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Company/Verification.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Company/Verification.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxWZXJpZmljYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Home/AboutUs.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Home/AboutUs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBYm91dFVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Home/Index.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Home/Privacy.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Internships/Details.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Internships/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW50ZXJuc2hpcHNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Internships/Index.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Internships/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW50ZXJuc2hpcHNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/ApplicationTips.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/ApplicationTips.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXEFwcGxpY2F0aW9uVGlwcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/CareerAdvice.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/CareerAdvice.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXENhcmVlckFkdmljZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/CVTips.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/CVTips.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXENWVGlwcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/Index.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/InternshipGuide.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/InternshipGuide.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXEludGVybnNoaXBHdWlkZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/InternshipTips.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/InternshipTips.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXEludGVybnNoaXBUaXBzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Resources/InterviewTips.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Resources/InterviewTips.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzb3VyY2VzXEludGVydmlld1RpcHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/Error.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/_Footer.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/_Footer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/_Navbar.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/_Navbar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9OYXZiYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/_Sidebar.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/_Sidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Student/ApplicationDetails.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Student/ApplicationDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFxBcHBsaWNhdGlvbkRldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Student/Applications.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Student/Applications.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFxBcHBsaWNhdGlvbnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Student/Dashboard.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Student/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFxEYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Student/Profile.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Student/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/_ViewImports.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/_ViewStart.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Lenovo/Downloads/InternshipManagement-fixed/InternshipManagement/InternshipManagement.Web/Views/Shared/_Layout.cshtml]
+[C:/Users/Lenovo/source/repos/Dallasluis/InternshipManagement/InternshipManagement.Web/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-33tzj4dg8d

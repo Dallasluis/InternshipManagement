@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jvPMsKz8UCg=",
+  "dgSpecHash": "XYrgYHT4Q4U=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Lenovo\\Downloads\\InternshipManagement-fixed\\InternshipManagement\\InternshipManagement.UnitTests\\InternshipManagement.UnitTests.csproj",
+  "projectFilePath": "C:\\Users\\Lenovo\\source\\repos\\Dallasluis\\InternshipManagement\\InternshipManagement.UnitTests\\InternshipManagement.UnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.net.test.sdk\\17.12.0\\microsoft.net.test.sdk.17.12.0.nupkg.sha512",
