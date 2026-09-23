@@ -3,6 +3,7 @@ using InternshipManagement.Web.Services;
 using InternshipManagement.Web.ViewModels;
 using InternshipManagement.Web.Models.Student;
 using InternshipManagement.Web.Models.Application;
+using InternshipManagement.Web.Models.Lifecycle;
 
 namespace InternshipManagement.Web.Controllers
 {
@@ -10,15 +11,18 @@ namespace InternshipManagement.Web.Controllers
     {
         private readonly IStudentApiClient _studentApiClient;
         private readonly IApplicationApiClient _applicationApiClient;
+        private readonly ILifecycleApiClient _lifecycleApiClient;
         private readonly IWebHostEnvironment _environment;
 
         public StudentController(
             IStudentApiClient studentApiClient,
             IApplicationApiClient applicationApiClient,
+            ILifecycleApiClient lifecycleApiClient,
             IWebHostEnvironment environment)
         {
             _studentApiClient = studentApiClient;
             _applicationApiClient = applicationApiClient;
+            _lifecycleApiClient = lifecycleApiClient;
             _environment = environment;
         }
 
@@ -148,7 +152,13 @@ namespace InternshipManagement.Web.Controllers
             if (application == null)
                 return NotFound();
 
-            return View(application);
+            var viewModel = new ApplicationDetailsViewModel
+            {
+                Application = application,
+                StatusHistory = await _lifecycleApiClient.GetApplicationStatusHistoryAsync(token, id)
+            };
+
+            return View(viewModel);
         }
 
         // POST: /student/applications/{id}/withdraw
@@ -179,6 +189,72 @@ namespace InternshipManagement.Web.Controllers
                 TempData["ErrorMessage"] = "Unable to respond to the offer.";
 
             return RedirectToAction(nameof(ApplicationDetails), new { id });
+        }
+
+        public async Task<IActionResult> Placements()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var placements = await _lifecycleApiClient.GetStudentPlacementsAsync(token);
+            return View(placements);
+        }
+
+        public async Task<IActionResult> PlacementDetails(int id)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var placement = await _lifecycleApiClient.GetPlacementAsync(token, id);
+            if (placement == null)
+                return NotFound();
+
+            return View(new PlacementDetailsViewModel
+            {
+                Placement = placement,
+                ProgressReports = await _lifecycleApiClient.GetProgressReportsAsync(token, id),
+                Evaluations = await _lifecycleApiClient.GetEvaluationsAsync(token, id)
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitProgressReport(int id, SubmitProgressReportRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Please complete the required progress report fields.";
+                return RedirectToAction(nameof(PlacementDetails), new { id });
+            }
+
+            var report = await _lifecycleApiClient.SubmitProgressReportAsync(token, id, request);
+            TempData[report == null ? "ErrorMessage" : "SuccessMessage"] = report == null
+                ? "Unable to submit the progress report."
+                : "Progress report submitted successfully.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestWithdrawal(int id, RequestWithdrawalRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.RequestWithdrawalAsync(token, id, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Withdrawal request submitted."
+                : "Unable to submit withdrawal request.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
         }
 
         private int CalculateProfileCompletion(StudentProfileResponse? profile)

@@ -1,0 +1,71 @@
+@model List<InternshipManagement.Web.Models.Lifecycle.PlacementResponse>
+@{
+    ViewData["Title"] = "Placements";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">Placements</h1>
+        <p class="text-muted">Students currently placed with your company</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-id-badge fa-4x text-muted mb-3"></i>
+        <h5>No Placements Yet</h5>
+        <p class="text-muted">Placements appear after students accept offers.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Internship</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var placement in Model.OrderByDescending(p => p.CurrentStartDate))
+                        {
+                            <tr>
+                                <td>@placement.StudentName</td>
+                                <td>@placement.InternshipTitle</td>
+                                <td>@placement.CurrentStartDate.ToString("MMM d, yyyy")</td>
+                                <td>@(placement.CurrentEndDate?.ToString("MMM d, yyyy") ?? "-")</td>
+                                <td><span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span></td>
+                                <td>
+                                    <a asp-controller="Company" asp-action="PlacementDetails" asp-route-id="@placement.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Active" => "bg-success",
+        "Extended" => "bg-primary",
+        "Completed" => "bg-secondary",
+        "Terminated" => "bg-danger",
+        "Pending" => "bg-warning",
+        _ => "bg-secondary"
+    };
+}

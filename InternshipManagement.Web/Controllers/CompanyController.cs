@@ -4,6 +4,7 @@ using InternshipManagement.Web.ViewModels;
 using InternshipManagement.Web.Models.Company;
 using InternshipManagement.Web.Models.Internship;
 using InternshipManagement.Web.Models.Application;
+using InternshipManagement.Web.Models.Lifecycle;
 
 namespace InternshipManagement.Web.Controllers
 {
@@ -12,15 +13,18 @@ namespace InternshipManagement.Web.Controllers
         private readonly ICompanyApiClient _companyApiClient;
         private readonly IInternshipApiClient _internshipApiClient;
         private readonly IApplicationApiClient _applicationApiClient;
+        private readonly ILifecycleApiClient _lifecycleApiClient;
 
         public CompanyController(
             ICompanyApiClient companyApiClient,
             IInternshipApiClient internshipApiClient,
-            IApplicationApiClient applicationApiClient)
+            IApplicationApiClient applicationApiClient,
+            ILifecycleApiClient lifecycleApiClient)
         {
             _companyApiClient = companyApiClient;
             _internshipApiClient = internshipApiClient;
             _applicationApiClient = applicationApiClient;
+            _lifecycleApiClient = lifecycleApiClient;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -164,7 +168,11 @@ namespace InternshipManagement.Web.Controllers
             if (application == null)
                 return NotFound();
 
-            return View(application);
+            return View(new ApplicationDetailsViewModel
+            {
+                Application = application,
+                StatusHistory = await _lifecycleApiClient.GetApplicationStatusHistoryAsync(token, id)
+            });
         }
 
         [HttpPost]
@@ -371,6 +379,117 @@ namespace InternshipManagement.Web.Controllers
             }
 
             return RedirectToAction(nameof(ManageInternships));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Placements()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var placements = await _lifecycleApiClient.GetCompanyPlacementsAsync(token);
+            return View(placements);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PlacementDetails(int id)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var placement = await _lifecycleApiClient.GetPlacementAsync(token, id);
+            if (placement == null)
+                return NotFound();
+
+            return View(new PlacementDetailsViewModel
+            {
+                Placement = placement,
+                ProgressReports = await _lifecycleApiClient.GetProgressReportsAsync(token, id),
+                Evaluations = await _lifecycleApiClient.GetEvaluationsAsync(token, id),
+                IsCompanyView = true
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReviewProgressReport(int placementId, int reportId, ReviewProgressReportRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.ReviewProgressReportAsync(token, reportId, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Progress report reviewed."
+                : "Unable to review progress report.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id = placementId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProposeExtension(int id, ProposeExtensionRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.ProposeExtensionAsync(token, id, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Extension proposed."
+                : "Unable to propose extension.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompletePlacement(int id, CompletePlacementRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.CompletePlacementAsync(token, id, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Placement marked as completed."
+                : "Unable to complete placement.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TerminatePlacement(int id, TerminatePlacementRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.TerminatePlacementAsync(token, id, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Placement terminated."
+                : "Unable to terminate placement.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitEvaluation(int id, SubmitEvaluationRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var evaluation = await _lifecycleApiClient.SubmitEvaluationAsync(token, id, request);
+            TempData[evaluation == null ? "ErrorMessage" : "SuccessMessage"] = evaluation == null
+                ? "Unable to submit evaluation."
+                : "Evaluation submitted.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
         }
     }
 }

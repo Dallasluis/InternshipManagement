@@ -10,11 +10,16 @@ namespace InternshipManagement.Application.Services
     {
         private readonly IApplicationDbContext _context;
         private readonly IInternshipService _internshipService;
+        private readonly IInternshipLifecycleService _lifecycleService;
 
-        public ApplicationService(IApplicationDbContext context, IInternshipService internshipService)
+        public ApplicationService(
+            IApplicationDbContext context,
+            IInternshipService internshipService,
+            IInternshipLifecycleService lifecycleService)
         {
             _context = context;
             _internshipService = internshipService;
+            _lifecycleService = lifecycleService;
         }
 
         public async Task<ApplicationResponse> ApplyAsync(int studentId, ApplyRequest request)
@@ -44,13 +49,15 @@ namespace InternshipManagement.Application.Services
 
             _context.InternshipApplications.Add(application);
             await _context.SaveChangesAsync();
+            AddStatusHistory(application, ApplicationStatus.Applied, ApplicationStatus.Applied, "Application submitted");
 
             var internship = await _context.Internships.FindAsync(request.InternshipId);
             if (internship != null)
             {
                 internship.ApplicationsCount++;
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
 
             return await MapToResponse(application);
         }
@@ -119,9 +126,11 @@ namespace InternshipManagement.Application.Services
             if (!IsValidStatusTransition(application.Status, newStatus))
                 throw new Exception($"Cannot transition from {application.Status} to {newStatus}");
 
+            var previousStatus = application.Status;
             application.Status = newStatus;
             application.StatusUpdatedAt = DateTime.UtcNow;
             application.StatusNotes = request.Notes;
+            AddStatusHistory(application, previousStatus, newStatus, request.Notes);
 
             await _context.SaveChangesAsync();
             return true;
@@ -139,8 +148,10 @@ namespace InternshipManagement.Application.Services
             application.IsShortlisted = true;
             application.ShortlistedAt = DateTime.UtcNow;
             application.ShortlistNotes = notes;
+            var previousStatus = application.Status;
             application.Status = ApplicationStatus.Shortlisted;
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, previousStatus, ApplicationStatus.Shortlisted, notes);
 
             await _context.SaveChangesAsync();
             return true;
@@ -158,8 +169,10 @@ namespace InternshipManagement.Application.Services
             application.InterviewType = request.InterviewType;
             application.InterviewLocationOrLink = request.InterviewLocationOrLink;
             application.InterviewNotes = request.InterviewNotes;
+            var previousStatus = application.Status;
             application.Status = ApplicationStatus.InterviewScheduled;
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewScheduled, request.InterviewNotes);
 
             await _context.SaveChangesAsync();
             return true;
@@ -173,8 +186,10 @@ namespace InternshipManagement.Application.Services
             if (application.Status != ApplicationStatus.InterviewScheduled)
                 throw new Exception("Only scheduled interviews can be marked as completed.");
 
+            var previousStatus = application.Status;
             application.Status = ApplicationStatus.InterviewCompleted;
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewCompleted, "Interview completed");
 
             await _context.SaveChangesAsync();
             return true;
@@ -192,8 +207,10 @@ namespace InternshipManagement.Application.Services
             application.OfferStartDate = request.StartDate;
             application.OfferDetails = request.OfferDetails;
             application.OfferExpiryDate = request.ExpiryDate;
+            var previousStatus = application.Status;
             application.Status = ApplicationStatus.OfferMade;
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, previousStatus, ApplicationStatus.OfferMade, request.OfferDetails);
 
             await _context.SaveChangesAsync();
             return true;
@@ -219,7 +236,14 @@ namespace InternshipManagement.Application.Services
             }
 
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, ApplicationStatus.OfferMade, application.Status, accepted ? "Offer accepted" : "Offer declined");
             await _context.SaveChangesAsync();
+
+            if (accepted)
+            {
+                await _lifecycleService.CreatePlacementFromAcceptedApplicationAsync(application.Id);
+            }
+
             return true;
         }
 
@@ -231,11 +255,25 @@ namespace InternshipManagement.Application.Services
             if (application.Status == ApplicationStatus.Rejected)
                 throw new Exception("Cannot withdraw a rejected application.");
 
+            var previousStatus = application.Status;
             application.Status = ApplicationStatus.Withdrawn;
             application.StatusUpdatedAt = DateTime.UtcNow;
+            AddStatusHistory(application, previousStatus, ApplicationStatus.Withdrawn, "Application withdrawn");
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private void AddStatusHistory(InternshipApplication application, ApplicationStatus previousStatus, ApplicationStatus newStatus, string? notes)
+        {
+            _context.ApplicationStatusHistories.Add(new ApplicationStatusHistory
+            {
+                InternshipApplicationId = application.Id,
+                PreviousStatus = previousStatus,
+                NewStatus = newStatus,
+                ChangedAt = DateTime.UtcNow,
+                Notes = notes
+            });
         }
 
         public async Task<List<ApplicationResponse>> GetShortlistedApplicationsAsync(int internshipId)

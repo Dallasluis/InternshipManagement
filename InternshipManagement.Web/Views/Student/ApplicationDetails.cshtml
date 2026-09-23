@@ -1,6 +1,7 @@
-﻿@model InternshipManagement.Web.Models.Application.ApplicationResponse
+@model InternshipManagement.Web.ViewModels.ApplicationDetailsViewModel
 @{
     ViewData["Title"] = "Application Details";
+    var application = Model.Application;
 }
 
 <div class="mb-3">
@@ -27,68 +28,68 @@
 
 <div class="card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">@Model.InternshipTitle</h5>
-        <span class="badge @GetStatusBadgeClass(Model.Status)">@Model.Status</span>
+        <h5 class="mb-0">@application.InternshipTitle</h5>
+        <span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-8">
                 <h6>Company</h6>
-                <p>@Model.CompanyName</p>
+                <p>@application.CompanyName</p>
 
                 <h6>Applied On</h6>
-                <p>@Model.AppliedAt.ToString("MMMM dd, yyyy")</p>
+                <p>@application.AppliedAt.ToString("MMMM dd, yyyy")</p>
 
-                @if (!string.IsNullOrEmpty(Model.CoverLetter))
+                @if (!string.IsNullOrEmpty(application.CoverLetter))
                 {
                     <h6>Cover Letter</h6>
                     <div class="border rounded p-3 bg-light">
-                        <p style="white-space: pre-line;">@Model.CoverLetter</p>
+                        <p style="white-space: pre-line;">@application.CoverLetter</p>
                     </div>
                 }
 
-                @if (Model.InterviewDateTime.HasValue)
+                @if (application.InterviewDateTime.HasValue)
                 {
                     <h6>Interview Details</h6>
                     <div class="border rounded p-3 bg-light mb-3">
-                        <p class="mb-1"><strong>Date:</strong> @Model.InterviewDateTime.Value.ToString("MMMM dd, yyyy h:mm tt")</p>
-                        <p class="mb-1"><strong>Type:</strong> @Model.InterviewType</p>
-                        @if (!string.IsNullOrWhiteSpace(Model.InterviewLocationOrLink))
+                        <p class="mb-1"><strong>Date:</strong> @application.InterviewDateTime.Value.ToString("MMMM dd, yyyy h:mm tt")</p>
+                        <p class="mb-1"><strong>Type:</strong> @application.InterviewType</p>
+                        @if (!string.IsNullOrWhiteSpace(application.InterviewLocationOrLink))
                         {
-                            <p class="mb-1"><strong>Location/Link:</strong> <a href="@Model.InterviewLocationOrLink" target="_blank" rel="noopener">@Model.InterviewLocationOrLink</a></p>
+                            <p class="mb-1"><strong>Location/Link:</strong> <a href="@application.InterviewLocationOrLink" target="_blank" rel="noopener">@application.InterviewLocationOrLink</a></p>
                         }
-                        @if (!string.IsNullOrWhiteSpace(Model.InterviewNotes))
+                        @if (!string.IsNullOrWhiteSpace(application.InterviewNotes))
                         {
-                            <p class="mb-0"><strong>Notes:</strong> @Model.InterviewNotes</p>
+                            <p class="mb-0"><strong>Notes:</strong> @application.InterviewNotes</p>
                         }
                     </div>
                 }
 
-                @if (Model.Status == "OfferMade")
+                @if (application.Status == "OfferMade")
                 {
                     <h6>Offer</h6>
                     <div class="border rounded p-3 bg-light mb-3">
-                        @if (Model.OfferStipendAmount.HasValue)
+                        @if (application.OfferStipendAmount.HasValue)
                         {
-                            <p class="mb-1"><strong>Stipend:</strong> @Model.OfferStipendAmount.Value.ToString("C")</p>
+                            <p class="mb-1"><strong>Stipend:</strong> @application.OfferStipendAmount.Value.ToString("C")</p>
                         }
-                        @if (Model.OfferStartDate.HasValue)
+                        @if (application.OfferStartDate.HasValue)
                         {
-                            <p class="mb-1"><strong>Start Date:</strong> @Model.OfferStartDate.Value.ToString("MMMM dd, yyyy")</p>
+                            <p class="mb-1"><strong>Start Date:</strong> @application.OfferStartDate.Value.ToString("MMMM dd, yyyy")</p>
                         }
-                        @if (Model.OfferExpiryDate.HasValue)
+                        @if (application.OfferExpiryDate.HasValue)
                         {
-                            <p class="mb-1"><strong>Expiry:</strong> @Model.OfferExpiryDate.Value.ToString("MMMM dd, yyyy")</p>
+                            <p class="mb-1"><strong>Expiry:</strong> @application.OfferExpiryDate.Value.ToString("MMMM dd, yyyy")</p>
                         }
-                        @if (!string.IsNullOrWhiteSpace(Model.OfferDetails))
+                        @if (!string.IsNullOrWhiteSpace(application.OfferDetails))
                         {
-                            <p class="mb-0"><strong>Details:</strong> @Model.OfferDetails</p>
+                            <p class="mb-0"><strong>Details:</strong> @application.OfferDetails</p>
                         }
                     </div>
 
                     <form asp-controller="Student" asp-action="RespondToOffer" method="post">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="id" value="@application.Id" />
                         <button type="submit" name="accepted" value="true" class="btn btn-success me-2">Accept Offer</button>
                         <button type="submit" name="accepted" value="false" class="btn btn-outline-danger">Decline Offer</button>
                     </form>
@@ -99,20 +100,20 @@
                     <div class="card-body">
                         <h6>Application Status</h6>
                         <p>
-                            <span class="badge @GetStatusBadgeClass(Model.Status)">@Model.Status</span>
+                            <span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span>
                         </p>
                         <hr />
                         <h6>Timeline</h6>
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <i class="fas fa-check-circle text-success me-2"></i>
-                                Applied: @Model.AppliedAt.ToString("MMM dd, yyyy")
+                                Applied: @application.AppliedAt.ToString("MMM dd, yyyy")
                             </li>
-                            @if (Model.StatusUpdatedAt.HasValue && Model.StatusUpdatedAt != Model.AppliedAt)
+                            @if (application.StatusUpdatedAt.HasValue && application.StatusUpdatedAt != application.AppliedAt)
                             {
                                 <li class="mb-2">
                                     <i class="fas fa-clock text-warning me-2"></i>
-                                    Status Updated: @Model.StatusUpdatedAt.Value.ToString("MMM dd, yyyy")
+                                    Status Updated: @application.StatusUpdatedAt.Value.ToString("MMM dd, yyyy")
                                 </li>
                             }
                         </ul>
@@ -120,6 +121,39 @@
                 </div>
             </div>
         </div>
+
+        <hr />
+        <h6>Status History</h6>
+        @if (!Model.StatusHistory.Any())
+        {
+            <p class="text-muted mb-0">No status history recorded yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.StatusHistory.OrderByDescending(h => h.ChangedAt))
+                        {
+                            <tr>
+                                <td>@item.ChangedAt.ToString("MMM d, yyyy h:mm tt")</td>
+                                <td>@item.PreviousStatus</td>
+                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@item.NewStatus</span></td>
+                                <td>@(string.IsNullOrWhiteSpace(item.Notes) ? "-" : item.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </div>
 

@@ -1,0 +1,182 @@
+@model InternshipManagement.Web.ViewModels.PlacementDetailsViewModel
+@{
+    ViewData["Title"] = "Placement Details";
+    var placement = Model.Placement;
+}
+
+<div class="mb-3">
+    <a asp-controller="Student" asp-action="Placements" class="text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to My Placements
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@placement.InternshipTitle</h5>
+        <span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Company</dt>
+            <dd class="col-sm-9">@placement.CompanyName</dd>
+            <dt class="col-sm-3">Current Dates</dt>
+            <dd class="col-sm-9">@placement.CurrentStartDate.ToString("MMM d, yyyy") - @(placement.CurrentEndDate?.ToString("MMM d, yyyy") ?? "Open")</dd>
+            <dt class="col-sm-3">Activated</dt>
+            <dd class="col-sm-9">@(placement.ActivatedAt?.ToString("MMM d, yyyy") ?? "-")</dd>
+            @if (!string.IsNullOrWhiteSpace(placement.TerminationReason))
+            {
+                <dt class="col-sm-3">Termination Reason</dt>
+                <dd class="col-sm-9">@placement.TerminationReason</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+@if (placement.Status == "Active" || placement.Status == "Extended")
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Submit Progress Report</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Student" asp-action="SubmitProgressReport" asp-route-id="@placement.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Period Start</label>
+                        <input type="date" class="form-control" name="PeriodStart" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Period End</label>
+                        <input type="date" class="form-control" name="PeriodEnd" required />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Work Completed</label>
+                        <textarea class="form-control" name="WorkCompleted" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Skills Learned</label>
+                        <textarea class="form-control" name="SkillsLearned" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Challenges</label>
+                        <textarea class="form-control" name="Challenges" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Achievements</label>
+                        <textarea class="form-control" name="Achievements" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-control" name="Comments" rows="2"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Submit Report</button>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Progress Reports</h5>
+    </div>
+    <div class="card-body">
+        @if (!Model.ProgressReports.Any())
+        {
+            <p class="text-muted mb-0">No progress reports submitted yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Status</th>
+                            <th>Work Completed</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var report in Model.ProgressReports.OrderByDescending(r => r.PeriodEnd))
+                        {
+                            <tr>
+                                <td>@report.PeriodStart.ToString("MMM d") - @report.PeriodEnd.ToString("MMM d, yyyy")</td>
+                                <td><span class="badge bg-info">@report.Status</span></td>
+                                <td>@report.WorkCompleted</td>
+                                <td>@(string.IsNullOrWhiteSpace(report.CompanyFeedback) ? "-" : report.CompanyFeedback)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Evaluations.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Evaluations</h5>
+        </div>
+        <div class="card-body">
+            @foreach (var evaluation in Model.Evaluations.OrderByDescending(e => e.SubmittedAt))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>Overall: @evaluation.OverallPerformanceRating / 5</strong>
+                        <span class="text-muted">@evaluation.SubmittedAt.ToString("MMM d, yyyy")</span>
+                    </div>
+                    <p class="mb-0 mt-2">@(string.IsNullOrWhiteSpace(evaluation.Comments) ? "No comments provided." : evaluation.Comments)</p>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (placement.Status == "Active" || placement.Status == "Extended")
+{
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Request Withdrawal</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Student" asp-action="RequestWithdrawal" asp-route-id="@placement.Id" method="post">
+                @Html.AntiForgeryToken()
+                <label class="form-label">Reason</label>
+                <textarea class="form-control" name="Reason" rows="3" required></textarea>
+                <button type="submit" class="btn btn-outline-danger mt-3">Submit Request</button>
+            </form>
+        </div>
+    </div>
+}
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Active" => "bg-success",
+        "Extended" => "bg-primary",
+        "Completed" => "bg-secondary",
+        "Terminated" => "bg-danger",
+        "Pending" => "bg-warning",
+        _ => "bg-secondary"
+    };
+}

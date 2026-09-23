@@ -330,3 +330,11 @@ C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagemen
 C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Web\obj\Debug\net10.0\InternshipManagement.Web.pdb
 C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Web\obj\Debug\net10.0\InternshipManagement.Web.genruntimeconfig.cache
 C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Web\obj\Debug\net10.0\ref\InternshipManagement.Web.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\appsettings.Development.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\appsettings.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.staticwebassets.runtime.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.staticwebassets.endpoints.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.deps.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.runtimeconfig.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\WebBuildCheckLifecycle\InternshipManagement.Web.pdb

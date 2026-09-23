@@ -22,6 +22,57 @@ namespace InternshipManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.ApplicationStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ChangedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InternshipApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("PreviousStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedAt");
+
+                    b.HasIndex("InternshipApplicationId");
+
+                    b.ToTable("ApplicationStatusHistories", (string)null);
+                });
+
             modelBuilder.Entity("InternshipManagement.Domain.Entities.CompanyProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -485,6 +536,348 @@ namespace InternshipManagement.Infrastructure.Migrations
                         .HasDatabaseName("IX_InternshipApplication_Student_Internship_Unique");
 
                     b.ToTable("InternshipApplications", (string)null);
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipEvaluation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("CommunicationRating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EvaluatorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OverallPerformanceRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlacementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProblemSolvingRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfessionalismRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReliabilityRating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TeamworkRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TechnicalSkillsRating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlacementId");
+
+                    b.ToTable("InternshipEvaluations", (string)null);
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipExtensionRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PlacementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProposedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ProposedEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RespondedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponseNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlacementId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("InternshipExtensionRequests", (string)null);
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipWithdrawalRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminDecisionNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("CompanyDecisionNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EffectiveTerminationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PlacementId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("RequestedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlacementId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("InternshipWithdrawalRequests", (string)null);
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.Placement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CompanyProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CurrentEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CurrentStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InternshipApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InternshipId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("OriginalEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OriginalStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TerminatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TerminationReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyProfileId");
+
+                    b.HasIndex("InternshipApplicationId")
+                        .IsUnique();
+
+                    b.HasIndex("InternshipId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("StudentProfileId");
+
+                    b.ToTable("Placements", (string)null);
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.ProgressReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Achievements")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Challenges")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("CompanyFeedback")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlacementId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SkillsLearned")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SupportingDocuments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkCompleted")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlacementId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("ProgressReports", (string)null);
                 });
 
             modelBuilder.Entity("InternshipManagement.Domain.Entities.Report", b =>
@@ -990,6 +1383,17 @@ namespace InternshipManagement.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.ApplicationStatusHistory", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.InternshipApplication", "InternshipApplication")
+                        .WithMany()
+                        .HasForeignKey("InternshipApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InternshipApplication");
+                });
+
             modelBuilder.Entity("InternshipManagement.Domain.Entities.CompanyRepresentative", b =>
                 {
                     b.HasOne("InternshipManagement.Domain.Entities.CompanyProfile", "CompanyProfile")
@@ -1040,6 +1444,85 @@ namespace InternshipManagement.Infrastructure.Migrations
                     b.Navigation("Internship");
 
                     b.Navigation("StudentProfile");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipEvaluation", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.Placement", "Placement")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("PlacementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Placement");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipExtensionRequest", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.Placement", "Placement")
+                        .WithMany("ExtensionRequests")
+                        .HasForeignKey("PlacementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Placement");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.InternshipWithdrawalRequest", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.Placement", "Placement")
+                        .WithMany("WithdrawalRequests")
+                        .HasForeignKey("PlacementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Placement");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.Placement", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.CompanyProfile", "CompanyProfile")
+                        .WithMany()
+                        .HasForeignKey("CompanyProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InternshipManagement.Domain.Entities.InternshipApplication", "InternshipApplication")
+                        .WithMany()
+                        .HasForeignKey("InternshipApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InternshipManagement.Domain.Entities.Internship", "Internship")
+                        .WithMany()
+                        .HasForeignKey("InternshipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InternshipManagement.Domain.Entities.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CompanyProfile");
+
+                    b.Navigation("Internship");
+
+                    b.Navigation("InternshipApplication");
+
+                    b.Navigation("StudentProfile");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.ProgressReport", b =>
+                {
+                    b.HasOne("InternshipManagement.Domain.Entities.Placement", "Placement")
+                        .WithMany("ProgressReports")
+                        .HasForeignKey("PlacementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Placement");
                 });
 
             modelBuilder.Entity("InternshipManagement.Domain.Entities.Report", b =>
@@ -1136,6 +1619,17 @@ namespace InternshipManagement.Infrastructure.Migrations
             modelBuilder.Entity("InternshipManagement.Domain.Entities.Internship", b =>
                 {
                     b.Navigation("InternshipApplications");
+                });
+
+            modelBuilder.Entity("InternshipManagement.Domain.Entities.Placement", b =>
+                {
+                    b.Navigation("Evaluations");
+
+                    b.Navigation("ExtensionRequests");
+
+                    b.Navigation("ProgressReports");
+
+                    b.Navigation("WithdrawalRequests");
                 });
 
             modelBuilder.Entity("InternshipManagement.Domain.Entities.StudentProfile", b =>

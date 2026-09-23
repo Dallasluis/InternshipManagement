@@ -1,0 +1,215 @@
+@model InternshipManagement.Web.ViewModels.PlacementDetailsViewModel
+@{
+    ViewData["Title"] = "Placement Details";
+    var placement = Model.Placement;
+}
+
+<div class="mb-3">
+    <a asp-controller="Company" asp-action="Placements" class="text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to Placements
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@placement.InternshipTitle</h5>
+        <span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Student</dt>
+            <dd class="col-sm-9">@placement.StudentName</dd>
+            <dt class="col-sm-3">Current Dates</dt>
+            <dd class="col-sm-9">@placement.CurrentStartDate.ToString("MMM d, yyyy") - @(placement.CurrentEndDate?.ToString("MMM d, yyyy") ?? "Open")</dd>
+            <dt class="col-sm-3">Activated</dt>
+            <dd class="col-sm-9">@(placement.ActivatedAt?.ToString("MMM d, yyyy") ?? "-")</dd>
+            @if (!string.IsNullOrWhiteSpace(placement.TerminationReason))
+            {
+                <dt class="col-sm-3">Termination Reason</dt>
+                <dd class="col-sm-9">@placement.TerminationReason</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Progress Reports</h5>
+    </div>
+    <div class="card-body">
+        @if (!Model.ProgressReports.Any())
+        {
+            <p class="text-muted mb-0">No progress reports submitted yet.</p>
+        }
+        else
+        {
+            @foreach (var report in Model.ProgressReports.OrderByDescending(r => r.PeriodEnd))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>@report.PeriodStart.ToString("MMM d") - @report.PeriodEnd.ToString("MMM d, yyyy")</strong>
+                        <span class="badge bg-info">@report.Status</span>
+                    </div>
+                    <p class="mt-2 mb-1"><strong>Work Completed:</strong> @report.WorkCompleted</p>
+                    @if (!string.IsNullOrWhiteSpace(report.SkillsLearned))
+                    {
+                        <p class="mb-1"><strong>Skills:</strong> @report.SkillsLearned</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(report.Challenges))
+                    {
+                        <p class="mb-1"><strong>Challenges:</strong> @report.Challenges</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(report.CompanyFeedback))
+                    {
+                        <p class="mb-1"><strong>Feedback:</strong> @report.CompanyFeedback</p>
+                    }
+
+                    @if (report.Status != "Reviewed")
+                    {
+                        <form asp-controller="Company" asp-action="ReviewProgressReport" method="post" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="placementId" value="@placement.Id" />
+                            <input type="hidden" name="reportId" value="@report.Id" />
+                            <label class="form-label">Feedback</label>
+                            <textarea class="form-control" name="Feedback" rows="2" required></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm mt-2">Mark Reviewed</button>
+                        </form>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if (placement.Status == "Active" || placement.Status == "Extended")
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Placement Actions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <form asp-controller="Company" asp-action="ProposeExtension" asp-route-id="@placement.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <h6>Propose Extension</h6>
+                        <label class="form-label">New End Date</label>
+                        <input type="date" class="form-control mb-2" name="ProposedEndDate" required />
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" name="Reason" rows="3"></textarea>
+                        <button type="submit" class="btn btn-outline-primary mt-3">Propose</button>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <form asp-controller="Company" asp-action="CompletePlacement" asp-route-id="@placement.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <h6>Complete Placement</h6>
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="Notes" rows="5"></textarea>
+                        <button type="submit" class="btn btn-success mt-3">Mark Completed</button>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <form asp-controller="Company" asp-action="TerminatePlacement" asp-route-id="@placement.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <h6>Terminate Placement</h6>
+                        <label class="form-label">Effective Date</label>
+                        <input type="date" class="form-control mb-2" name="EffectiveTerminationDate" />
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" name="Reason" rows="3" required></textarea>
+                        <button type="submit" class="btn btn-outline-danger mt-3">Terminate</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Evaluations</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Evaluations.Any())
+        {
+            @foreach (var evaluation in Model.Evaluations.OrderByDescending(e => e.SubmittedAt))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>Overall: @evaluation.OverallPerformanceRating / 5</strong>
+                        <span class="text-muted">@evaluation.SubmittedAt.ToString("MMM d, yyyy")</span>
+                    </div>
+                    <p class="mb-0 mt-2">@(string.IsNullOrWhiteSpace(evaluation.Comments) ? "No comments provided." : evaluation.Comments)</p>
+                </div>
+            }
+        }
+
+        <form asp-controller="Company" asp-action="SubmitEvaluation" asp-route-id="@placement.Id" method="post">
+            @Html.AntiForgeryToken()
+            <h6>Submit Evaluation</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Technical</label>
+                    <input type="number" min="1" max="5" class="form-control" name="TechnicalSkillsRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Communication</label>
+                    <input type="number" min="1" max="5" class="form-control" name="CommunicationRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Teamwork</label>
+                    <input type="number" min="1" max="5" class="form-control" name="TeamworkRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Problem Solving</label>
+                    <input type="number" min="1" max="5" class="form-control" name="ProblemSolvingRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Professionalism</label>
+                    <input type="number" min="1" max="5" class="form-control" name="ProfessionalismRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Reliability</label>
+                    <input type="number" min="1" max="5" class="form-control" name="ReliabilityRating" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Overall</label>
+                    <input type="number" min="1" max="5" class="form-control" name="OverallPerformanceRating" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Comments</label>
+                    <textarea class="form-control" name="Comments" rows="3"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Submit Evaluation</button>
+        </form>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(string status) => status switch
+    {
+        "Active" => "bg-success",
+        "Extended" => "bg-primary",
+        "Completed" => "bg-secondary",
+        "Terminated" => "bg-danger",
+        "Pending" => "bg-warning",
+        _ => "bg-secondary"
+    };
+}

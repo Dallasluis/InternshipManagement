@@ -1,12 +1,13 @@
-@model InternshipManagement.Web.Models.Application.ApplicationResponse
+@model InternshipManagement.Web.ViewModels.ApplicationDetailsViewModel
 @{
     ViewData["Title"] = "Review Application";
+    var application = Model.Application;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h2 mb-1">Review Application</h1>
-        <p class="text-muted">@Model.InternshipTitle</p>
+        <p class="text-muted">@application.InternshipTitle</p>
     </div>
     <a asp-controller="Company" asp-action="Applications" class="btn btn-outline-secondary">Back to Applications</a>
 </div>
@@ -29,26 +30,26 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <h5>@Model.Student?.FullName</h5>
-        <p class="text-muted mb-1">@Model.Student?.Email</p>
-        <p class="text-muted">@Model.Student?.Programme at @Model.Student?.University</p>
+        <h5>@application.Student?.FullName</h5>
+        <p class="text-muted mb-1">@application.Student?.Email</p>
+        <p class="text-muted">@application.Student?.Programme at @application.Student?.University</p>
 
         <dl class="row">
             <dt class="col-sm-3">Status</dt>
-            <dd class="col-sm-9"><span class="badge @GetStatusBadgeClass(Model.Status)">@Model.Status</span></dd>
+            <dd class="col-sm-9"><span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span></dd>
             <dt class="col-sm-3">Applied</dt>
-            <dd class="col-sm-9">@Model.AppliedAt.ToString("MMM d, yyyy")</dd>
+            <dd class="col-sm-9">@application.AppliedAt.ToString("MMM d, yyyy")</dd>
         </dl>
 
-        @if (!string.IsNullOrWhiteSpace(Model.CoverLetter))
+        @if (!string.IsNullOrWhiteSpace(application.CoverLetter))
         {
             <h6>Cover Letter</h6>
-            <p class="border rounded p-3">@Model.CoverLetter</p>
+            <p class="border rounded p-3">@application.CoverLetter</p>
         }
 
-        @if (!string.IsNullOrWhiteSpace(Model.Student?.ResumeUrl))
+        @if (!string.IsNullOrWhiteSpace(application.Student?.ResumeUrl))
         {
-            <a href="@Model.Student.ResumeUrl" target="_blank" rel="noopener" class="btn btn-primary">
+            <a href="@application.Student.ResumeUrl" target="_blank" rel="noopener" class="btn btn-primary">
                 <i class="fas fa-file-pdf me-1"></i> View CV / Resume
             </a>
         }
@@ -59,34 +60,34 @@
     </div>
 </div>
 
-@if (Model.Status == "Shortlisted" || Model.Status == "InterviewScheduled" || Model.Status == "InterviewCompleted" || Model.Status == "OfferMade" || Model.Status == "Accepted" || Model.Status == "OfferDeclined")
+@if (application.Status == "Shortlisted" || application.Status == "InterviewScheduled" || application.Status == "InterviewCompleted" || application.Status == "OfferMade" || application.Status == "Accepted" || application.Status == "OfferDeclined")
 {
     <div class="card mb-4">
         <div class="card-header bg-white">
             <h5 class="mb-0">Interview Management</h5>
         </div>
         <div class="card-body">
-            @if (Model.InterviewDateTime.HasValue)
+            @if (application.InterviewDateTime.HasValue)
             {
                 <div class="alert alert-light border mb-3">
-                    <strong>Interview:</strong> @Model.InterviewDateTime.Value.ToString("MMM d, yyyy h:mm tt")<br />
-                    <strong>Type:</strong> @Model.InterviewType<br />
-                    @if (!string.IsNullOrWhiteSpace(Model.InterviewLocationOrLink))
+                    <strong>Interview:</strong> @application.InterviewDateTime.Value.ToString("MMM d, yyyy h:mm tt")<br />
+                    <strong>Type:</strong> @application.InterviewType<br />
+                    @if (!string.IsNullOrWhiteSpace(application.InterviewLocationOrLink))
                     {
-                        <strong>Location/Link:</strong> <a href="@Model.InterviewLocationOrLink" target="_blank" rel="noopener">@Model.InterviewLocationOrLink</a><br />
+                        <strong>Location/Link:</strong> <a href="@application.InterviewLocationOrLink" target="_blank" rel="noopener">@application.InterviewLocationOrLink</a><br />
                     }
-                    @if (!string.IsNullOrWhiteSpace(Model.InterviewNotes))
+                    @if (!string.IsNullOrWhiteSpace(application.InterviewNotes))
                     {
-                        <strong>Notes:</strong> @Model.InterviewNotes
+                        <strong>Notes:</strong> @application.InterviewNotes
                     }
                 </div>
             }
 
-            @if (Model.Status == "Shortlisted")
+            @if (application.Status == "Shortlisted")
             {
                 <form asp-controller="Company" asp-action="ScheduleInterview" method="post">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="id" value="@application.Id" />
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Interview Date</label>
@@ -109,11 +110,11 @@
                 </form>
             }
 
-            @if (Model.Status == "InterviewScheduled")
+            @if (application.Status == "InterviewScheduled")
             {
                 <form asp-controller="Company" asp-action="MarkInterviewCompleted" method="post">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="id" value="@application.Id" />
                     <button type="submit" class="btn btn-success">Mark Interview Completed</button>
                 </form>
             }
@@ -121,40 +122,40 @@
     </div>
 }
 
-@if (Model.Status == "InterviewCompleted" || Model.Status == "OfferMade" || Model.Status == "Accepted" || Model.Status == "OfferDeclined")
+@if (application.Status == "InterviewCompleted" || application.Status == "OfferMade" || application.Status == "Accepted" || application.Status == "OfferDeclined")
 {
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header bg-white">
             <h5 class="mb-0">Offer Management</h5>
         </div>
         <div class="card-body">
-            @if (Model.OfferStipendAmount.HasValue || Model.OfferStartDate.HasValue || !string.IsNullOrWhiteSpace(Model.OfferDetails) || Model.OfferExpiryDate.HasValue)
+            @if (application.OfferStipendAmount.HasValue || application.OfferStartDate.HasValue || !string.IsNullOrWhiteSpace(application.OfferDetails) || application.OfferExpiryDate.HasValue)
             {
                 <div class="alert alert-light border mb-3">
-                    @if (Model.OfferStipendAmount.HasValue)
+                    @if (application.OfferStipendAmount.HasValue)
                     {
-                        <div><strong>Stipend:</strong> @Model.OfferStipendAmount.Value.ToString("C")</div>
+                        <div><strong>Stipend:</strong> @application.OfferStipendAmount.Value.ToString("C")</div>
                     }
-                    @if (Model.OfferStartDate.HasValue)
+                    @if (application.OfferStartDate.HasValue)
                     {
-                        <div><strong>Start Date:</strong> @Model.OfferStartDate.Value.ToString("MMM d, yyyy")</div>
+                        <div><strong>Start Date:</strong> @application.OfferStartDate.Value.ToString("MMM d, yyyy")</div>
                     }
-                    @if (!string.IsNullOrWhiteSpace(Model.OfferDetails))
+                    @if (!string.IsNullOrWhiteSpace(application.OfferDetails))
                     {
-                        <div><strong>Details:</strong> @Model.OfferDetails</div>
+                        <div><strong>Details:</strong> @application.OfferDetails</div>
                     }
-                    @if (Model.OfferExpiryDate.HasValue)
+                    @if (application.OfferExpiryDate.HasValue)
                     {
-                        <div><strong>Expiry:</strong> @Model.OfferExpiryDate.Value.ToString("MMM d, yyyy")</div>
+                        <div><strong>Expiry:</strong> @application.OfferExpiryDate.Value.ToString("MMM d, yyyy")</div>
                     }
                 </div>
             }
 
-            @if (Model.Status == "InterviewCompleted")
+            @if (application.Status == "InterviewCompleted")
             {
                 <form asp-controller="Company" asp-action="MakeOffer" method="post">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="id" value="@application.Id" />
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label">Stipend</label>
@@ -179,6 +180,44 @@
         </div>
     </div>
 }
+
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Status History</h5>
+    </div>
+    <div class="card-body">
+        @if (!Model.StatusHistory.Any())
+        {
+            <p class="text-muted mb-0">No status history recorded yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.StatusHistory.OrderByDescending(h => h.ChangedAt))
+                        {
+                            <tr>
+                                <td>@item.ChangedAt.ToString("MMM d, yyyy h:mm tt")</td>
+                                <td>@item.PreviousStatus</td>
+                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@item.NewStatus</span></td>
+                                <td>@(string.IsNullOrWhiteSpace(item.Notes) ? "-" : item.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
 
 @functions {
     private string GetStatusBadgeClass(string status) => status switch

@@ -97,6 +97,7 @@ namespace InternshipManagement.Api.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IInternshipService, InternshipService>();
             services.AddScoped<IApplicationService, ApplicationService>();
+            services.AddScoped<IInternshipLifecycleService, InternshipLifecycleService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IAdminService, AdminService>();

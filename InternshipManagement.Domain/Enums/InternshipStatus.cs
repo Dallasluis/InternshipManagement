@@ -73,4 +73,35 @@
         Expired,
         Cancelled
     }
+
+    public enum PlacementStatus
+    {
+        Pending,
+        Active,
+        Extended,
+        Completed,
+        Terminated
+    }
+
+    public enum ExtensionStatus
+    {
+        Proposed,
+        Accepted,
+        Rejected,
+        Cancelled
+    }
+
+    public enum WithdrawalStatus
+    {
+        Requested,
+        Approved,
+        Rejected,
+        Disputed
+    }
+
+    public enum ProgressReportStatus
+    {
+        Submitted,
+        Reviewed
+    }
 }

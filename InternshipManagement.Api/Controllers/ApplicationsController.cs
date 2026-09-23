@@ -13,11 +13,16 @@ namespace InternshipManagement.Api.Controllers
     public class ApplicationsController : ControllerBase
     {
         private readonly IApplicationService _applicationService;
+        private readonly IInternshipLifecycleService _lifecycleService;
         private readonly IApplicationDbContext _context;
 
-        public ApplicationsController(IApplicationService applicationService, IApplicationDbContext context)
+        public ApplicationsController(
+            IApplicationService applicationService,
+            IInternshipLifecycleService lifecycleService,
+            IApplicationDbContext context)
         {
             _applicationService = applicationService;
+            _lifecycleService = lifecycleService;
             _context = context;
         }
 
@@ -132,6 +137,13 @@ namespace InternshipManagement.Api.Controllers
                 return NotFound();
 
             return Ok(application);
+        }
+
+        [HttpGet("{id}/status-history")]
+        public async Task<IActionResult> GetStatusHistory(int id)
+        {
+            var history = await _lifecycleService.GetApplicationStatusHistoryAsync(id);
+            return Ok(history);
         }
 
         [HttpPut("{id}/status")]

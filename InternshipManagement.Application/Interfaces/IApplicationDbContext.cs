@@ -13,6 +13,12 @@ namespace InternshipManagement.Application.Interfaces
         DbSet<CompanyRepresentative> CompanyRepresentatives { get; }
         DbSet<Internship> Internships { get; }
         DbSet<InternshipApplication> InternshipApplications { get; }  // Changed
+        DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; }
+        DbSet<Placement> Placements { get; }
+        DbSet<ProgressReport> ProgressReports { get; }
+        DbSet<InternshipExtensionRequest> InternshipExtensionRequests { get; }
+        DbSet<InternshipWithdrawalRequest> InternshipWithdrawalRequests { get; }
+        DbSet<InternshipEvaluation> InternshipEvaluations { get; }
         DbSet<Report> Reports { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
