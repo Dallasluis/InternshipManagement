@@ -42,7 +42,7 @@ else
                                 <td>@placement.CompanyName</td>
                                 <td>@placement.CurrentStartDate.ToString("MMM d, yyyy")</td>
                                 <td>@(placement.CurrentEndDate?.ToString("MMM d, yyyy") ?? "-")</td>
-                                <td><span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span></td>
+                                <td><span class="badge @GetStatusBadgeClass(placement.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(placement.Status)</span></td>
                                 <td>
                                     <a asp-controller="Student" asp-action="PlacementDetails" asp-route-id="@placement.Id"
                                        class="btn btn-sm btn-outline-primary">
@@ -59,13 +59,5 @@ else
 }
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Active" => "bg-success",
-        "Extended" => "bg-primary",
-        "Completed" => "bg-secondary",
-        "Terminated" => "bg-danger",
-        "Pending" => "bg-warning",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

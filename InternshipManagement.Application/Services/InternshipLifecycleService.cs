@@ -41,7 +41,7 @@ namespace InternshipManagement.Application.Services
                 (p.Status == PlacementStatus.Pending || p.Status == PlacementStatus.Active || p.Status == PlacementStatus.Extended));
 
             if (hasActivePlacement)
-                throw new Exception("Student already has an active or pending placement. Terminate or complete it before creating another placement.");
+                return null;
 
             var startDate = application.OfferStartDate ?? application.Internship.StartDate;
             var placement = new Placement
@@ -90,9 +90,11 @@ namespace InternshipManagement.Application.Services
             return placements.Select(MapPlacement).ToList();
         }
 
-        public async Task<PlacementResponse?> GetPlacementAsync(int placementId)
+        public async Task<PlacementResponse?> GetPlacementAsync(int userId, int placementId)
         {
-            var placement = await PlacementQuery().FirstOrDefaultAsync(p => p.Id == placementId);
+            var placement = await PlacementQuery().FirstOrDefaultAsync(p =>
+                p.Id == placementId &&
+                (p.StudentProfile.UserId == userId || p.CompanyProfile.UserId == userId));
             return placement == null ? null : MapPlacement(placement);
         }
 
@@ -127,6 +129,17 @@ namespace InternshipManagement.Application.Services
             if (request.PeriodEnd < request.PeriodStart)
                 throw new Exception("Report period end date cannot be before the start date.");
 
+            var documentIds = (request.SupportingDocumentIds ?? new List<Guid>()).Distinct().ToList();
+            if (documentIds.Count > 5)
+                throw new InvalidOperationException("A progress report may include up to five documents.");
+            var ownedDocuments = await _context.PrivateDocuments.CountAsync(document =>
+                documentIds.Contains(document.Id)
+                && document.OwnerUserId == userId
+                && document.RetentionState == DocumentRetentionState.Active
+                && document.Category != "CompanyEvidence");
+            if (ownedDocuments != documentIds.Count)
+                throw new InvalidOperationException("Progress reports can only include active files uploaded by this student.");
+
             var report = new ProgressReport
             {
                 PlacementId = placementId,
@@ -137,7 +150,7 @@ namespace InternshipManagement.Application.Services
                 Challenges = request.Challenges,
                 Achievements = request.Achievements,
                 Comments = request.Comments,
-                SupportingDocuments = request.SupportingDocumentUrls != null ? JsonSerializer.Serialize(request.SupportingDocumentUrls) : null,
+                SupportingDocuments = documentIds.Count > 0 ? JsonSerializer.Serialize(documentIds) : null,
                 Status = ProgressReportStatus.Submitted
             };
 
@@ -146,8 +159,11 @@ namespace InternshipManagement.Application.Services
             return MapProgressReport(report);
         }
 
-        public async Task<List<ProgressReportResponse>> GetProgressReportsAsync(int placementId)
+        public async Task<List<ProgressReportResponse>?> GetProgressReportsAsync(int userId, int placementId)
         {
+            if (await GetPlacementAsync(userId, placementId) == null)
+                return null;
+
             var reports = await _context.ProgressReports
                 .Where(r => r.PlacementId == placementId)
                 .OrderByDescending(r => r.PeriodEnd)
@@ -285,6 +301,8 @@ namespace InternshipManagement.Application.Services
             }
 
             await _context.SaveChangesAsync();
+            if (request.Approved)
+                await CreateNextAcceptedPlacementAsync(withdrawal.Placement.StudentProfileId);
             return true;
         }
 
@@ -301,6 +319,7 @@ namespace InternshipManagement.Application.Services
             placement.Status = PlacementStatus.Completed;
             placement.CompletedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
+            await CreateNextAcceptedPlacementAsync(placement.StudentProfileId);
             return true;
         }
 
@@ -318,7 +337,24 @@ namespace InternshipManagement.Application.Services
             placement.TerminatedAt = request.EffectiveTerminationDate ?? DateTime.UtcNow;
             placement.TerminationReason = request.Reason;
             await _context.SaveChangesAsync();
+            await CreateNextAcceptedPlacementAsync(placement.StudentProfileId);
             return true;
+        }
+
+        private async Task CreateNextAcceptedPlacementAsync(int studentProfileId)
+        {
+            var nextApplicationId = await _context.InternshipApplications
+                .Where(application => application.StudentProfileId == studentProfileId
+                    && application.Status == ApplicationStatus.Accepted
+                    && !_context.Placements.Any(placement =>
+                        placement.InternshipApplicationId == application.Id))
+                .OrderBy(application => application.OfferAcceptedAt)
+                .ThenBy(application => application.Id)
+                .Select(application => (int?)application.Id)
+                .FirstOrDefaultAsync();
+
+            if (nextApplicationId.HasValue)
+                await CreatePlacementFromAcceptedApplicationAsync(nextApplicationId.Value);
         }
 
         public async Task<EvaluationResponse> SubmitEvaluationAsync(int userId, int placementId, SubmitEvaluationRequest request)
@@ -352,8 +388,11 @@ namespace InternshipManagement.Application.Services
             return MapEvaluation(evaluation);
         }
 
-        public async Task<List<EvaluationResponse>> GetEvaluationsAsync(int placementId)
+        public async Task<List<EvaluationResponse>?> GetEvaluationsAsync(int userId, int placementId)
         {
+            if (await GetPlacementAsync(userId, placementId) == null)
+                return null;
+
             var evaluations = await _context.InternshipEvaluations
                 .Where(e => e.PlacementId == placementId)
                 .OrderByDescending(e => e.SubmittedAt)
@@ -367,7 +406,9 @@ namespace InternshipManagement.Application.Services
             return _context.Placements
                 .Include(p => p.StudentProfile)
                 .Include(p => p.CompanyProfile)
-                .Include(p => p.Internship);
+                .Include(p => p.Internship)
+                .Include(p => p.ExtensionRequests)
+                .Include(p => p.WithdrawalRequests);
         }
 
         private async Task<Placement?> GetStudentPlacementForUser(int userId, int placementId)
@@ -427,7 +468,15 @@ namespace InternshipManagement.Application.Services
                 ActivatedAt = placement.ActivatedAt,
                 CompletedAt = placement.CompletedAt,
                 TerminatedAt = placement.TerminatedAt,
-                TerminationReason = placement.TerminationReason
+                TerminationReason = placement.TerminationReason,
+                ExtensionRequests = placement.ExtensionRequests
+                    .OrderByDescending(request => request.CreatedAt)
+                    .Select(MapExtension)
+                    .ToList(),
+                WithdrawalRequests = placement.WithdrawalRequests
+                    .OrderByDescending(request => request.CreatedAt)
+                    .Select(MapWithdrawal)
+                    .ToList()
             };
         }
 
@@ -444,9 +493,9 @@ namespace InternshipManagement.Application.Services
                 Challenges = report.Challenges,
                 Achievements = report.Achievements,
                 Comments = report.Comments,
-                SupportingDocumentUrls = string.IsNullOrWhiteSpace(report.SupportingDocuments)
-                    ? new List<string>()
-                    : JsonSerializer.Deserialize<List<string>>(report.SupportingDocuments) ?? new List<string>(),
+                SupportingDocumentIds = string.IsNullOrWhiteSpace(report.SupportingDocuments)
+                    ? new List<Guid>()
+                    : JsonSerializer.Deserialize<List<Guid>>(report.SupportingDocuments) ?? new List<Guid>(),
                 Status = report.Status.ToString(),
                 CompanyFeedback = report.CompanyFeedback,
                 ReviewedAt = report.ReviewedAt

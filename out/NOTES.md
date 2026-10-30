@@ -1,0 +1,1 @@
+Appeals older than 5 business days are listed on the admin Verification Turnaround page (SLA endpoint now returns overdueAppeals). Registration-number change already triggers re-verification (CompanyService, UpdateProfile).

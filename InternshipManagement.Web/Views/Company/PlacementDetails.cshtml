@@ -29,7 +29,7 @@
 <div class="card mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">@placement.InternshipTitle</h5>
-        <span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span>
+        <span class="badge @GetStatusBadgeClass(placement.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(placement.Status)</span>
     </div>
     <div class="card-body">
         <dl class="row mb-0">
@@ -96,6 +96,73 @@
         }
     </div>
 </div>
+
+@if (placement.WithdrawalRequests.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Student withdrawal requests</h5>
+        </div>
+        <div class="card-body">
+            @foreach (var withdrawal in placement.WithdrawalRequests.OrderByDescending(request => request.ReviewedAt))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>Request @withdrawal.Status</strong>
+                        @if (withdrawal.EffectiveTerminationDate.HasValue)
+                        {
+                            <span class="text-muted">Effective @withdrawal.EffectiveTerminationDate.Value.ToString("MMM d, yyyy")</span>
+                        }
+                    </div>
+                    <p class="mt-2 mb-1">@withdrawal.Reason</p>
+                    @if (!string.IsNullOrWhiteSpace(withdrawal.CompanyDecisionNotes))
+                    {
+                        <p class="mb-2"><strong>Decision notes:</strong> @withdrawal.CompanyDecisionNotes</p>
+                    }
+                    @if (withdrawal.Status == "Requested")
+                    {
+                        <form asp-controller="Company" asp-action="ReviewWithdrawal" method="post" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@placement.Id" />
+                            <input type="hidden" name="withdrawalRequestId" value="@withdrawal.Id" />
+                            <label class="form-label">Effective termination date (if approved)</label>
+                            <input type="date" class="form-control mb-2" name="request.EffectiveTerminationDate" />
+                            <label class="form-label">Decision notes</label>
+                            <textarea class="form-control mb-2" name="request.Notes" rows="2"></textarea>
+                            <button type="submit" name="request.Approved" value="true" class="btn btn-danger me-2">Approve withdrawal</button>
+                            <button type="submit" name="request.Approved" value="false" class="btn btn-outline-secondary">Decline</button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (placement.ExtensionRequests.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Extension requests</h5>
+        </div>
+        <div class="card-body">
+            @foreach (var extension in placement.ExtensionRequests.OrderByDescending(request => request.ProposedEndDate))
+            {
+                <div class="border rounded p-3 mb-2">
+                    <strong>@extension.Status</strong> — proposed end date @extension.ProposedEndDate.ToString("MMM d, yyyy")
+                    @if (!string.IsNullOrWhiteSpace(extension.Reason))
+                    {
+                        <p class="mb-0 mt-2">@extension.Reason</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(extension.ResponseNotes))
+                    {
+                        <p class="mb-0 mt-2"><strong>Student response:</strong> @extension.ResponseNotes</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @if (placement.Status == "Active" || placement.Status == "Extended")
 {
@@ -203,13 +270,5 @@
 </div>
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Active" => "bg-success",
-        "Extended" => "bg-primary",
-        "Completed" => "bg-secondary",
-        "Terminated" => "bg-danger",
-        "Pending" => "bg-warning",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

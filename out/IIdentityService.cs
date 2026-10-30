@@ -1,0 +1,113 @@
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using InternshipManagement.Application.DTOs.Auth;
+
+namespace InternshipManagement.Application.Interfaces
+{
+    public interface IIdentityService
+    {
+        Task<IdentityResult> CreateUserAsync(string email, string password, string firstName, string lastName, string userType);
+        Task<IdentityUserDto> FindUserByEmailAsync(string email);
+        Task<IdentityUserDto> FindUserByIdAsync(string userId);
+        Task<bool> CheckPasswordAsync(string email, string password);
+        Task<SignInResult> SignInAsync(string email, string password, bool isPersistent);
+        Task SignOutAsync();
+        Task<bool> IsInRoleAsync(string userId, string role);
+        Task<IList<string>> GetUserRolesAsync(string userId);
+        Task<IdentityResult> AddToRoleAsync(string userId, string role);
+        Task<bool> RoleExistsAsync(string role);
+        Task<IdentityResult> CreateRoleAsync(string role);
+        Task<string> GenerateEmailConfirmationTokenAsync(string userId);
+        Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
+        Task<string> GeneratePasswordResetTokenAsync(string userId);
+        Task<IdentityResult> ResetPasswordAsync(string userId, string token, string newPassword);
+        Task<string> GenerateJwtTokenAsync(
+            string userId,
+            bool rememberMe = false,
+            bool twoFactorSetupOnly = false,
+            DateTime? absoluteSessionExpiresAt = null);
+        string GenerateRefreshToken();
+        Task<bool> UpdateRefreshTokenAsync(
+            string userId,
+            string? refreshToken,
+            DateTime? expiryTime,
+            bool rememberMe = false,
+            DateTime? absoluteSessionExpiresAt = null);
+        Task<bool> RotateRefreshTokenAsync(
+            string userId,
+            string currentRefreshToken,
+            string nextRefreshToken,
+            DateTime expiryTime,
+            DateTime absoluteSessionExpiresAt,
+            bool rememberMe);
+        Task<bool> TouchSessionAsync(string userId, DateTime activityAt);
+        Task<IdentityUserDto?> FindUserByRefreshTokenAsync(string refreshToken);
+        Task<ClaimsPrincipal> GetUserPrincipalAsync();
+        Task<IdentityUserDto> GetCurrentUserAsync();
+        Task<List<IdentityUserDto>> GetAllUsersAsync();
+        Task<bool> SetUserActiveStatusAsync(string userId, bool isActive);
+        Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+        Task<IdentityResult> ChangeEmailAsync(string userId, string currentPassword, string newEmail);
+        Task<IdentityResult> SetEmailAfterConfirmationAsync(string userId, string newEmail);
+        Task<IdentityResult> ConfirmEmailAddressAsync(string userId);
+        Task<IdentityResult> DeleteUserAsync(string userId);
+        Task<string?> GetUserTokenAsync(string userId, string name);
+        Task SetUserTokenAsync(string userId, string name, string value);
+        Task RemoveUserTokenAsync(string userId, string name);
+        Task<IdentityResult> UpdateProfilePictureUrlAsync(string userId, string profilePictureUrl);
+        Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId);
+        Task<IdentityResult> UpdateAccountPreferencesAsync(string userId, AccountPreferencesDto preferences);
+        Task<IdentityResult> DeactivateAccountAsync(string userId);
+    }
+
+    public class IdentityResult
+    {
+        public bool Succeeded { get; set; }
+        public List<string> Errors { get; set; } = new();
+        public string UserId { get; set; }
+
+        public static IdentityResult Success(string userId = null) =>
+            new() { Succeeded = true, UserId = userId };
+
+        public static IdentityResult Failure(List<string> errors) =>
+            new() { Succeeded = false, Errors = errors };
+    }
+
+    public class SignInResult
+    {
+        public bool Succeeded { get; set; }
+        public bool IsLockedOut { get; set; }
+        public bool IsNotAllowed { get; set; }
+                public bool RequiresTwoFactor { get; set; }
+
+        public static SignInResult Success() => new() { Succeeded = true };
+        public static SignInResult Failed() => new() { Succeeded = false };
+        public bool IsNewlyLockedOut { get; set; }
+        public static SignInResult LockedOut(bool newlyLockedOut = false) => new() { Succeeded = false, IsLockedOut = true, IsNewlyLockedOut = newlyLockedOut };
+        public static SignInResult NotAllowed() => new() { Succeeded = false, IsNotAllowed = true };
+        public static SignInResult TwoFactorRequired() => new() { Succeeded = false, RequiresTwoFactor = true };
+    }
+
+    public class IdentityUserDto
+    {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string UserType { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public bool TwoFactorEnabled { get; set; }
+        public bool RememberMe { get; set; }
+        public int LockoutEscalationLevel { get; set; }
+        public bool IsActive { get; set; }
+        
+        public bool EmailConfirmed { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public DateTime? AbsoluteSessionExpiresAt { get; set; }
+        public DateTime? LastSessionActivityAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? LastLoginAt { get; set; }
+    }
+}

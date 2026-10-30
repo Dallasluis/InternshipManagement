@@ -7,7 +7,7 @@ namespace InternshipManagement.Application.Interfaces
     {
         Task<StudentProfileResponse> GetStudentProfileAsync(int userId);
         Task<StudentProfileResponse> UpdateStudentProfileAsync(int userId, UpdateStudentProfileRequest request);
-        Task<bool> UploadResumeAsync(int userId, string resumeUrl);
+        Task<bool> UploadResumeAsync(int userId, Guid resumeDocumentId);
 
         // Education
         Task<bool> AddEducationAsync(int userId, AddEducationRequest request);
@@ -22,5 +22,15 @@ namespace InternshipManagement.Application.Interfaces
         // Skills
         Task<bool> AddSkillAsync(int userId, AddSkillRequest request);
         Task<bool> DeleteSkillAsync(int userId, int skillId);
+
+        // Certifications
+        Task<bool> AddCertificationAsync(int userId, AddCertificationRequest request);
+        Task<bool> UpdateCertificationAsync(int userId, int certificationId, UpdateCertificationRequest request);
+        Task<bool> DeleteCertificationAsync(int userId, int certificationId);
+
+        // Projects
+        Task<bool> AddProjectAsync(int userId, AddProjectRequest request);
+        Task<bool> UpdateProjectAsync(int userId, int projectId, UpdateProjectRequest request);
+        Task<bool> DeleteProjectAsync(int userId, int projectId);
     }
 }

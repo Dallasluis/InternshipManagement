@@ -42,12 +42,38 @@ namespace InternshipManagement.Web.Services
             return await response.Content.ReadFromJsonAsync<List<CompanySummaryResponse>>() ?? new List<CompanySummaryResponse>();
         }
 
-        public async Task<bool> ReviewVerificationAsync(string token, int companyId, bool approved, string? notes)
+        public async Task<bool> ReviewVerificationAsync(
+            string token,
+            int companyId,
+            string status,
+            string reasonCode,
+            string notes,
+            Dictionary<string, bool> criteriaAssessment,
+            bool isAppeal = false)
         {
             AddAuthorization(token);
-            var request = new { Approved = approved, Notes = notes ?? string.Empty };
-            var response = await _httpClient.PutAsJsonAsync($"api/Admin/companies/{companyId}/verification", request);
+            var request = new { Approved = status == "Verified", Status = status, ReasonCode = reasonCode, Notes = notes, CriteriaAssessment = criteriaAssessment };
+            var route = isAppeal
+                ? $"api/Admin/companies/{companyId}/verification/appeal"
+                : $"api/Admin/companies/{companyId}/verification";
+            var response = await _httpClient.PutAsJsonAsync(route, request);
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<CompanyVerificationHistoryResponse>> GetVerificationHistoryAsync(string token, int companyId)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.GetAsync($"api/Admin/companies/{companyId}/verification/history");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<List<CompanyVerificationHistoryResponse>>() ?? new();
+        }
+
+        public async Task<List<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse>> GetVerificationEvidenceAsync(string token, int companyId)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.GetAsync($"api/Admin/companies/{companyId}/verification/evidence");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<List<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse>>() ?? new();
         }
 
         public async Task<List<InternshipListResponse>> GetAllInternshipsAsync(string token)
@@ -82,10 +108,16 @@ namespace InternshipManagement.Web.Services
             return await response.Content.ReadFromJsonAsync<List<ReportSummaryResponse>>() ?? new List<ReportSummaryResponse>();
         }
 
-        public async Task<bool> ResolveReportAsync(string token, int id, string response, bool resolved)
+        public async Task<bool> ResolveReportAsync(
+            string token,
+            int id,
+            string response,
+            bool resolved,
+            string? status = null,
+            bool fraudUpheld = false)
         {
             AddAuthorization(token);
-            var request = new { Response = response, Resolved = resolved };
+            var request = new { Response = response, Resolved = resolved, Status = status, FraudUpheld = fraudUpheld };
             var responseMessage = await _httpClient.PutAsJsonAsync($"api/Admin/reports/{id}/resolve", request);
             return responseMessage.IsSuccessStatusCode;
         }

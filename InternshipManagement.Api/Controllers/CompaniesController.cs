@@ -19,6 +19,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("profile")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetProfile()
         {
             var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
@@ -31,6 +32,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("profile")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateCompanyProfileRequest request)
         {
             try
@@ -46,6 +48,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("verification")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> SubmitVerification([FromBody] SubmitVerificationRequest request)
         {
             try
@@ -60,20 +63,39 @@ namespace InternshipManagement.Api.Controllers
             }
         }
 
-        // Admin endpoints
-        [HttpPut("verification/{companyProfileId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ReviewVerification(int companyProfileId, [FromBody] ReviewVerificationRequest request)
+        [HttpPost("verification/appeal")]
+        [Authorize(Roles = "Company")]
+        public async Task<IActionResult> SubmitVerificationAppeal([FromBody] SubmitVerificationAppealRequest request)
         {
             try
             {
-                var result = await _companyService.ReviewVerificationAsync(companyProfileId, request);
-                return Ok(new { Success = result });
+                var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+                var submitted = await _companyService.SubmitVerificationAppealAsync(userId, request);
+                return submitted ? Ok(new { Success = true }) : NotFound();
             }
             catch (Exception ex)
             {
                 return BadRequest(new { Error = ex.Message });
             }
+        }
+
+        [HttpGet("verification/history")]
+        [Authorize(Roles = "Company")]
+        public async Task<IActionResult> GetVerificationHistory()
+        {
+            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+            var profile = await _companyService.GetCompanyProfileAsync(userId);
+            if (profile == null)
+                return NotFound();
+            var history = await _companyService.GetVerificationHistoryAsync(profile.Id);
+            return Ok(history.Select(entry => new
+            {
+                Status = entry.Status.ToString(),
+                entry.ReasonCode,
+                entry.Notes,
+                entry.IsAppeal,
+                entry.CreatedAt
+            }));
         }
 
         [HttpPut("{companyProfileId}/subscription")]

@@ -12,7 +12,7 @@ namespace InternshipManagement.Application.DTOs.Auth
         public string Token { get; set; }
 
         [Required]
-        [MinLength(8)]
+        [MinLength(10)]
         public string NewPassword { get; set; }
     }
 }

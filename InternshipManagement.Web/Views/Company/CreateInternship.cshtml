@@ -13,6 +13,33 @@
             <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
         }
 
+        <div id="ai-root" data-page="draft"
+             data-login-url="@Url.Action("Login", "Account")"
+             data-generate-url="@Url.Action("GenerateDraft", "CompanyAi")"
+             data-drafts-url="@Url.Action("Drafts", "CompanyAi")"
+             data-draft-url="@Url.Action("Draft", "CompanyAi")">
+            <div class="card mb-4 border-primary">
+                <div class="card-body">
+                    <h2 class="h5 mb-1"><i class="fas fa-magic me-1"></i> Write it with AI</h2>
+                    <p class="small text-muted mb-2">
+                        Describe the role in a few sentences (what the intern will do, skills, duration). The AI fills in the form below.
+                        You then check and complete it before creating the internship.
+                    </p>
+                    <textarea id="draft-prompt" class="form-control mb-1" rows="3" maxlength="4000"
+                              placeholder="e.g., 3-month software internship in Windhoek for a fintech team. The intern helps build web features with C# and SQL."></textarea>
+                    <div class="small text-muted text-end mb-2"><span id="draft-count">0 / 4000</span></div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <button id="draft-btn" type="button" class="btn btn-primary">Generate draft</button>
+                        <select id="draft-saved" class="form-select form-select-sm w-auto d-none" aria-label="Load a saved draft">
+                            <option value="">Load a saved draft…</option>
+                        </select>
+                    </div>
+                    <div id="draft-errors" class="mt-2"></div>
+                    <div id="draft-result" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <form asp-controller="Company" asp-action="CreateInternship" method="post">
@@ -41,7 +68,20 @@
                     <div class="mb-3">
                         <label asp-for="Requirements" class="form-label"></label>
                         <textarea asp-for="Requirements" class="form-control" rows="3"
-                                  placeholder="List the requirements..."></textarea>
+                                  placeholder="List general requirements..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RequiredQualifications" class="form-label">Required Qualifications</label>
+                            <textarea asp-for="RequiredQualifications" class="form-control" rows="3"
+                                      placeholder="Qualifications applicants must have..."></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PreferredQualifications" class="form-label">Preferred Qualifications</label>
+                            <textarea asp-for="PreferredQualifications" class="form-control" rows="3"
+                                      placeholder="Qualifications that would be helpful..."></textarea>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -56,23 +96,19 @@
                         </div>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input asp-for="IsRemote" class="form-check-input" />
-                        <label asp-for="IsRemote" class="form-check-label"></label>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="InternshipType" class="form-label"></label>
-                            <select asp-for="InternshipType" class="form-select">
-                                <option value="FullTime">Full Time</option>
-                                <option value="PartTime">Part Time</option>
-                                <option value="Summer">Summer</option>
-                                <option value="Winter">Winter</option>
-                                <option value="YearRound">Year Round</option>
-                                <option value="Flexible">Flexible</option>
+                            <label class="form-label">Schedule</label>
+                            <input type="hidden" asp-for="InternshipType" value="FullTime" />
+                            <input class="form-control" value="Full-time" readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="WorkArrangement" class="form-label">Work arrangement</label>
+                            <select asp-for="WorkArrangement" class="form-select">
+                                <option value="OnSite">On-site</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Hybrid">Hybrid</option>
                             </select>
-                            <span asp-validation-for="InternshipType" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label asp-for="Duration" class="form-label"></label>
@@ -138,9 +174,22 @@
                         <input asp-for="Skills" class="form-control" placeholder="e.g., C#, JavaScript, React, .NET Core" />
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RequiredSkills" class="form-label">Required Skills</label>
+                            <textarea asp-for="RequiredSkills" class="form-control" rows="3"
+                                      placeholder="Skills applicants must have, comma separated"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PreferredSkills" class="form-label">Preferred Skills</label>
+                            <textarea asp-for="PreferredSkills" class="form-control" rows="3"
+                                      placeholder="Nice-to-have skills, comma separated"></textarea>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="EligibleProgrammes" class="form-label">Eligible Programmes</label>
-                        <input asp-for="EligibleProgrammes" class="form-control" placeholder="e.g., Computer Science, Engineering, Business (comma separated)" />
+                        <input id="EligibleProgrammes" name="EligibleProgrammes" class="form-control" value="@string.Join(", ", Model.EligibleProgrammes ?? new List<string>())" placeholder="e.g., Computer Science, Engineering, Business (comma separated)" />
                         <small class="text-muted">Enter the academic programmes eligible for this internship.</small>
                     </div>
 
@@ -156,7 +205,10 @@
     </div>
 </div>
 
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
 @section Scripts {
+    <script src="~/js/company-ai.js" asp-append-version="true"></script>
     <script>
         document.querySelector('#Compensation').addEventListener('change', function () {
             const stipendFields = document.querySelector('#stipendFields');

@@ -32,7 +32,33 @@ namespace InternshipManagement.Api.Controllers
         public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
         {
             var result = await _authService.ChangeEmailAsync(CurrentUserId, request);
-            return result.Succeeded ? Ok(new { Success = true, Message = "Email changed. Please log in again." }) : BadRequest(result);
+            return result.Succeeded
+                ? Ok(new { Success = true, Message = "Confirm the new email address to complete the change. Your current email remains active until then." })
+                : BadRequest(result);
+        }
+
+        [HttpPost("resend-verification")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> ResendVerification()
+        {
+            var result = await _authService.ResendVerificationAsync(CurrentUserId, HttpContext.Connection.RemoteIpAddress?.ToString());
+            if (result.Success)
+                return Ok(new { Success = true, Message = "A verification link has been sent if the account needs verification." });
+
+            return result.Error?.Contains("limit", StringComparison.OrdinalIgnoreCase) == true
+                ? StatusCode(StatusCodes.Status429TooManyRequests, new { Success = false, Message = result.Error })
+                : BadRequest(new { Success = false, Message = result.Error });
+        }
+
+        [HttpPost("security-code")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> SendSecurityCode()
+        {
+            var result = await _authService.SendSecurityCodeAsync(CurrentUserId);
+            return result.Success
+                ? Ok(result)
+                : StatusCode(result.Message?.Contains("wait", StringComparison.OrdinalIgnoreCase) == true
+                    ? StatusCodes.Status429TooManyRequests : StatusCodes.Status400BadRequest, result);
         }
 
         [HttpGet("preferences")]
@@ -47,6 +73,20 @@ namespace InternshipManagement.Api.Controllers
         public async Task<IActionResult> UpdatePreferences([FromBody] UpdateAccountPreferencesRequest request)
         {
             var result = await _authService.UpdateAccountPreferencesAsync(CurrentUserId, request);
+            return result.Succeeded ? Ok(new { Success = true }) : BadRequest(result);
+        }
+
+        [HttpPut("profile-picture")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> UpdateProfilePicture([FromBody] UpdateProfilePictureRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.ProfilePictureUrl)
+                || !request.ProfilePictureUrl.StartsWith("/uploads/profile-pictures/", StringComparison.Ordinal))
+            {
+                return BadRequest(new { Success = false, Errors = new[] { "The profile picture path is invalid." } });
+            }
+
+            var result = await _authService.UpdateProfilePictureUrlAsync(CurrentUserId, request.ProfilePictureUrl);
             return result.Succeeded ? Ok(new { Success = true }) : BadRequest(result);
         }
 
@@ -69,8 +109,10 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("login")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
         public async Task<IActionResult> Login([FromBody] Application.DTOs.Auth.LoginRequest request)
         {
+            request.ClientIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var result = await _authService.LoginAsync(request);
             if (!result.Success)
                 return Unauthorized(result);
@@ -89,9 +131,10 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("logout")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
-            var result = await _authService.LogoutAsync(request.UserId);
+            var result = await _authService.LogoutAsync(CurrentUserId);
             return Ok(new { Success = result });
         }
 
@@ -99,7 +142,34 @@ namespace InternshipManagement.Api.Controllers
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
         {
             var result = await _authService.VerifyEmailAsync(request.UserId, request.Token);
-            return Ok(new { Success = result });
+            return result ? Ok(new { Success = true }) : BadRequest(new { Success = false, Message = "The verification link is invalid, expired, or already used." });
+        }
+
+        [HttpGet("verify-email")]
+        public async Task<IActionResult> VerifyEmailFromLink([FromQuery] int userId, [FromQuery] string token)
+        {
+            var result = await _authService.VerifyEmailAsync(userId, token);
+            return result
+                ? Content("Your email address is verified. You can now sign in.", "text/plain")
+                : BadRequest("This verification link is invalid, expired, or already used.");
+        }
+
+        [HttpGet("confirm-email-change")]
+        public async Task<IActionResult> ConfirmEmailChange([FromQuery] int userId, [FromQuery] string token)
+        {
+            var result = await _authService.ConfirmEmailChangeAsync(userId, token, HttpContext.Connection.RemoteIpAddress?.ToString());
+            return result
+                ? Content("Your email address has been changed successfully.", "text/plain")
+                : BadRequest("This email-change link is invalid, expired, or already used.");
+        }
+
+        [HttpGet("cancel-email-change")]
+        public async Task<IActionResult> CancelEmailChange([FromQuery] int userId, [FromQuery] string token)
+        {
+            var result = await _authService.CancelEmailChangeAsync(userId, token, HttpContext.Connection.RemoteIpAddress?.ToString());
+            return result
+                ? Content("The email change request has been cancelled.", "text/plain")
+                : BadRequest("This cancellation link is invalid, expired, or already used.");
         }
 
         [HttpPost("forgot-password")]
@@ -114,6 +184,17 @@ namespace InternshipManagement.Api.Controllers
         {
             var result = await _authService.ResetPasswordAsync(request.Email, request.Token, request.NewPassword);
             return Ok(new { Success = result });
+        }
+
+        public class UpdateProfilePictureRequest
+        {
+            public string ProfilePictureUrl { get; set; } = string.Empty;
+        }
+
+        public sealed class EnableTwoFactorRequest
+        {
+            [System.ComponentModel.DataAnnotations.Required]
+            public string Code { get; set; } = string.Empty;
         }
     }
 }

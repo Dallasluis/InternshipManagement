@@ -1,0 +1,42 @@
+@model InternshipManagement.Web.Models.Auth.EmailActionViewModel
+@{
+    ViewData["Title"] = Model.Heading;
+    var postAction = Model.Kind switch
+    {
+        "verify" => "VerifyEmailConfirmed",
+        "confirm-change" => "ConfirmEmailChangeConfirmed",
+        _ => "CancelEmailChangeConfirmed"
+    };
+}
+
+<div class="auth-container">
+    <div class="auth-card text-center">
+        @if (!Model.Done)
+        {
+            <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+            <h2 class="auth-title">@Model.Heading</h2>
+            <p class="auth-subtitle">@Model.Prompt</p>
+
+            <form asp-controller="AccountRecovery" asp-action="@postAction" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="userId" value="@Model.UserId" />
+                <input type="hidden" name="token" value="@Model.Token" />
+                <button type="submit" class="btn @(Model.Kind == "cancel-change" ? "btn-danger" : "btn-primary") w-100">@Model.ButtonText</button>
+            </form>
+        }
+        else if (Model.Success)
+        {
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h2 class="auth-title">Done</h2>
+            <p class="auth-subtitle">@Model.Message</p>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary w-100">Go to sign in</a>
+        }
+        else
+        {
+            <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+            <h2 class="auth-title">This did not work</h2>
+            <p class="auth-subtitle">@Model.Message</p>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary w-100">Go to sign in</a>
+        }
+    </div>
+</div>

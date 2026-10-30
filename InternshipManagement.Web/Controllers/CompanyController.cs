@@ -14,17 +14,23 @@ namespace InternshipManagement.Web.Controllers
         private readonly IInternshipApiClient _internshipApiClient;
         private readonly IApplicationApiClient _applicationApiClient;
         private readonly ILifecycleApiClient _lifecycleApiClient;
+        private readonly UploadedFileStorage _uploadedFileStorage;
+        private readonly IDocumentApiClient _documentApiClient;
 
         public CompanyController(
             ICompanyApiClient companyApiClient,
             IInternshipApiClient internshipApiClient,
             IApplicationApiClient applicationApiClient,
-            ILifecycleApiClient lifecycleApiClient)
+            ILifecycleApiClient lifecycleApiClient,
+            UploadedFileStorage uploadedFileStorage,
+            IDocumentApiClient documentApiClient)
         {
             _companyApiClient = companyApiClient;
             _internshipApiClient = internshipApiClient;
             _applicationApiClient = applicationApiClient;
             _lifecycleApiClient = lifecycleApiClient;
+            _uploadedFileStorage = uploadedFileStorage;
+            _documentApiClient = documentApiClient;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -69,8 +75,87 @@ namespace InternshipManagement.Web.Controllers
             return View(profile);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Verification()
+        {
+            if (string.IsNullOrWhiteSpace(GetToken()))
+                return RedirectToAction("Login", "Account");
+            var userId = HttpContext.Session.GetString("UserId");
+            if (!string.IsNullOrWhiteSpace(userId))
+                ViewBag.Profile = await _companyApiClient.GetProfileAsync(GetToken(), int.Parse(userId));
+            return View(new SubmitVerificationRequest());
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(52 * 1024 * 1024)]
+        public async Task<IActionResult> Verification(SubmitVerificationRequest request)
+        {
+            var token = GetToken();
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(userId))
+                return RedirectToAction("Login", "Account");
+            if (request.EvidenceFiles.Count == 0)
+                ModelState.AddModelError(nameof(request.EvidenceFiles), "Upload at least one verification document.");
+            if (!ModelState.IsValid)
+                return View(request);
+
+            try
+            {
+                foreach (var file in request.EvidenceFiles.Where(file => file.Length > 0))
+                {
+                    var uploaded = await _documentApiClient.UploadAsync(
+                        token, file, "CompanyEvidence", HttpContext.RequestAborted);
+                    request.EvidenceDocumentIds.Add(uploaded.Id);
+                }
+
+                if (!await _companyApiClient.SubmitVerificationAsync(token, int.Parse(userId), request))
+                {
+                    ModelState.AddModelError(string.Empty, "Unable to submit verification.");
+                    return View(request);
+                }
+
+                TempData["SuccessMessage"] = "Verification documents submitted for review.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+            catch (InvalidOperationException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View(request);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AppealVerification(SubmitVerificationAppealRequest request)
+        {
+            var token = GetToken();
+            if (string.IsNullOrWhiteSpace(token))
+                return RedirectToAction("Login", "Account");
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(Verification));
+
+            try
+            {
+                if (!await _companyApiClient.SubmitVerificationAppealAsync(token, request))
+                {
+                    TempData["ErrorMessage"] = "Unable to submit verification appeal.";
+                    return RedirectToAction(nameof(Verification));
+                }
+
+                TempData["SuccessMessage"] = "Your verification appeal has been submitted.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+            catch (InvalidOperationException exception)
+            {
+                TempData["ErrorMessage"] = exception.Message;
+                return RedirectToAction(nameof(Verification));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(3 * 1024 * 1024)]
         public async Task<IActionResult> Profile(UpdateCompanyProfileRequest request)
         {
             var token = HttpContext.Session.GetString("JwtToken");
@@ -80,7 +165,25 @@ namespace InternshipManagement.Web.Controllers
                 return RedirectToAction("Login", "Account");
 
             if (!ModelState.IsValid)
-                return View(await _companyApiClient.GetProfileAsync(token, int.Parse(userId)));
+                return View(await _companyApiClient.GetProfileAsync(token, int.Parse(userId)) ?? new CompanyProfileResponse());
+
+            if (request.LogoFile is { Length: > 0 })
+            {
+                try
+                {
+                    request.LogoUrl = await _uploadedFileStorage.SaveAsync(
+                        request.LogoFile,
+                        "company-logos",
+                        new[] { ".jpg", ".jpeg", ".png", ".webp" },
+                        2 * 1024 * 1024,
+                        HttpContext.RequestAborted);
+                }
+                catch (InvalidDataException ex)
+                {
+                    ModelState.AddModelError(nameof(request.LogoFile), ex.Message);
+                    return View(await _companyApiClient.GetProfileAsync(token, int.Parse(userId)) ?? new CompanyProfileResponse());
+                }
+            }
 
             var profile = await _companyApiClient.UpdateProfileAsync(token, int.Parse(userId), request);
             if (profile == null)
@@ -289,9 +392,13 @@ namespace InternshipManagement.Web.Controllers
                 Id = internship.Id,
                 Title = internship.Title,
                 Description = internship.Description,
+                Responsibilities = internship.Responsibilities,
+                Requirements = internship.Requirements,
+                Qualifications = internship.Qualifications,
                 Industry = internship.Industry,
                 Location = internship.Location,
                 IsRemote = internship.IsRemote,
+                WorkArrangement = internship.WorkArrangement,
                 InternshipType = internship.InternshipType,
                 Duration = internship.Duration,
                 StartDate = internship.StartDate,
@@ -302,6 +409,10 @@ namespace InternshipManagement.Web.Controllers
                 StipendAmount = internship.StipendAmount,
                 Currency = internship.Currency,
                 Skills = internship.Skills,
+                RequiredQualifications = internship.RequiredQualifications,
+                PreferredQualifications = internship.PreferredQualifications,
+                RequiredSkills = internship.RequiredSkills,
+                PreferredSkills = internship.PreferredSkills,
                 EligibleProgrammes = internship.EligibleProgrammes
             });
         }
@@ -440,6 +551,25 @@ namespace InternshipManagement.Web.Controllers
             TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
                 ? "Extension proposed."
                 : "Unable to propose extension.";
+
+            return RedirectToAction(nameof(PlacementDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReviewWithdrawal(
+            int id,
+            int withdrawalRequestId,
+            ReviewWithdrawalRequest request)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            var success = await _lifecycleApiClient.ReviewWithdrawalAsync(token, withdrawalRequestId, request);
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+                ? "Withdrawal request reviewed. If approved, the accepted internship will become active once the current placement ends."
+                : "Unable to review the withdrawal request.";
 
             return RedirectToAction(nameof(PlacementDetails), new { id });
         }

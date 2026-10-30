@@ -37,7 +37,10 @@ namespace InternshipManagement.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var internship = await _internshipService.GetInternshipByIdAsync(id);
+            var userId = int.TryParse(User.FindFirst("userId")?.Value, out var parsedUserId)
+                ? parsedUserId
+                : (int?)null;
+            var internship = await _internshipService.GetInternshipByIdAsync(id, userId);
             if (internship == null)
                 return NotFound();
 
@@ -45,7 +48,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Create([FromBody] CreateInternshipRequest request)
         {
             try
@@ -61,13 +64,16 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateInternshipRequest request)
         {
             try
             {
                 request.Id = id;
-                var result = await _internshipService.UpdateInternshipAsync(id, request);
+                var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+                var result = await _internshipService.UpdateInternshipAsync(userId, id, request);
+                if (result == null)
+                    return NotFound();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -77,12 +83,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/publish")]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Publish(int id)
         {
             try
             {
-                var result = await _internshipService.PublishInternshipAsync(id);
+                var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+                var result = await _internshipService.PublishInternshipAsync(userId, id);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -92,12 +101,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/close")]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Close(int id)
         {
             try
             {
-                var result = await _internshipService.CloseInternshipAsync(id);
+                var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+                var result = await _internshipService.CloseInternshipAsync(userId, id);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -107,15 +119,18 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _internshipService.DeleteInternshipAsync(id);
+            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+            var result = await _internshipService.DeleteInternshipAsync(userId, id);
+            if (!result)
+                return NotFound();
             return Ok(new { Success = result });
         }
 
         [HttpGet("company")]
-        [Authorize]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetCompanyInternships()
         {
             try

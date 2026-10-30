@@ -1,13 +1,13 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="InternshipManagement.Api/InternshipManagement.Api.csproj" Id="f74ee224-0f63-4b4e-ab91-5b17206608fe" />
-    <Project Path="InternshipManagement.Application/InternshipManagement.Application.csproj" />
-    <Project Path="InternshipManagement.Domain/InternshipManagement.Domain.csproj" />
-    <Project Path="InternshipManagement.Infrastructure/InternshipManagement.Infrastructure.csproj" />
+    <Project Path="InternshipManagement.Api/InternshipManagement.Api.csproj" Id="f74ee224-0f63-4b4e-ab91-5b17206608fe"/>
+    <Project Path="InternshipManagement.Application/InternshipManagement.Application.csproj"/>
+    <Project Path="InternshipManagement.Domain/InternshipManagement.Domain.csproj"/>
+    <Project Path="InternshipManagement.Infrastructure/InternshipManagement.Infrastructure.csproj"/>
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="InternshipManagement.IntegrationTests/InternshipManagement.IntegrationTests.csproj" />
-    <Project Path="InternshipManagement.UnitTests/InternshipManagement.UnitTests.csproj" />
+    <Project Path="InternshipManagement.IntegrationTests/InternshipManagement.IntegrationTests.csproj"/>
+    <Project Path="InternshipManagement.UnitTests/InternshipManagement.UnitTests.csproj"/>
   </Folder>
-  <Project Path="InternshipManagement.Web/InternshipManagement.Web.csproj" Id="cb5914bc-6a30-45d0-bf1b-f99dd7d2084d" />
+  <Project Path="InternshipManagement.Web/InternshipManagement.Web.csproj" Id="cb5914bc-6a30-45d0-bf1b-f99dd7d2084d"/>
 </Solution>

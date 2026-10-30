@@ -10,5 +10,10 @@ namespace InternshipManagement.Application.DTOs.Auth
 
         [Required]
         public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
+        public string? TwoFactorCode { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string? ClientIpAddress { get; set; }
     }
 }

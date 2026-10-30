@@ -7,10 +7,17 @@ namespace InternshipManagement.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IAuthApiClient _authApiClient;
+        private readonly UploadedFileStorage _uploadedFileStorage;
+        private readonly ITwoFactorApiClient _twoFactorApiClient;
 
-        public AccountController(IAuthApiClient authApiClient)
+        public AccountController(
+            IAuthApiClient authApiClient,
+            UploadedFileStorage uploadedFileStorage,
+            ITwoFactorApiClient twoFactorApiClient)
         {
             _authApiClient = authApiClient;
+            _uploadedFileStorage = uploadedFileStorage;
+            _twoFactorApiClient = twoFactorApiClient;
         }
 
         [HttpGet]
@@ -57,10 +64,25 @@ namespace InternshipManagement.Web.Controllers
 
             if (!result.Success)
             {
+                if (result.RequiresTwoFactor)
+                {
+                    model.RequiresTwoFactor = true;
+                    ModelState.AddModelError(string.Empty, result.Message ?? "Enter the 6-digit code we emailed you.");
+                    return View(model);
+                }
+
                 foreach (var error in result.Errors ?? new List<string>())
                     ModelState.AddModelError(string.Empty, error);
 
                 return View(model);
+            }
+
+            if (result.RequiresTwoFactorSetup)
+            {
+                HttpContext.Session.SetString("JwtToken", result.Token ?? string.Empty);
+                HttpContext.Session.SetString("UserId", result.UserId ?? string.Empty);
+                HttpContext.Session.SetString("UserType", result.UserType ?? string.Empty);
+                return RedirectToAction(nameof(TwoFactorSetup));
             }
 
             // Store JWT and user info in Session
@@ -69,6 +91,9 @@ namespace InternshipManagement.Web.Controllers
             HttpContext.Session.SetString("UserType", result.UserType ?? string.Empty);
             HttpContext.Session.SetString("UserEmail", result.Email ?? string.Empty);
             HttpContext.Session.SetString("UserFullName", $"{result.FirstName} {result.LastName}".Trim());
+            HttpContext.Session.SetString("ProfilePictureUrl", result.ProfilePictureUrl ?? string.Empty);
+            HttpContext.Session.SetString("EmailConfirmed", result.EmailConfirmed.ToString());
+            HttpContext.Session.SetString("RefreshToken", result.RefreshToken ?? string.Empty);
 
             // Redirect based on user type
             return result.UserType switch
@@ -82,8 +107,18 @@ namespace InternshipManagement.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout([FromServices] IAiApiClient api)
         {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                // Ends the session on the API too, so the refresh token cannot be used again from somewhere else.
+                // Best effort: the user is signed out here whether or not the API answers.
+                int.TryParse(HttpContext.Session.GetString("UserId"), out var userId);
+                await api.SendAsync(token, HttpMethod.Post, "api/Auth/logout",
+                    new StringContent($"{{\"userId\":{userId}}}", System.Text.Encoding.UTF8, "application/json"));
+            }
+
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
         }
@@ -101,8 +136,88 @@ namespace InternshipManagement.Web.Controllers
                 UserFullName = HttpContext.Session.GetString("UserFullName"),
                 UserEmail = HttpContext.Session.GetString("UserEmail"),
                 UserType = HttpContext.Session.GetString("UserType"),
+                ProfilePictureUrl = HttpContext.Session.GetString("ProfilePictureUrl"),
                 Preferences = await _authApiClient.GetPreferencesAsync(token) ?? new AccountPreferencesViewModel()
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TwoFactorSetup()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrWhiteSpace(token))
+                return RedirectToAction(nameof(Login));
+
+            var setup = await _twoFactorApiClient.GetSetupAsync(token);
+            if (setup == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load authenticator setup.";
+                return RedirectToAction(nameof(Settings));
+            }
+
+            return View(setup);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EnableTwoFactor(TwoFactorSetupViewModel model)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrWhiteSpace(token))
+                return RedirectToAction(nameof(Login));
+
+            var result = await _twoFactorApiClient.EnableAsync(token, model.Code);
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = string.Join(" ", result.Errors ?? new List<string> { "Unable to enable two-factor authentication." });
+                return RedirectToAction(nameof(TwoFactorSetup));
+            }
+
+            HttpContext.Session.Clear();
+            TempData["StatusMessage"] = result.Message ?? "Two-factor authentication enabled. Sign in again.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(3 * 1024 * 1024)]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile? profilePicture)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrWhiteSpace(token))
+                return RedirectToAction(nameof(Login));
+
+            if (profilePicture == null)
+            {
+                TempData["ErrorMessage"] = "Choose a profile picture to upload.";
+                return RedirectToAction(nameof(Settings));
+            }
+
+            try
+            {
+                var pictureUrl = await _uploadedFileStorage.SaveAsync(
+                    profilePicture,
+                    "profile-pictures",
+                    new[] { ".jpg", ".jpeg", ".png", ".webp" },
+                    2 * 1024 * 1024,
+                    HttpContext.RequestAborted);
+
+                var result = await _authApiClient.UpdateProfilePictureAsync(token, pictureUrl);
+                if (!result.Success)
+                {
+                    TempData["ErrorMessage"] = string.Join(" ", result.Errors ?? new List<string> { "Unable to update profile picture." });
+                    return RedirectToAction(nameof(Settings));
+                }
+
+                HttpContext.Session.SetString("ProfilePictureUrl", pictureUrl);
+                TempData["SuccessMessage"] = "Profile picture updated.";
+            }
+            catch (InvalidDataException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Settings));
         }
 
         [HttpPost]

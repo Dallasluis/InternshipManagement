@@ -19,6 +19,8 @@ namespace InternshipManagement.Application.DTOs.Lifecycle
         public DateTime? CompletedAt { get; set; }
         public DateTime? TerminatedAt { get; set; }
         public string? TerminationReason { get; set; }
+        public List<ExtensionRequestResponse> ExtensionRequests { get; set; } = new();
+        public List<WithdrawalRequestResponse> WithdrawalRequests { get; set; } = new();
     }
 
     public class ApplicationStatusHistoryResponse
@@ -41,7 +43,7 @@ namespace InternshipManagement.Application.DTOs.Lifecycle
         public string? Challenges { get; set; }
         public string? Achievements { get; set; }
         public string? Comments { get; set; }
-        public List<string>? SupportingDocumentUrls { get; set; }
+        public List<Guid>? SupportingDocumentIds { get; set; }
     }
 
     public class ProgressReportResponse
@@ -55,7 +57,7 @@ namespace InternshipManagement.Application.DTOs.Lifecycle
         public string? Challenges { get; set; }
         public string? Achievements { get; set; }
         public string? Comments { get; set; }
-        public List<string> SupportingDocumentUrls { get; set; } = new();
+        public List<Guid> SupportingDocumentIds { get; set; } = new();
         public string Status { get; set; } = string.Empty;
         public string? CompanyFeedback { get; set; }
         public DateTime? ReviewedAt { get; set; }

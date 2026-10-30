@@ -49,12 +49,12 @@
                                 <td>@internship.ApplicationsCount</td>
                                 <td>
                                     <span class="badge @GetStatusBadgeClass(internship.Status)">
-                                        @internship.Status
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.Status)
                                     </span>
                                 </td>
                                 <td>
                                     <span class="badge @GetModerationBadgeClass(internship.ModerationStatus)">
-                                        @internship.ModerationStatus
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.ModerationStatus)
                                     </span>
                                 </td>
                                 <td>
@@ -102,24 +102,9 @@
 </div>
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Draft" => "bg-secondary",
-        "Published" => "bg-success",
-        "Closed" => "bg-danger",
-        "Filled" => "bg-info",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 
-    private string GetModerationBadgeClass(string status) => status switch
-    {
-        "Approved" => "bg-success",
-        "Pending" => "bg-warning",
-        "Rejected" => "bg-danger",
-        "Flagged" => "bg-warning",
-        "Removed" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetModerationBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }
 
 @section Scripts {

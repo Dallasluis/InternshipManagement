@@ -22,11 +22,18 @@
     <div class="col-lg-4">
         <div class="card text-center">
             <div class="card-body">
-                <div class="company-avatar-large mx-auto mb-3">@Model?.CompanyName?.FirstOrDefault()</div>
+                @if (!string.IsNullOrWhiteSpace(Model?.LogoUrl))
+                {
+                    <img src="@Model.LogoUrl" alt="Company logo" class="company-avatar-large mx-auto mb-3" />
+                }
+                else
+                {
+                    <div class="company-avatar-large mx-auto mb-3">@Model?.CompanyName?.FirstOrDefault()</div>
+                }
                 <h5>@Model?.CompanyName</h5>
                 <p class="text-muted">@Model?.Industry</p>
                 <span class="badge @GetVerificationBadgeClass(Model?.VerificationStatus)">
-                    @Model?.VerificationStatus
+                    @InternshipManagement.Web.Helpers.StatusDisplay.VerificationLabel(Model?.VerificationStatus)
                 </span>
             </div>
         </div>
@@ -37,8 +44,23 @@
                 <h6 class="mb-0">Edit Company Profile</h6>
             </div>
             <div class="card-body">
-                <form asp-controller="Company" asp-action="Profile" method="post">
+                <form asp-controller="Company" asp-action="Profile" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="LegalName" class="form-label">Legal company name</label>
+                        <input id="LegalName" name="LegalName" class="form-control" value="@Model?.LegalName" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="RegistrationNumber" class="form-label">Registration number</label>
+                        <input id="RegistrationNumber" name="RegistrationNumber" class="form-control" value="@Model?.RegistrationNumber" />
+                    </div>
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
+                    <div class="mb-3">
+                        <label for="LogoFile" class="form-label">Company Logo</label>
+                        <input id="LogoFile" name="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                        <small class="text-muted">JPG, PNG, or WebP up to 2 MB.</small>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
@@ -91,21 +113,14 @@
 </div>
 
 @functions {
-    private string GetVerificationBadgeClass(string? status) => status switch
-    {
-        "Verified" => "bg-success",
-        "Pending" => "bg-warning",
-        "UnderReview" => "bg-info",
-        "Rejected" => "bg-danger",
-        "Suspended" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetVerificationBadgeClass(string? status) => InternshipManagement.Web.Helpers.StatusDisplay.VerificationBadge(status);
 }
 
 <style>
     .company-avatar-large {
         width: 80px;
         height: 80px;
+        object-fit: cover;
         background: #2563eb;
         color: white;
         border-radius: 50%;

@@ -13,13 +13,14 @@ namespace InternshipManagement.Web.Models.Student
         public string? Programme { get; set; }
         public string? YearOfStudy { get; set; }
         public string? ExpectedGraduationYear { get; set; }
-        public string? ResumeUrl { get; set; }
-        public string? CoverLetterUrl { get; set; }
-        public string? AcademicTranscriptUrl { get; set; }
-        public string? QualificationDocumentUrl { get; set; }
-        public string? IdentificationDocumentUrl { get; set; }
-        public string? CertificatesUrl { get; set; }
-        public string? OtherSupportingDocumentsUrl { get; set; }
+        public Guid? ResumeDocumentId { get; set; }
+        public Guid? CoverLetterDocumentId { get; set; }
+        public Guid? AcademicTranscriptDocumentId { get; set; }
+        public Guid? QualificationDocumentId { get; set; }
+        public Guid? IdentificationDocumentId { get; set; }
+        public Guid? CertificatesDocumentId { get; set; }
+        public Guid? OtherSupportingDocumentsId { get; set; }
+        public string? ProfilePictureUrl { get; set; }
         [JsonIgnore]
         public IFormFile? ResumeFile { get; set; }
         [JsonIgnore]
@@ -34,5 +35,7 @@ namespace InternshipManagement.Web.Models.Student
         public IFormFile? CertificatesFile { get; set; }
         [JsonIgnore]
         public IFormFile? OtherSupportingDocumentsFile { get; set; }
+        [JsonIgnore]
+        public IFormFile? ProfilePictureFile { get; set; }
     }
 }

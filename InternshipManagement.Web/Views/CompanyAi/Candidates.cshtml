@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Best candidates";
+    var internshipId = (int)(ViewData["InternshipId"] ?? 0);
+}
+
+<div id="ai-root" data-page="candidates"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-candidates-url="@Url.Action("CandidatesData", "CompanyAi")"
+     data-internship-id="@internshipId">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <a asp-controller="Company" asp-action="ManageInternships" class="text-muted">&larr; Back to my internships</a>
+    </div>
+
+    <div class="mb-4">
+        <h1 class="h2 mb-1">Best candidates</h1>
+        <p class="text-muted mb-0">
+            Students whose profiles fit this internship best, based on skills, qualifications and experience.
+            This is a guide only: review every application yourself before deciding.
+        </p>
+    </div>
+
+    <div id="candidates-errors"></div>
+    <div id="candidates-list"><div class="text-muted py-4 text-center">Finding candidates…</div></div>
+</div>
+
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+@section Scripts { <script src="~/js/company-ai.js" asp-append-version="true"></script> }

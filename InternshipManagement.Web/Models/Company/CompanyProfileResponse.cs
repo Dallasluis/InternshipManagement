@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public string CompanyName { get; set; } = string.Empty;
+        public string? LegalName { get; set; }
+        public string? RegistrationNumber { get; set; }
         public string? Description { get; set; }
         public string Industry { get; set; } = string.Empty;
         public string? Website { get; set; }
@@ -14,6 +16,9 @@
         public string? Country { get; set; }
         public string? PhoneNumber { get; set; }
         public string VerificationStatus { get; set; } = string.Empty;
+        public bool HasUsedVerificationAppeal { get; set; }
+        public bool AppealPending { get; set; }
+        public DateTime? AppealSubmittedAt { get; set; }
         public bool IsSubscribed { get; set; }
         public DateTime? SubscriptionStartDate { get; set; }
         public DateTime? SubscriptionEndDate { get; set; }

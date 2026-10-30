@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Skill gaps";
+    var internshipId = ViewData["InternshipId"] as int?;
+}
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
+<div id="ai-root" data-page="gaps"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-job-url="@Url.Action("Job", "StudentAi")"
+     data-details-url="@Url.Action("Details", "Internships")"
+     data-gaps-url="@Url.Action("Gaps", "StudentAi")"
+     data-start-url="@Url.Action("StartGaps", "StudentAi")"
+     data-internship-id="@internshipId">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-4">
+        <h1 class="h2 mb-1">Skill gaps</h1>
+        <p class="text-muted mb-0">
+            @if (internshipId.HasValue)
+            {
+                <text>What you are missing for this internship, and certificates that could help.</text>
+            }
+            else
+            {
+                <text>What you are missing for the internships that fit you best, and certificates that could help.</text>
+            }
+        </p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body d-flex flex-wrap align-items-center gap-3">
+            <button id="gaps-ai-btn" type="button" class="btn btn-primary">Add an AI summary</button>
+            <span id="gaps-note" class="small text-muted" aria-live="polite"></span>
+        </div>
+    </div>
+
+    <div id="gaps-errors"></div>
+    <div id="gaps-result"><div class="text-muted py-4 text-center">Comparing your profile…</div></div>
+</div>
+
+@section Scripts { <script src="~/js/student-ai.js" asp-append-version="true"></script> }

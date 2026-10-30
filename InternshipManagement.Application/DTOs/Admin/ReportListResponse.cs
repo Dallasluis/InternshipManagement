@@ -27,5 +27,7 @@ namespace InternshipManagement.Application.DTOs.Admin
     {
         public string Response { get; set; } = string.Empty;
         public bool Resolved { get; set; }
+        public string? Status { get; set; }
+        public bool FraudUpheld { get; set; }
     }
 }

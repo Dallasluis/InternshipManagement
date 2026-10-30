@@ -20,9 +20,13 @@ namespace InternshipManagement.Infrastructure.Persistence
         public DbSet<Education> Educations { get; set; }
         public DbSet<WorkExperience> WorkExperiences { get; set; }
         public DbSet<Skill> Skills { get; set; }
+        public DbSet<StudentCertification> StudentCertifications { get; set; }
+        public DbSet<StudentProject> StudentProjects { get; set; }
         public DbSet<CompanyProfile> CompanyProfiles { get; set; }
         public DbSet<CompanyRepresentative> CompanyRepresentatives { get; set; }
         public DbSet<Internship> Internships { get; set; }
+        public DbSet<InternshipDraft> InternshipDrafts { get; set; }
+        public DbSet<AiJob> AiJobs { get; set; }
         public DbSet<InternshipApplication> InternshipApplications { get; set; }
         public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; }
         public DbSet<Placement> Placements { get; set; }
@@ -31,6 +35,12 @@ namespace InternshipManagement.Infrastructure.Persistence
         public DbSet<InternshipWithdrawalRequest> InternshipWithdrawalRequests { get; set; }
         public DbSet<InternshipEvaluation> InternshipEvaluations { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<AccountSecurityEvent> AccountSecurityEvents { get; set; }
+        public DbSet<EmailActionToken> EmailActionTokens { get; set; }
+        public DbSet<CompanyVerificationHistory> CompanyVerificationHistories { get; set; }
+        public DbSet<PrivateDocument> PrivateDocuments { get; set; }
+        public DbSet<DocumentAccessToken> DocumentAccessTokens { get; set; }
+        public DbSet<DocumentAccessAudit> DocumentAccessAudits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,12 +51,71 @@ namespace InternshipManagement.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new CompanyProfileConfiguration());
             modelBuilder.ApplyConfiguration(new InternshipConfiguration());
             modelBuilder.ApplyConfiguration(new ApplicationConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.InternshipDraftConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.AiJobConfiguration());
             ConfigureLifecycleEntities(modelBuilder);
+            modelBuilder.Entity<AccountSecurityEvent>(builder =>
+            {
+                builder.HasKey(e => e.Id);
+                builder.Property(e => e.EventType).IsRequired().HasMaxLength(100);
+                builder.Property(e => e.Details).HasMaxLength(2000);
+                builder.Property(e => e.IpAddress).HasMaxLength(64);
+                builder.HasIndex(e => e.CreatedAt);
+                builder.HasIndex(e => new { e.UserId, e.CreatedAt });
+            });
+            modelBuilder.Entity<EmailActionToken>(builder =>
+            {
+                builder.HasKey(e => e.TokenHash);
+                builder.Property(e => e.TokenHash).HasMaxLength(64);
+                builder.Property(e => e.Purpose).IsRequired().HasMaxLength(40);
+                builder.Property(e => e.TargetEmail).HasMaxLength(256);
+                builder.HasIndex(e => new { e.UserId, e.Purpose, e.CreatedAt });
+                builder.HasIndex(e => e.ExpiresAt);
+            });
+            modelBuilder.Entity<CompanyVerificationHistory>(builder =>
+            {
+                builder.HasKey(e => e.Id);
+                builder.Property(e => e.ReasonCode).HasMaxLength(100);
+                builder.Property(e => e.Notes).HasMaxLength(2000);
+                builder.Property(e => e.CriteriaAssessmentJson).HasColumnType("nvarchar(max)");
+                builder.Property(e => e.EvidenceDocumentIdsJson).HasColumnType("nvarchar(max)");
+                builder.HasIndex(e => new { e.CompanyProfileId, e.CreatedAt });
+                builder.HasIndex(e => new { e.ChangedByUserId, e.CreatedAt });
+            });
+            modelBuilder.Entity<PrivateDocument>(builder =>
+            {
+                builder.HasKey(e => e.Id);
+                builder.Property(e => e.Category).IsRequired().HasMaxLength(50);
+                builder.Property(e => e.OriginalFileName).IsRequired().HasMaxLength(255);
+                builder.Property(e => e.ContentType).IsRequired().HasMaxLength(100);
+                builder.HasIndex(e => new { e.OwnerUserId, e.RetentionState });
+            });
+            modelBuilder.Entity<DocumentAccessToken>(builder =>
+            {
+                builder.HasKey(e => e.TokenHash);
+                builder.Property(e => e.TokenHash).HasMaxLength(64);
+                builder.HasIndex(e => e.ExpiresAt);
+                builder.HasIndex(e => new { e.DocumentId, e.RequestedByUserId });
+            });
+            modelBuilder.Entity<DocumentAccessAudit>(builder =>
+            {
+                builder.HasKey(e => e.Id);
+                builder.Property(e => e.Action).IsRequired().HasMaxLength(30);
+                builder.HasIndex(e => new { e.DocumentId, e.AccessedAt });
+                builder.HasIndex(e => new { e.UserId, e.AccessedAt });
+            });
 
             // Global query filters (soft delete) - keep these here
             modelBuilder.Entity<StudentProfile>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Education>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<WorkExperience>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Skill>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<StudentCertification>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<StudentProject>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<CompanyProfile>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Internship>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<InternshipDraft>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<AiJob>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<InternshipApplication>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ApplicationStatusHistory>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Placement>().HasQueryFilter(e => !e.IsDeleted);

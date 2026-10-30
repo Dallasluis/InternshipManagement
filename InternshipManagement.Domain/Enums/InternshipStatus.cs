@@ -11,11 +11,15 @@
     // Additional enums needed for the system
     public enum CompanyVerificationStatus
     {
-        Pending,
-        UnderReview,
-        Verified,
-        Rejected,
-        Suspended
+        Unverified = 0,
+        Pending = Unverified,
+        PendingReview = 1,
+        UnderReview = PendingReview,
+        Verified = 2,
+        Rejected = 3,
+        Suspended = 4,
+        MoreInformationRequested = 5,
+        ReverificationRequired = 6
     }
 
     public enum ModerationStatus
@@ -35,6 +39,13 @@
         Winter,
         YearRound,
         Flexible
+    }
+
+    public enum InternshipWorkArrangement
+    {
+        OnSite,
+        Remote,
+        Hybrid
     }
 
     public enum InternshipDuration

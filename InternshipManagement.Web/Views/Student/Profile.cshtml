@@ -1,6 +1,16 @@
 ﻿@model InternshipManagement.Web.Models.Student.StudentProfileResponse
 @{
     ViewData["Title"] = "My Profile";
+    var existingDocuments = new[]
+    {
+        ("CV / Resume", Model?.ResumeDocumentId),
+        ("Cover letter", Model?.CoverLetterDocumentId),
+        ("Transcript", Model?.AcademicTranscriptDocumentId),
+        ("Qualification", Model?.QualificationDocumentId),
+        ("Identification", Model?.IdentificationDocumentId),
+        ("Certificates", Model?.CertificatesDocumentId),
+        ("Other supporting documents", Model?.OtherSupportingDocumentsId)
+    };
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -22,7 +32,14 @@
     <div class="col-lg-4">
         <div class="card text-center">
             <div class="card-body">
-                <div class="avatar-circle-large mx-auto mb-3">@Model?.FirstName?.FirstOrDefault()</div>
+                @if (!string.IsNullOrWhiteSpace(Model?.ProfilePictureUrl))
+                {
+                    <img src="@Model.ProfilePictureUrl" alt="Profile picture" class="avatar-circle-large mx-auto mb-3" />
+                }
+                else
+                {
+                    <div class="avatar-circle-large mx-auto mb-3">@Model?.FirstName?.FirstOrDefault()</div>
+                }
                 <h5>@Model?.FirstName @Model?.LastName</h5>
                 <p class="text-muted">@Model?.Programme</p>
                 <p class="text-muted small">@Model?.University</p>
@@ -37,6 +54,36 @@
             <div class="card-body">
                 <form asp-controller="Student" asp-action="Profile" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
+                    <input type="hidden" name="ResumeDocumentId" value="@Model?.ResumeDocumentId" />
+                    <input type="hidden" name="CoverLetterDocumentId" value="@Model?.CoverLetterDocumentId" />
+                    <input type="hidden" name="AcademicTranscriptDocumentId" value="@Model?.AcademicTranscriptDocumentId" />
+                    <input type="hidden" name="QualificationDocumentId" value="@Model?.QualificationDocumentId" />
+                    <input type="hidden" name="IdentificationDocumentId" value="@Model?.IdentificationDocumentId" />
+                    <input type="hidden" name="CertificatesDocumentId" value="@Model?.CertificatesDocumentId" />
+                    <input type="hidden" name="OtherSupportingDocumentsId" value="@Model?.OtherSupportingDocumentsId" />
+                    @if (existingDocuments.Any(document => document.Item2.HasValue))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Current uploaded documents</label>
+                            <ul>
+                                @foreach (var document in existingDocuments)
+                                {
+                                    if (document.Item2.HasValue)
+                                    {
+                                        <li><a asp-controller="Documents" asp-action="Download" asp-route-id="@document.Item2.Value">@document.Item1</a></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="ProfilePictureFile" class="form-label">Profile Picture</label>
+                        <input id="ProfilePictureFile" name="ProfilePictureFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                        <small class="text-muted">JPG, PNG, or WebP up to 2 MB.</small>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Bio</label>
@@ -94,38 +141,22 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">CV / Resume URL</label>
-                        <input type="url" name="ResumeUrl" class="form-control" value="@Model?.ResumeUrl" placeholder="https://..." />
-                    </div>
-
-                    <div class="mb-3">
                         <label for="CoverLetterFile" class="form-label">Upload Cover Letter (Required)</label>
                         <input id="CoverLetterFile" name="CoverLetterFile" type="file" class="form-control" accept=".pdf,.doc,.docx" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Cover Letter URL</label>
-                        <input type="url" name="CoverLetterUrl" class="form-control" value="@Model?.CoverLetterUrl" placeholder="https://..." />
-                    </div>
-
-                    <div class="mb-3">
                         <label for="AcademicTranscriptFile" class="form-label">Academic Record / Transcript</label>
                         <input id="AcademicTranscriptFile" name="AcademicTranscriptFile" type="file" class="form-control" accept=".pdf,.doc,.docx" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Academic Transcript URL</label>
-                        <input type="url" name="AcademicTranscriptUrl" class="form-control" value="@Model?.AcademicTranscriptUrl" placeholder="https://..." />
+                        <div class="extra-files" data-category="Transcript"></div>
+                        <button type="button" class="btn btn-link btn-sm px-0 add-extra" data-category="Transcript"><i class="fas fa-plus me-1"></i>Add another file</button>
                     </div>
 
                     <div class="mb-3">
                         <label for="QualificationDocumentFile" class="form-label">Proof of Qualification / Diploma</label>
                         <input id="QualificationDocumentFile" name="QualificationDocumentFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Qualification Document URL</label>
-                        <input type="url" name="QualificationDocumentUrl" class="form-control" value="@Model?.QualificationDocumentUrl" placeholder="https://..." />
+                        <div class="extra-files" data-category="Qualification"></div>
+                        <button type="button" class="btn btn-link btn-sm px-0 add-extra" data-category="Qualification"><i class="fas fa-plus me-1"></i>Add another file</button>
                     </div>
 
                     <div class="mb-3">
@@ -134,28 +165,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">ID / Passport URL</label>
-                        <input type="url" name="IdentificationDocumentUrl" class="form-control" value="@Model?.IdentificationDocumentUrl" placeholder="https://..." />
-                    </div>
-
-                    <div class="mb-3">
                         <label for="CertificatesFile" class="form-label">Certificates / Short Courses</label>
                         <input id="CertificatesFile" name="CertificatesFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Certificates URL</label>
-                        <input type="url" name="CertificatesUrl" class="form-control" value="@Model?.CertificatesUrl" placeholder="https://..." />
+                        <div class="extra-files" data-category="Certificate"></div>
+                        <button type="button" class="btn btn-link btn-sm px-0 add-extra" data-category="Certificate"><i class="fas fa-plus me-1"></i>Add another file</button>
                     </div>
 
                     <div class="mb-3">
                         <label for="OtherSupportingDocumentsFile" class="form-label">Other Supporting Documents</label>
                         <input id="OtherSupportingDocumentsFile" name="OtherSupportingDocumentsFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Supporting Documents URL</label>
-                        <input type="url" name="OtherSupportingDocumentsUrl" class="form-control" value="@Model?.OtherSupportingDocumentsUrl" placeholder="https://..." />
+                        <div class="extra-files" data-category="Supporting"></div>
+                        <button type="button" class="btn btn-link btn-sm px-0 add-extra" data-category="Supporting"><i class="fas fa-plus me-1"></i>Add another file</button>
                     </div>
 
                     <button type="submit" class="btn btn-primary">
@@ -164,6 +184,30 @@
                 </form>
             </div>
         </div>
+
+        @if (ViewBag.OwnedDocuments is IEnumerable<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse> ownedDocuments
+             && ownedDocuments.Any(document => document.RetentionState == "Active"))
+        {
+            <div class="card mt-3">
+                <div class="card-header bg-white"><h6 class="mb-0">All my uploaded documents</h6></div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var document in ownedDocuments.Where(document => document.RetentionState == "Active"))
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                            <span class="text-break">@document.OriginalFileName <span class="badge bg-light text-dark border ms-1">@document.Category</span></span>
+                            <span class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" asp-controller="Documents" asp-action="Download" asp-route-id="@document.Id">Download</a>
+                                <form asp-controller="Student" asp-action="RemoveDocument" method="post" class="d-inline" onsubmit="return confirm('Remove this document?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@document.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
 </div>
 
@@ -171,6 +215,7 @@
     .avatar-circle-large {
         width: 80px;
         height: 80px;
+        object-fit: cover;
         background: #2563eb;
         color: white;
         border-radius: 50%;
@@ -181,3 +226,32 @@
         font-weight: 600;
     }
 </style>
+
+@section Scripts {
+    <script>
+        // "Add another file" under a document type: adds one more file box (as many as needed).
+        document.querySelectorAll('.add-extra').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var category = button.getAttribute('data-category');
+                var holder = button.parentElement.querySelector('.extra-files[data-category="' + category + '"]');
+                if (holder.children.length >= 10) return;
+                var row = document.createElement('div');
+                row.className = 'input-group mt-2';
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.name = 'Extra_' + category;
+                input.className = 'form-control';
+                input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+                var remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'btn btn-outline-secondary';
+                remove.setAttribute('aria-label', 'Remove this file box');
+                remove.innerHTML = '<i class="fas fa-times"></i>';
+                remove.addEventListener('click', function () { row.remove(); });
+                row.appendChild(input);
+                row.appendChild(remove);
+                holder.appendChild(row);
+            });
+        });
+    </script>
+}

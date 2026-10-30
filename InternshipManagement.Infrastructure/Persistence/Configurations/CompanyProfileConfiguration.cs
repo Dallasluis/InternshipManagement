@@ -17,6 +17,9 @@ namespace InternshipManagement.Domain.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
+            builder.Property(c => c.LegalName).HasMaxLength(200);
+            builder.Property(c => c.RegistrationNumber).HasMaxLength(100);
+
             builder.Property(c => c.Description)
                 .HasMaxLength(2000);
 

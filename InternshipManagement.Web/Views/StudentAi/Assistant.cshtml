@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Career assistant";
+    var embedded = Context.Request.Query["embed"] == "1";
+}
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
+<div id="ai-root" data-page="assistant"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-job-url="@Url.Action("Job", "StudentAi")"
+     data-details-url="@Url.Action("Details", "Internships")"
+     data-chat-url="@Url.Action("Chat", "StudentAi")"
+     data-greeting="Hi! I can look at your profile and help with your internship search: what to improve, how to prepare, which skills to learn. What would you like to know?">
+    @Html.AntiForgeryToken()
+
+    @if (embedded)
+    {
+        <style>.chat-log { height: calc(100vh - 290px); min-height: 160px; }</style>
+        <div class="text-end mb-2">
+            <button id="chat-reset" type="button" class="btn btn-outline-secondary btn-sm">New conversation</button>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="h2 mb-1">Career assistant</h1>
+                <p class="text-muted mb-0">Ask about your profile, skills and internship search. It can read your profile but cannot change anything or apply for you.</p>
+            </div>
+            <button id="chat-reset" type="button" class="btn btn-outline-secondary btn-sm">New conversation</button>
+        </div>
+    }
+
+    <div id="chat-log" class="chat-log mb-3" aria-live="polite"></div>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="What are the biggest gaps in my profile?">What are my biggest gaps?</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="Which skills should I learn first to improve my chances?">Which skills should I learn first?</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="How should I prepare for an internship interview?">How do I prepare for an interview?</button>
+    </div>
+
+    <form id="chat-form" class="d-flex gap-2 align-items-end">
+        <div class="flex-grow-1">
+            <textarea id="chat-input" class="form-control" rows="2" maxlength="1000" placeholder="Type your question…"></textarea>
+            <div class="small text-muted text-end"><span id="chat-count">0 / 1000</span></div>
+        </div>
+        <div class="d-flex flex-column gap-1">
+            <button id="chat-send" type="submit" class="btn btn-primary">Send</button>
+            <button id="chat-stop" type="button" class="btn btn-outline-secondary btn-sm d-none">Stop</button>
+        </div>
+    </form>
+    <p class="small text-muted mt-2 mb-0">AI answers can be wrong. Check anything important before acting on it.</p>
+</div>
+
+@section Scripts { <script src="~/js/student-ai.js" asp-append-version="true"></script> }

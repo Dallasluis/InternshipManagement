@@ -15,9 +15,14 @@ namespace InternshipManagement.Application.DTOs.Internship
         public string? Requirements { get; set; }
         public string? Qualifications { get; set; }
         public string? Skills { get; set; }
+        public string? RequiredQualifications { get; set; }
+        public string? PreferredQualifications { get; set; }
+        public string? RequiredSkills { get; set; }
+        public string? PreferredSkills { get; set; }
         public string Industry { get; set; }
         public string? Location { get; set; }
         public bool IsRemote { get; set; }
+        public string WorkArrangement { get; set; } = "OnSite";
         public string InternshipType { get; set; }
         public string Duration { get; set; }
         public DateTime StartDate { get; set; }

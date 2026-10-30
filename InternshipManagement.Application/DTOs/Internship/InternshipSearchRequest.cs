@@ -6,6 +6,7 @@
         public string? Location { get; set; }
         public string? Industry { get; set; }
         public string? InternshipType { get; set; }
+        public string? WorkArrangement { get; set; }
         public decimal? MinStipend { get; set; }
         public bool? IsRemote { get; set; }
         public string? Programme { get; set; }

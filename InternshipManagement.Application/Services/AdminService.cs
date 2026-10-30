@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using InternshipManagement.Application.DTOs.Admin;
 using InternshipManagement.Application.Interfaces;
 using InternshipManagement.Domain.Enums;
+using InternshipManagement.Domain.Entities;
 
 namespace InternshipManagement.Application.Services
 {
@@ -9,11 +10,16 @@ namespace InternshipManagement.Application.Services
     {
         private readonly IApplicationDbContext _context;
         private readonly IIdentityService _identityService;
+        private readonly IEmailSender _emailSender;
 
-        public AdminService(IApplicationDbContext context, IIdentityService identityService)
+        public AdminService(
+            IApplicationDbContext context,
+            IIdentityService identityService,
+            IEmailSender emailSender)
         {
             _context = context;
             _identityService = identityService;
+            _emailSender = emailSender;
         }
 
         public async Task<AdminStatsResponse> GetStatsAsync()
@@ -194,15 +200,44 @@ namespace InternshipManagement.Application.Services
             }).ToList();
         }
 
-        public async Task<bool> ResolveReportAsync(int reportId, string response, bool resolved)
+        public async Task<bool> ResolveReportAsync(
+            int reportId,
+            string response,
+            ReportStatus status,
+            bool fraudUpheld,
+            int adminUserId)
         {
             var report = await _context.Reports.FirstOrDefaultAsync(r => r.Id == reportId && !r.IsDeleted);
             if (report == null) return false;
 
             report.AdminResponse = response;
-            report.Status = resolved ? ReportStatus.Resolved : ReportStatus.Dismissed;
-            report.ResolvedAt = DateTime.UtcNow;
+            report.Status = status;
+            report.ResolvedAt = status is ReportStatus.Resolved or ReportStatus.Dismissed ? DateTime.UtcNow : null;
+            report.ResolvedBy = status is ReportStatus.Resolved or ReportStatus.Dismissed ? adminUserId : null;
             report.UpdatedAt = DateTime.UtcNow;
+
+            if (report.Type is ReportType.Fraud or ReportType.Scam
+                && (status == ReportStatus.UnderInvestigation || fraudUpheld))
+            {
+                var internship = await _context.Internships
+                    .Include(item => item.CompanyProfile)
+                    .FirstOrDefaultAsync(item => item.Id == report.InternshipId && !item.IsDeleted);
+                if (internship?.CompanyProfile is { VerificationStatus: CompanyVerificationStatus.Verified } company)
+                {
+                    company.VerificationStatus = CompanyVerificationStatus.ReverificationRequired;
+                    company.ReverificationRequiredAt = DateTime.UtcNow;
+                    company.UpdatedAt = DateTime.UtcNow;
+                    _context.CompanyVerificationHistories.Add(new CompanyVerificationHistory
+                    {
+                        CompanyProfileId = company.Id,
+                        Status = CompanyVerificationStatus.ReverificationRequired,
+                        ReasonCode = fraudUpheld ? "FRAUD_REPORT_UPHELD" : "FRAUD_REPORT_UNDER_INVESTIGATION",
+                        Notes = response,
+                        ChangedByUserId = adminUserId,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    });
+                }
+            }
 
             await _context.SaveChangesAsync();
             return true;
@@ -224,9 +259,76 @@ namespace InternshipManagement.Application.Services
             }).ToList();
         }
 
-        public async Task<bool> SuspendUserAsync(int userId, bool suspend)
+        public async Task<bool> SuspendUserAsync(int userId, bool suspend, int adminUserId)
         {
-            return await _identityService.SetUserActiveStatusAsync(userId.ToString(), !suspend);
+            var company = await _context.CompanyProfiles
+                .FirstOrDefaultAsync(profile => profile.UserId == userId && !profile.IsDeleted);
+            if (company != null)
+            {
+                if (suspend && company.VerificationStatus != CompanyVerificationStatus.Suspended)
+                {
+                    company.StatusBeforeSuspension = company.VerificationStatus;
+                    company.VerificationStatus = CompanyVerificationStatus.Suspended;
+                    company.AdminNotes = "Company suspended by an administrator.";
+                    company.UpdatedAt = DateTime.UtcNow;
+                    _context.CompanyVerificationHistories.Add(new CompanyVerificationHistory
+                    {
+                        CompanyProfileId = company.Id,
+                        Status = CompanyVerificationStatus.Suspended,
+                        ReasonCode = "ADMIN_SUSPENDED",
+                        Notes = company.AdminNotes,
+                        ChangedByUserId = adminUserId,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    });
+                }
+                else if (!suspend && company.VerificationStatus == CompanyVerificationStatus.Suspended)
+                {
+                    var restoredStatus = company.StatusBeforeSuspension
+                        ?? CompanyVerificationStatus.ReverificationRequired;
+                    company.VerificationStatus = restoredStatus;
+                    company.StatusBeforeSuspension = null;
+                    company.AdminNotes = "Company suspension lifted.";
+                    company.UpdatedAt = DateTime.UtcNow;
+                    _context.CompanyVerificationHistories.Add(new CompanyVerificationHistory
+                    {
+                        CompanyProfileId = company.Id,
+                        Status = restoredStatus,
+                        ReasonCode = "ADMIN_REINSTATED",
+                        Notes = company.AdminNotes,
+                        ChangedByUserId = adminUserId,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            var statusUpdated = await _identityService.SetUserActiveStatusAsync(userId.ToString(), !suspend);
+            if (!statusUpdated)
+                return false;
+
+            var details = $"User {userId} was {(suspend ? "suspended" : "reinstated")} by administrator {adminUserId}.";
+            _context.AccountSecurityEvents.Add(new AccountSecurityEvent
+            {
+                UserId = adminUserId,
+                EventType = "AccountPrivilegeChanged",
+                Details = details,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+            await _context.SaveChangesAsync();
+
+            var administrators = await _identityService.GetAllUsersAsync();
+            foreach (var administrator in administrators.Where(user =>
+                user.Id != adminUserId
+                && user.IsActive
+                && user.UserType.Equals("Admin", StringComparison.OrdinalIgnoreCase)))
+            {
+                await _emailSender.SendEmailAsync(
+                    administrator.Email,
+                    "Administrator security alert",
+                    details);
+            }
+
+            return true;
         }
     }
 }

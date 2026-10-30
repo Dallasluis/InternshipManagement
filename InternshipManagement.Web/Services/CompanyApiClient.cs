@@ -47,6 +47,14 @@ namespace InternshipManagement.Web.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<bool> SubmitVerificationAppealAsync(string token, SubmitVerificationAppealRequest request)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PostAsJsonAsync("api/Companies/verification/appeal",
+                new { request.Reason });
+            return response.IsSuccessStatusCode;
+        }
+
         public async Task<CompanyStatsResponse?> GetCompanyStatsAsync(string token, int userId)
         {
             AddAuthorization(token);

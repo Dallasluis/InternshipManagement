@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿
+using FluentValidation;
 using InternshipManagement.Application.DTOs.Application;
 using InternshipManagement.Domain.Enums;
 
@@ -18,9 +19,9 @@ namespace InternshipManagement.Application.Validators
                     .MaximumLength(2000).WithMessage("Cover letter cannot exceed 2000 characters");
             });
 
-            When(x => x.AdditionalDocumentUrls != null, () =>
+            When(x => x.AdditionalDocumentIds != null, () =>
             {
-                RuleFor(x => x.AdditionalDocumentUrls)
+                RuleFor(x => x.AdditionalDocumentIds)
                     .Must(x => x.Count <= 5).WithMessage("Maximum 5 additional documents allowed");
             });
         }

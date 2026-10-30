@@ -23,7 +23,7 @@ else
                     <h5>@Model.CompanyName</h5>
                     <p class="text-muted">@Model.Industry</p>
                     <span class="badge @GetVerificationBadgeClass(Model.VerificationStatus)">
-                        @Model.VerificationStatus
+                        @InternshipManagement.Web.Helpers.StatusDisplay.VerificationLabel(Model.VerificationStatus)
                     </span>
                     <hr />
                     <div class="text-start">
@@ -41,17 +41,34 @@ else
                     <h6 class="mb-0">Verification Actions</h6>
                 </div>
                 <div class="card-body">
-                    @if (Model.VerificationStatus == "Pending" || Model.VerificationStatus == "UnderReview")
+                    @if (Model.VerificationStatus == "Pending" || Model.VerificationStatus == "Unverified"
+                        || Model.VerificationStatus == "UnderReview" || Model.VerificationStatus == "PendingReview")
                     {
                         <div class="alert alert-warning">
                             <i class="fas fa-clock me-2"></i>
                             This company is waiting for verification.
                         </div>
+                        @if (ViewBag.VerificationEvidence is IEnumerable<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse> evidence)
+                        {
+                            <h6>Submitted evidence</h6>
+                            <ul>
+                                @foreach (var document in evidence)
+                                {
+                                    <li>
+                                        <a asp-controller="Documents" asp-action="Download" asp-route-id="@document.Id"
+                                           asp-route-companyProfileId="@Model.Id">@document.OriginalFileName</a>
+                                    </li>
+                                }
+                            </ul>
+                        }
                         <div class="d-flex gap-2">
-                            <button class="btn btn-success" onclick="verifyCompany(@Model.Id, true)">
+                            <button class="btn btn-success" onclick="verifyCompany(@Model.Id, 'Verified')">
                                 <i class="fas fa-check me-1"></i> Approve
                             </button>
-                            <button class="btn btn-danger" onclick="verifyCompany(@Model.Id, false)">
+                            <button class="btn btn-warning" onclick="verifyCompany(@Model.Id, 'MoreInformationRequested')">
+                                <i class="fas fa-info-circle me-1"></i> Request more information
+                            </button>
+                            <button class="btn btn-danger" onclick="verifyCompany(@Model.Id, 'Rejected')">
                                 <i class="fas fa-times me-1"></i> Reject
                             </button>
                         </div>
@@ -82,38 +99,87 @@ else
                             <i class="fas fa-times-circle me-2"></i>
                             This company was rejected.
                         </div>
-                        <button class="btn btn-warning" onclick="verifyCompany(@Model.Id, true)">
+                        <button class="btn btn-warning" onclick="verifyCompany(@Model.Id, 'Verified')">
                             <i class="fas fa-undo me-1"></i> Reconsider
                         </button>
                     }
+                    else if (Model.VerificationStatus == "ReverificationRequired")
+                    {
+                        <div class="alert alert-warning">Re-verification is required. Existing listings remain visible for seven days.</div>
+                        <button class="btn btn-primary" onclick="verifyCompany(@Model.Id, 'Verified')">Review re-verification</button>
+                    }
                 </div>
             </div>
+            @if (ViewBag.VerificationHistory is IEnumerable<InternshipManagement.Web.Models.Admin.CompanyVerificationHistoryResponse> history)
+            {
+                <div class="card mt-3">
+                    <div class="card-header bg-white"><h6 class="mb-0">Verification decision history</h6></div>
+                    <div class="card-body">
+                        @if (history.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead><tr><th>When</th><th>Status</th><th>Reason</th><th>Notes</th><th>Appeal</th></tr></thead>
+                                    <tbody>
+                                    @foreach (var entry in history)
+                                    {
+                                        <tr>
+                                            <td>@entry.CreatedAt.ToLocalTime().ToString("g")</td>
+                                            <td>@entry.Status</td>
+                                            <td>@entry.ReasonCode</td>
+                                            <td>@entry.Notes</td>
+                                            <td>@(entry.IsAppeal ? "Yes" : "No")</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No verification events recorded.</p>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
 }
 
 @functions {
-    private string GetVerificationBadgeClass(string status) => status switch
-    {
-        "Verified" => "bg-success",
-        "Pending" => "bg-warning",
-        "UnderReview" => "bg-info",
-        "Rejected" => "bg-danger",
-        "Suspended" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetVerificationBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.VerificationBadge(status);
 }
 
 @section Scripts {
     <script>
-        function verifyCompany(id, approved) {
-            const action = approved ? 'approve' : 'reject';
-            if (confirm(`Are you sure you want to ${action} this company?`)) {
-                fetch(`/Admin/VerifyCompany?id=${id}&approved=${approved}`, { method: 'POST' })
+        function verifyCompany(id, status) {
+            const reasonCode = prompt('Enter a decision reason code (for example APPROVED, INCOMPLETE_EVIDENCE, or REGISTRATION_MISMATCH):');
+            if (!reasonCode) return;
+            const notes = prompt('Enter review notes:');
+            if (!notes) return;
+            const evidenceReviewed = confirm('Have you reviewed the uploaded evidence?');
+            const registrationReviewed = confirm('Have you checked the company registration details?');
+            const addressReviewed = confirm('Have you checked the company address?');
+            const latestEvent = document.querySelector('tbody tr:last-child td:nth-child(5)')?.textContent?.trim();
+            const isAppeal = latestEvent === 'Yes';
+            const query = new URLSearchParams({
+                id: id,
+                status: status,
+                reasonCode: reasonCode,
+                notes: notes,
+                evidenceReviewed: evidenceReviewed,
+                registrationReviewed: registrationReviewed,
+                addressReviewed: addressReviewed,
+                isAppeal: isAppeal
+            });
+            if (confirm(`Are you sure you want to record ${status} for this company?`)) {
+                fetch(`/Admin/VerifyCompany?${query}`, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             location.reload();
+                        } else {
+                            alert(data.message || 'The verification decision could not be saved.');
                         }
                     });
             }

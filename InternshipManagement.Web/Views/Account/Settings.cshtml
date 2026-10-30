@@ -16,6 +16,23 @@
 
 <div class="row g-4">
     <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Profile Picture</h6>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfilePictureUrl))
+                {
+                    <img src="@Model.ProfilePictureUrl" alt="Profile picture" class="rounded-circle mb-3" style="width: 88px; height: 88px; object-fit: cover;" />
+                }
+                <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input name="profilePicture" type="file" class="form-control mb-2" accept=".jpg,.jpeg,.png,.webp" required />
+                    <small class="d-block text-muted mb-3">JPG, PNG, or WebP up to 2 MB.</small>
+                    <button type="submit" class="btn btn-primary">Upload Picture</button>
+                </form>
+            </div>
+        </div>
         <div class="card">
             <div class="card-header bg-white">
                 <h6 class="mb-0">Account Information</h6>
@@ -36,11 +53,20 @@
                 <h6 class="mb-0">Change Password</h6>
             </div>
             <div class="card-body">
+                @if (Context.Session.GetString("UserType") is "Admin" or "Company")
+                {
+                    <form asp-controller="SecurityCode" asp-action="Send" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Send me a code</button>
+                        <small class="text-muted ms-2">Admins and companies: we email a code to confirm password or email changes.</small>
+                    </form>
+                }
                 <form asp-action="ChangePassword" method="post">
                     @Html.AntiForgeryToken()
                     <input name="CurrentPassword" type="password" class="form-control mb-2" placeholder="Current password" required />
                     <input name="NewPassword" type="password" class="form-control mb-2" placeholder="New password" minlength="8" required />
                     <input name="ConfirmPassword" type="password" class="form-control mb-3" placeholder="Confirm new password" minlength="8" required />
+                    <input name="TwoFactorCode" type="text" class="form-control mb-3" inputmode="numeric" autocomplete="one-time-code" placeholder="Emailed code (admins and companies)" />
                     <button type="submit" class="btn btn-primary">Change Password</button>
                 </form>
             </div>
@@ -56,6 +82,7 @@
                     @Html.AntiForgeryToken()
                     <input name="NewEmail" type="email" class="form-control mb-2" placeholder="New email address" required />
                     <input name="CurrentPassword" type="password" class="form-control mb-3" placeholder="Current password" required />
+                    <input name="TwoFactorCode" type="text" class="form-control mb-3" inputmode="numeric" autocomplete="one-time-code" placeholder="Emailed code (admins and companies)" />
                     <button type="submit" class="btn btn-primary">Change Email</button>
                 </form>
             </div>

@@ -1,0 +1,12 @@
+--- orig/IAuthService.cs	2026-10-28 08:48:49.911688715 +0200
++++ new/IAuthService.cs	2026-10-28 08:48:50.127630268 +0200
+@@ -14,8 +14,7 @@
+         Task<bool> ConfirmEmailChangeAsync(int userId, string token, string? ipAddress);
+         Task<bool> CancelEmailChangeAsync(int userId, string token, string? ipAddress);
+         Task RunEmailVerificationHousekeepingAsync(CancellationToken cancellationToken);
+-        Task<AuthResponse> EnableTwoFactorAsync(int userId, string code);
+-        Task<AuthenticatorSetupResponse> GetTwoFactorSetupAsync(int userId);
++        Task<AuthResponse> SendSecurityCodeAsync(int userId);
+         Task<bool> RequestPasswordResetAsync(string email);
+         Task<bool> ResetPasswordAsync(string email, string token, string newPassword);
+         Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordRequest request);

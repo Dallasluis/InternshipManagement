@@ -64,12 +64,19 @@ else
                                         @internship.Title
                                     </a>
                                 </td>
-                                <td>@internship.InternshipType</td>
+                                <td>Full-time · @internship.WorkArrangement</td>
                                 <td>@internship.ApplicationsCount</td>
                                 <td>
                                     <span class="badge @GetStatusBadgeClass(internship.Status)">
-                                        @internship.Status
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.Status)
                                     </span>
+                                    @if (!string.IsNullOrEmpty(internship.ModerationStatus) && internship.ModerationStatus != "Approved")
+                                    {
+                                        <span class="badge @InternshipManagement.Web.Helpers.StatusDisplay.Badge(internship.ModerationStatus) ms-1"
+                                              title="Admin review status">
+                                            @(internship.ModerationStatus == "Pending" ? "Awaiting moderation" : InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.ModerationStatus))
+                                        </span>
+                                    }
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
@@ -78,6 +85,15 @@ else
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i>
                                         </a>
+
+                                        <!-- Best candidates (only for Published) -->
+                                        @if (internship.Status == "Published")
+                                        {
+                                            <a asp-controller="CompanyAi" asp-action="Candidates" asp-route-internshipId="@internship.Id"
+                                               class="btn btn-sm btn-outline-info" title="Best candidates">
+                                                <i class="fas fa-users"></i>
+                                            </a>
+                                        }
 
                                         <!-- Edit -->
                                         <a asp-controller="Company" asp-action="EditInternship" asp-route-id="@internship.Id"
@@ -129,12 +145,5 @@ else
 }
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Draft" => "bg-secondary",
-        "Published" => "bg-success",
-        "Closed" => "bg-danger",
-        "Filled" => "bg-info",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

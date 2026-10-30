@@ -1,0 +1,36 @@
+@host = http://localhost:5003
+@studentEmail = teststudent@example.com
+@studentPassword = Test@12345
+
+### 1. Log in as the student
+# @name studentLogin
+POST {{host}}/api/Auth/login
+Content-Type: application/json
+
+{ "email": "{{studentEmail}}", "password": "{{studentPassword}}" }
+
+### 2. Start a CV analysis: returns 202 at once with {"id": N, "status": "Pending"}
+# @name cvJob
+POST {{host}}/api/students/cv-analysis
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+Content-Type: multipart/form-data; boundary=CvBoundary
+
+--CvBoundary
+Content-Disposition: form-data; name="file"; filename="sample-cv.pdf"
+Content-Type: application/pdf
+
+< ./sample-cv.pdf
+--CvBoundary--
+
+### 3. Poll the job (repeat every few seconds): Pending -> Running -> Done (result) or Failed (error)
+GET {{host}}/api/ai-jobs/{{cvJob.response.body.$.id}}
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+
+### 4. Start match explanations (202 + job id)
+# @name matchJob
+POST {{host}}/api/Matching/student/internships/explained?maxResults=5
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+
+### 5. Poll it
+GET {{host}}/api/ai-jobs/{{matchJob.response.body.$.id}}
+Authorization: Bearer {{studentLogin.response.body.$.token}}

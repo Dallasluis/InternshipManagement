@@ -15,15 +15,20 @@ namespace InternshipManagement.Web.Models.Internship
         public string? Requirements { get; set; }
         public string? Qualifications { get; set; }
         public string? Skills { get; set; }
+        public string? RequiredQualifications { get; set; }
+        public string? PreferredQualifications { get; set; }
+        public string? RequiredSkills { get; set; }
+        public string? PreferredSkills { get; set; }
 
         [Required(ErrorMessage = "Industry is required")]
         public string Industry { get; set; } = string.Empty;
 
         public string? Location { get; set; }
         public bool IsRemote { get; set; }
+        public string WorkArrangement { get; set; } = "OnSite";
 
         [Required(ErrorMessage = "Internship type is required")]
-        public string InternshipType { get; set; } = string.Empty;
+        public string InternshipType { get; set; } = "FullTime";
 
         [Required(ErrorMessage = "Duration is required")]
         public string Duration { get; set; } = string.Empty;
@@ -44,6 +49,7 @@ namespace InternshipManagement.Web.Models.Internship
         public decimal? StipendAmount { get; set; }
         public string? Currency { get; set; }
 
+        [Microsoft.AspNetCore.Mvc.ModelBinder(typeof(InternshipManagement.Web.ModelBinding.CommaSeparatedListBinder))]
         public List<string>? EligibleProgrammes { get; set; }
     }
 }

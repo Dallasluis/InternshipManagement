@@ -20,6 +20,8 @@ namespace InternshipManagement.Application.Services
                 .Include(s => s.Education)
                 .Include(s => s.WorkExperience)
                 .Include(s => s.Skills)
+                .Include(s => s.Certifications)
+                .Include(s => s.Projects)
                 .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
 
             if (profile == null) return null;
@@ -35,6 +37,31 @@ namespace InternshipManagement.Application.Services
             if (profile == null)
                 throw new Exception("Student profile not found.");
 
+            if (request.ProfilePictureUrl != null
+                && !request.ProfilePictureUrl.StartsWith("/uploads/profile-pictures/", StringComparison.Ordinal))
+                throw new InvalidOperationException("Profile pictures must be uploaded as image files.");
+
+            var requestedDocumentIds = new[]
+            {
+                request.ResumeDocumentId,
+                request.CoverLetterDocumentId,
+                request.AcademicTranscriptDocumentId,
+                request.QualificationDocumentId,
+                request.IdentificationDocumentId,
+                request.CertificatesDocumentId,
+                request.OtherSupportingDocumentsId
+            }
+            .Where(value => value.HasValue)
+            .Select(value => value!.Value)
+            .Distinct()
+            .ToList();
+            var ownedDocumentCount = await _context.PrivateDocuments.CountAsync(document =>
+                requestedDocumentIds.Contains(document.Id)
+                && document.OwnerUserId == userId
+                && document.RetentionState == InternshipManagement.Domain.Enums.DocumentRetentionState.Active);
+            if (ownedDocumentCount != requestedDocumentIds.Count)
+                throw new InvalidOperationException("Profile documents must be active files uploaded by this student.");
+
             profile.Bio = request.Bio ?? profile.Bio;
             profile.Location = request.Location ?? profile.Location;
             profile.PhoneNumber = request.PhoneNumber ?? profile.PhoneNumber;
@@ -44,13 +71,14 @@ namespace InternshipManagement.Application.Services
             profile.Programme = request.Programme ?? profile.Programme;
             profile.YearOfStudy = request.YearOfStudy ?? profile.YearOfStudy;
             profile.ExpectedGraduationYear = request.ExpectedGraduationYear ?? profile.ExpectedGraduationYear;
-            profile.ResumeUrl = request.ResumeUrl ?? profile.ResumeUrl;
-            profile.CoverLetterUrl = request.CoverLetterUrl ?? profile.CoverLetterUrl;
-            profile.AcademicTranscriptUrl = request.AcademicTranscriptUrl ?? profile.AcademicTranscriptUrl;
-            profile.QualificationDocumentUrl = request.QualificationDocumentUrl ?? profile.QualificationDocumentUrl;
-            profile.IdentificationDocumentUrl = request.IdentificationDocumentUrl ?? profile.IdentificationDocumentUrl;
-            profile.CertificatesUrl = request.CertificatesUrl ?? profile.CertificatesUrl;
-            profile.OtherSupportingDocumentsUrl = request.OtherSupportingDocumentsUrl ?? profile.OtherSupportingDocumentsUrl;
+            profile.ResumeDocumentId = request.ResumeDocumentId ?? profile.ResumeDocumentId;
+            profile.CoverLetterDocumentId = request.CoverLetterDocumentId ?? profile.CoverLetterDocumentId;
+            profile.AcademicTranscriptDocumentId = request.AcademicTranscriptDocumentId ?? profile.AcademicTranscriptDocumentId;
+            profile.QualificationDocumentId = request.QualificationDocumentId ?? profile.QualificationDocumentId;
+            profile.IdentificationDocumentId = request.IdentificationDocumentId ?? profile.IdentificationDocumentId;
+            profile.CertificatesDocumentId = request.CertificatesDocumentId ?? profile.CertificatesDocumentId;
+            profile.OtherSupportingDocumentsId = request.OtherSupportingDocumentsId ?? profile.OtherSupportingDocumentsId;
+            profile.ProfilePictureUrl = request.ProfilePictureUrl ?? profile.ProfilePictureUrl;
             profile.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -58,14 +86,22 @@ namespace InternshipManagement.Application.Services
             return await GetStudentProfileAsync(userId);
         }
 
-        public async Task<bool> UploadResumeAsync(int userId, string resumeUrl)
+        public async Task<bool> UploadResumeAsync(int userId, Guid resumeDocumentId)
         {
+            var isOwnedActiveDocument = await _context.PrivateDocuments.AnyAsync(document =>
+                document.Id == resumeDocumentId
+                && document.OwnerUserId == userId
+                && document.Category == "Resume"
+                && document.RetentionState == InternshipManagement.Domain.Enums.DocumentRetentionState.Active);
+            if (!isOwnedActiveDocument)
+                throw new InvalidOperationException("The resume must be an active file uploaded by this student.");
+
             var profile = await _context.StudentProfiles
                 .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
 
             if (profile == null) return false;
 
-            profile.ResumeUrl = resumeUrl;
+            profile.ResumeDocumentId = resumeDocumentId;
             profile.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -88,7 +124,8 @@ namespace InternshipManagement.Application.Services
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 IsCurrent = request.IsCurrent,
-                Grade = request.Grade
+                Grade = request.Grade,
+                CompletionStatus = request.CompletionStatus,
             };
 
             _context.Educations.Add(education);
@@ -116,6 +153,7 @@ namespace InternshipManagement.Application.Services
             education.EndDate = request.EndDate;
             education.IsCurrent = request.IsCurrent;
             education.Grade = request.Grade;
+            education.CompletionStatus = request.CompletionStatus;
             education.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -247,6 +285,136 @@ namespace InternshipManagement.Application.Services
             return true;
         }
 
+        public async Task<bool> AddCertificationAsync(int userId, AddCertificationRequest request)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var certification = new StudentCertification
+            {
+                StudentProfileId = profile.Id,
+                Name = request.Name,
+                IssuingOrganization = request.IssuingOrganization,
+                IssueDate = request.IssueDate,
+                ExpirationDate = request.ExpirationDate
+            };
+
+            _context.StudentCertifications.Add(certification);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateCertificationAsync(int userId, int certificationId, UpdateCertificationRequest request)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var certification = await _context.StudentCertifications
+                .FirstOrDefaultAsync(c => c.Id == certificationId && c.StudentProfileId == profile.Id && !c.IsDeleted);
+
+            if (certification == null) return false;
+
+            certification.Name = request.Name;
+            certification.IssuingOrganization = request.IssuingOrganization;
+            certification.IssueDate = request.IssueDate;
+            certification.ExpirationDate = request.ExpirationDate;
+            certification.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteCertificationAsync(int userId, int certificationId)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var certification = await _context.StudentCertifications
+                .FirstOrDefaultAsync(c => c.Id == certificationId && c.StudentProfileId == profile.Id && !c.IsDeleted);
+
+            if (certification == null) return false;
+
+            certification.IsDeleted = true;
+            certification.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> AddProjectAsync(int userId, AddProjectRequest request)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var project = new StudentProject
+            {
+                StudentProfileId = profile.Id,
+                Title = request.Title,
+                Description = request.Description,
+                Role = request.Role,
+                Technologies = request.Technologies,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            };
+
+            _context.StudentProjects.Add(project);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateProjectAsync(int userId, int projectId, UpdateProjectRequest request)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var project = await _context.StudentProjects
+                .FirstOrDefaultAsync(p => p.Id == projectId && p.StudentProfileId == profile.Id && !p.IsDeleted);
+
+            if (project == null) return false;
+
+            project.Title = request.Title;
+            project.Description = request.Description;
+            project.Role = request.Role;
+            project.Technologies = request.Technologies;
+            project.StartDate = request.StartDate;
+            project.EndDate = request.EndDate;
+            project.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteProjectAsync(int userId, int projectId)
+        {
+            var profile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (profile == null) return false;
+
+            var project = await _context.StudentProjects
+                .FirstOrDefaultAsync(p => p.Id == projectId && p.StudentProfileId == profile.Id && !p.IsDeleted);
+
+            if (project == null) return false;
+
+            project.IsDeleted = true;
+            project.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         private StudentProfileResponse MapToResponse(StudentProfile profile)
         {
             return new StudentProfileResponse
@@ -263,13 +431,13 @@ namespace InternshipManagement.Application.Services
                 Programme = profile.Programme,
                 YearOfStudy = profile.YearOfStudy,
                 ExpectedGraduationYear = profile.ExpectedGraduationYear,
-                ResumeUrl = profile.ResumeUrl,
-                CoverLetterUrl = profile.CoverLetterUrl,
-                AcademicTranscriptUrl = profile.AcademicTranscriptUrl,
-                QualificationDocumentUrl = profile.QualificationDocumentUrl,
-                IdentificationDocumentUrl = profile.IdentificationDocumentUrl,
-                CertificatesUrl = profile.CertificatesUrl,
-                OtherSupportingDocumentsUrl = profile.OtherSupportingDocumentsUrl,
+                ResumeDocumentId = profile.ResumeDocumentId,
+                CoverLetterDocumentId = profile.CoverLetterDocumentId,
+                AcademicTranscriptDocumentId = profile.AcademicTranscriptDocumentId,
+                QualificationDocumentId = profile.QualificationDocumentId,
+                IdentificationDocumentId = profile.IdentificationDocumentId,
+                CertificatesDocumentId = profile.CertificatesDocumentId,
+                OtherSupportingDocumentsId = profile.OtherSupportingDocumentsId,
                 ProfilePictureUrl = profile.ProfilePictureUrl,
                 Education = profile.Education?.Select(e => new EducationDto
                 {
@@ -280,7 +448,8 @@ namespace InternshipManagement.Application.Services
                     StartDate = e.StartDate,
                     EndDate = e.EndDate,
                     IsCurrent = e.IsCurrent,
-                    Grade = e.Grade
+                    Grade = e.Grade,
+                    CompletionStatus = e.CompletionStatus,
                 }).ToList() ?? new List<EducationDto>(),
                 WorkExperience = profile.WorkExperience?.Select(w => new WorkExperienceDto
                 {
@@ -297,8 +466,27 @@ namespace InternshipManagement.Application.Services
                     Id = s.Id,
                     Name = s.Name,
                     ProficiencyLevel = s.ProficiencyLevel
-                }).ToList() ?? new List<SkillDto>()
+                }).ToList() ?? new List<SkillDto>(),
+                Certifications = profile.Certifications?.Select(c => new StudentCertificationDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    IssuingOrganization = c.IssuingOrganization,
+                    IssueDate = c.IssueDate,
+                    ExpirationDate = c.ExpirationDate,
+                }).ToList() ?? new List<StudentCertificationDto>(),
+                Projects = profile.Projects?.Select(p => new StudentProjectDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    Role = p.Role,
+                    Technologies = p.Technologies,
+                    StartDate = p.StartDate,
+                    EndDate = p.EndDate
+                }).ToList() ?? new List<StudentProjectDto>()
             };
         }
+
     }
 }

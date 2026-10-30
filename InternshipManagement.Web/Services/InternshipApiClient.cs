@@ -32,8 +32,8 @@ namespace InternshipManagement.Web.Services
                 query.Add($"Location={Uri.EscapeDataString(filters.Location)}");
             if (!string.IsNullOrWhiteSpace(filters.Industry))
                 query.Add($"Industry={Uri.EscapeDataString(filters.Industry)}");
-            if (!string.IsNullOrWhiteSpace(filters.InternshipType))
-                query.Add($"InternshipType={Uri.EscapeDataString(filters.InternshipType)}");
+            if (!string.IsNullOrWhiteSpace(filters.WorkArrangement))
+                query.Add($"WorkArrangement={Uri.EscapeDataString(filters.WorkArrangement)}");
             if (filters.MinStipend.HasValue)
                 query.Add($"MinStipend={filters.MinStipend.Value}");
             if (filters.IsRemote.HasValue)

@@ -21,15 +21,40 @@ namespace InternshipManagement.Application.Interfaces
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GeneratePasswordResetTokenAsync(string userId);
         Task<IdentityResult> ResetPasswordAsync(string userId, string token, string newPassword);
-        Task<string> GenerateJwtTokenAsync(string userId);
+        Task<string> GenerateJwtTokenAsync(
+            string userId,
+            bool rememberMe = false,
+            bool twoFactorSetupOnly = false,
+            DateTime? absoluteSessionExpiresAt = null);
         string GenerateRefreshToken();
-        Task<bool> UpdateRefreshTokenAsync(string userId, string? refreshToken, DateTime? expiryTime);
+        Task<bool> UpdateRefreshTokenAsync(
+            string userId,
+            string? refreshToken,
+            DateTime? expiryTime,
+            bool rememberMe = false,
+            DateTime? absoluteSessionExpiresAt = null);
+        Task<bool> RotateRefreshTokenAsync(
+            string userId,
+            string currentRefreshToken,
+            string nextRefreshToken,
+            DateTime expiryTime,
+            DateTime absoluteSessionExpiresAt,
+            bool rememberMe);
+        Task<bool> TouchSessionAsync(string userId, DateTime activityAt);
+        Task<IdentityUserDto?> FindUserByRefreshTokenAsync(string refreshToken);
         Task<ClaimsPrincipal> GetUserPrincipalAsync();
         Task<IdentityUserDto> GetCurrentUserAsync();
         Task<List<IdentityUserDto>> GetAllUsersAsync();
         Task<bool> SetUserActiveStatusAsync(string userId, bool isActive);
         Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
         Task<IdentityResult> ChangeEmailAsync(string userId, string currentPassword, string newEmail);
+        Task<IdentityResult> SetEmailAfterConfirmationAsync(string userId, string newEmail);
+        Task<IdentityResult> ConfirmEmailAddressAsync(string userId);
+        Task<IdentityResult> DeleteUserAsync(string userId);
+        Task<string?> GetUserTokenAsync(string userId, string name);
+        Task SetUserTokenAsync(string userId, string name, string value);
+        Task RemoveUserTokenAsync(string userId, string name);
+        Task<IdentityResult> UpdateProfilePictureUrlAsync(string userId, string profilePictureUrl);
         Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId);
         Task<IdentityResult> UpdateAccountPreferencesAsync(string userId, AccountPreferencesDto preferences);
         Task<IdentityResult> DeactivateAccountAsync(string userId);
@@ -57,7 +82,8 @@ namespace InternshipManagement.Application.Interfaces
 
         public static SignInResult Success() => new() { Succeeded = true };
         public static SignInResult Failed() => new() { Succeeded = false };
-        public static SignInResult LockedOut() => new() { Succeeded = false, IsLockedOut = true };
+        public bool IsNewlyLockedOut { get; set; }
+        public static SignInResult LockedOut(bool newlyLockedOut = false) => new() { Succeeded = false, IsLockedOut = true, IsNewlyLockedOut = newlyLockedOut };
         public static SignInResult NotAllowed() => new() { Succeeded = false, IsNotAllowed = true };
         public static SignInResult TwoFactorRequired() => new() { Succeeded = false, RequiresTwoFactor = true };
     }
@@ -70,11 +96,17 @@ namespace InternshipManagement.Application.Interfaces
         public string LastName { get; set; }
         public string UserType { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public bool TwoFactorEnabled { get; set; }
+        public bool RememberMe { get; set; }
+        public int LockoutEscalationLevel { get; set; }
         public bool IsActive { get; set; }
         
         public bool EmailConfirmed { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
+        public DateTime? AbsoluteSessionExpiresAt { get; set; }
+        public DateTime? LastSessionActivityAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
     }

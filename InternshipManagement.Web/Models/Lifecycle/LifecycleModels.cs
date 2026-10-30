@@ -21,6 +21,31 @@ namespace InternshipManagement.Web.Models.Lifecycle
         public DateTime? CompletedAt { get; set; }
         public DateTime? TerminatedAt { get; set; }
         public string? TerminationReason { get; set; }
+        public List<ExtensionRequestResponse> ExtensionRequests { get; set; } = new();
+        public List<WithdrawalRequestResponse> WithdrawalRequests { get; set; } = new();
+    }
+
+    public class ExtensionRequestResponse
+    {
+        public int Id { get; set; }
+        public int PlacementId { get; set; }
+        public DateTime ProposedEndDate { get; set; }
+        public string? Reason { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public int ProposedByUserId { get; set; }
+        public DateTime? RespondedAt { get; set; }
+        public string? ResponseNotes { get; set; }
+    }
+
+    public class WithdrawalRequestResponse
+    {
+        public int Id { get; set; }
+        public int PlacementId { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public DateTime? EffectiveTerminationDate { get; set; }
+        public string? CompanyDecisionNotes { get; set; }
+        public DateTime? ReviewedAt { get; set; }
     }
 
     public class ApplicationStatusHistoryResponse
@@ -49,7 +74,7 @@ namespace InternshipManagement.Web.Models.Lifecycle
         public string? Challenges { get; set; }
         public string? Achievements { get; set; }
         public string? Comments { get; set; }
-        public List<string>? SupportingDocumentUrls { get; set; }
+        public List<Guid>? SupportingDocumentIds { get; set; }
     }
 
     public class ProgressReportResponse
@@ -63,7 +88,7 @@ namespace InternshipManagement.Web.Models.Lifecycle
         public string? Challenges { get; set; }
         public string? Achievements { get; set; }
         public string? Comments { get; set; }
-        public List<string> SupportingDocumentUrls { get; set; } = new();
+        public List<Guid> SupportingDocumentIds { get; set; } = new();
         public string Status { get; set; } = string.Empty;
         public string? CompanyFeedback { get; set; }
         public DateTime? ReviewedAt { get; set; }

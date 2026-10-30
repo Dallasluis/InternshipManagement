@@ -10,6 +10,11 @@
         public string? Email { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public bool EmailConfirmed { get; set; }
+        public bool RequiresTwoFactor { get; set; }
+        public bool RequiresTwoFactorSetup { get; set; }
+        public string? RefreshTokenExpiresAt { get; set; }
         public string? Message { get; set; }
         public List<string>? Errors { get; set; }
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,6 +12,7 @@ using System.Text.Json;
 using InternshipManagement.Application.DTOs.Auth;
 using InternshipManagement.Application.Interfaces;
 using InternshipManagement.Infrastructure.Persistence;
+using InternshipManagement.Application.Services;
 
 using IdentityResult = InternshipManagement.Application.Interfaces.IdentityResult;
 using SignInResult = InternshipManagement.Application.Interfaces.SignInResult;
@@ -24,19 +26,22 @@ namespace InternshipManagement.Infrastructure.Identity
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private readonly LoginSecurityOptions _loginSecurityOptions;
 
         public IdentityService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole<int>> roleManager,
             IConfiguration configuration,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IOptions<LoginSecurityOptions> loginSecurityOptions)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _context = context;
+            _loginSecurityOptions = loginSecurityOptions.Value;
         }
 
         public async Task<IdentityResult> CreateUserAsync(string email, string password, string firstName, string lastName, string userType)
@@ -93,15 +98,46 @@ namespace InternshipManagement.Infrastructure.Identity
                 return SignInResult.Failed();
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, true);
+            var now = DateTimeOffset.UtcNow;
+            if (user.LockoutEnd > now)
+                return SignInResult.LockedOut();
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
 
             if (result.Succeeded)
+            {
+                user.FailedLoginAttempts = 0;
+                user.FailedLoginWindowStartedAt = null;
+                user.LockoutEscalationLevel = 0;
+                user.LastLoginAt = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
                 return SignInResult.Success();
-            if (result.IsLockedOut)
-                return SignInResult.LockedOut();
+            }
             if (result.IsNotAllowed)
                 return SignInResult.NotAllowed();
 
+            if (user.FailedLoginWindowStartedAt == null
+                || user.FailedLoginWindowStartedAt < now.AddMinutes(-_loginSecurityOptions.LockoutWindowMinutes))
+            {
+                user.FailedLoginAttempts = 0;
+                user.FailedLoginWindowStartedAt = now;
+            }
+
+            user.FailedLoginAttempts++;
+            if (user.FailedLoginAttempts >= _loginSecurityOptions.LockoutMaxFailedAttempts)
+            {
+                var lockoutMinutes = Math.Min(
+                    _loginSecurityOptions.InitialLockoutMinutes * Math.Pow(2, user.LockoutEscalationLevel),
+                    _loginSecurityOptions.MaxLockoutMinutes);
+                user.LockoutEscalationLevel = Math.Min(user.LockoutEscalationLevel + 1, 10);
+                user.FailedLoginAttempts = 0;
+                user.FailedLoginWindowStartedAt = null;
+                await _userManager.SetLockoutEndDateAsync(user, now.AddMinutes(lockoutMinutes));
+                await _userManager.UpdateAsync(user);
+                return SignInResult.LockedOut(newlyLockedOut: true);
+            }
+
+            await _userManager.UpdateAsync(user);
             return SignInResult.Failed();
         }
 
@@ -208,7 +244,11 @@ namespace InternshipManagement.Infrastructure.Identity
             return IdentityResult.Success(userId);
         }
 
-        public async Task<string> GenerateJwtTokenAsync(string userId)
+        public async Task<string> GenerateJwtTokenAsync(
+            string userId,
+            bool rememberMe = false,
+            bool twoFactorSetupOnly = false,
+            DateTime? absoluteSessionExpiresAt = null)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return null;
@@ -219,8 +259,11 @@ namespace InternshipManagement.Infrastructure.Identity
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, $"{user.FirstName} {user.LastName}"),
                 new Claim("userId", user.Id.ToString()),
-                new Claim("userType", user.UserType)
+                new Claim("userType", user.UserType),
+                new Claim("email_verified", user.EmailConfirmed ? "true" : "false")
             };
+            if (twoFactorSetupOnly)
+                claims.Add(new Claim("two_factor_setup", "true"));
 
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -230,8 +273,17 @@ namespace InternshipManagement.Infrastructure.Identity
                 jwtSettings["Key"] ?? "SuperSecretKeyHere1234567890!@#$%"));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddHours(
-                double.Parse(jwtSettings["ExpiryHours"] ?? "2"));
+            var now = DateTime.UtcNow;
+            var duration = user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase)
+                ? TimeSpan.FromHours(_loginSecurityOptions.StudentIdleTimeoutHours)
+                : TimeSpan.FromMinutes(_loginSecurityOptions.AdminCompanyIdleTimeoutMinutes);
+            var expires = twoFactorSetupOnly ? now.AddMinutes(10) : now.Add(duration);
+            var absoluteExpiry = absoluteSessionExpiresAt
+                ?? (rememberMe && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase)
+                    ? now.AddDays(_loginSecurityOptions.RememberStudentDays)
+                    : now.AddHours(_loginSecurityOptions.AbsoluteSessionHours));
+            if (expires > absoluteExpiry)
+                expires = absoluteExpiry;
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -252,16 +304,108 @@ namespace InternshipManagement.Infrastructure.Identity
             return Convert.ToBase64String(randomNumber);
         }
 
-        public async Task<bool> UpdateRefreshTokenAsync(string userId, string refreshToken, DateTime? expiryTime)
+        public async Task<bool> UpdateRefreshTokenAsync(
+            string userId,
+            string? refreshToken,
+            DateTime? expiryTime,
+            bool rememberMe = false,
+            DateTime? absoluteSessionExpiresAt = null)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return false;
 
-            user.RefreshToken = refreshToken;
+            user.RefreshToken = refreshToken == null
+                ? null
+                : Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
             user.RefreshTokenExpiryTime = expiryTime;
+            user.RememberMe = refreshToken != null && rememberMe
+                && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase);
+            user.AbsoluteSessionExpiresAt = refreshToken == null ? null : absoluteSessionExpiresAt;
+            user.LastSessionActivityAt = refreshToken == null ? null : DateTime.UtcNow;
 
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
+        }
+
+        public async Task<bool> TouchSessionAsync(string userId, DateTime activityAt)
+        {
+            if (!int.TryParse(userId, out var parsedUserId))
+                return false;
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(candidate => candidate.Id == parsedUserId && candidate.IsActive)
+                .Select(candidate => new
+                {
+                    candidate.UserType,
+                    candidate.AbsoluteSessionExpiresAt,
+                    candidate.RefreshTokenExpiryTime
+                })
+                .FirstOrDefaultAsync();
+            if (user?.AbsoluteSessionExpiresAt is not DateTime absoluteExpiry
+                || absoluteExpiry <= activityAt
+                || user.RefreshTokenExpiryTime is not DateTime refreshExpiry
+                || refreshExpiry <= activityAt)
+            {
+                return false;
+            }
+
+            var idleDuration = user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase)
+                ? TimeSpan.FromHours(_loginSecurityOptions.StudentIdleTimeoutHours)
+                : TimeSpan.FromMinutes(_loginSecurityOptions.AdminCompanyIdleTimeoutMinutes);
+            var idleExpiry = activityAt.Add(idleDuration);
+
+            var updatedRows = await _context.Users
+                .Where(candidate => candidate.Id == parsedUserId
+                    && candidate.IsActive
+                    && candidate.AbsoluteSessionExpiresAt > activityAt
+                    && candidate.RefreshTokenExpiryTime > activityAt)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(candidate => candidate.LastSessionActivityAt, activityAt)
+                    .SetProperty(
+                        candidate => candidate.RefreshTokenExpiryTime,
+                        candidate => candidate.AbsoluteSessionExpiresAt!.Value <= idleExpiry
+                            ? candidate.AbsoluteSessionExpiresAt
+                            : idleExpiry));
+            return updatedRows == 1;
+        }
+
+        public async Task<bool> RotateRefreshTokenAsync(
+            string userId,
+            string currentRefreshToken,
+            string nextRefreshToken,
+            DateTime expiryTime,
+            DateTime absoluteSessionExpiresAt,
+            bool rememberMe)
+        {
+            if (!int.TryParse(userId, out var parsedUserId))
+                return false;
+
+            var now = DateTime.UtcNow;
+            var currentTokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(currentRefreshToken)));
+            var nextTokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(nextRefreshToken)));
+            var updatedRows = await _context.Users
+                .Where(candidate => candidate.Id == parsedUserId
+                    && candidate.RefreshToken == currentTokenHash
+                    && candidate.IsActive
+                    && candidate.RefreshTokenExpiryTime > now
+                    && candidate.AbsoluteSessionExpiresAt == absoluteSessionExpiresAt
+                    && candidate.AbsoluteSessionExpiresAt > now)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(candidate => candidate.RefreshToken, nextTokenHash)
+                    .SetProperty(candidate => candidate.RefreshTokenExpiryTime, expiryTime)
+                    .SetProperty(candidate => candidate.LastSessionActivityAt, now)
+                    .SetProperty(
+                        candidate => candidate.RememberMe,
+                        candidate => rememberMe && candidate.UserType == "Student"));
+            return updatedRows == 1;
+        }
+
+        public async Task<IdentityUserDto?> FindUserByRefreshTokenAsync(string refreshToken)
+        {
+            var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+            var user = await _userManager.Users.FirstOrDefaultAsync(candidate => candidate.RefreshToken == tokenHash);
+            return user == null ? null : MapToDto(user);
         }
 
         public async Task<ClaimsPrincipal> GetUserPrincipalAsync()
@@ -305,6 +449,13 @@ namespace InternshipManagement.Infrastructure.Identity
             if (user == null) return false;
 
             user.IsActive = isActive;
+            if (!isActive)
+            {
+                user.RefreshToken = null;
+                user.RefreshTokenExpiryTime = null;
+                user.AbsoluteSessionExpiresAt = null;
+                user.LastSessionActivityAt = null;
+            }
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
@@ -337,6 +488,87 @@ namespace InternshipManagement.Infrastructure.Identity
             return nameResult.Succeeded
                 ? IdentityResult.Success(userId)
                 : IdentityResult.Failure(nameResult.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<IdentityResult> SetEmailAfterConfirmationAsync(string userId, string newEmail)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found." });
+
+            var emailResult = await _userManager.SetEmailAsync(user, newEmail);
+            if (!emailResult.Succeeded)
+                return IdentityResult.Failure(emailResult.Errors.Select(e => e.Description).ToList());
+
+            var nameResult = await _userManager.SetUserNameAsync(user, newEmail);
+            if (!nameResult.Succeeded)
+                return IdentityResult.Failure(nameResult.Errors.Select(e => e.Description).ToList());
+
+            user.EmailConfirmed = true;
+            var updateResult = await _userManager.UpdateAsync(user);
+            return updateResult.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(updateResult.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAddressAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found." });
+
+            user.EmailConfirmed = true;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found." });
+
+            var result = await _userManager.DeleteAsync(user);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<string?> GetUserTokenAsync(string userId, string name)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return user == null ? null : await _userManager.GetAuthenticationTokenAsync(user, "InternshipManagement", name);
+        }
+
+        public async Task SetUserTokenAsync(string userId, string name, string value)
+        {
+            var user = await _userManager.FindByIdAsync(userId)
+                ?? throw new InvalidOperationException("User not found.");
+            var result = await _userManager.SetAuthenticationTokenAsync(user, "InternshipManagement", name, value);
+            if (!result.Succeeded)
+                throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+        }
+
+        public async Task RemoveUserTokenAsync(string userId, string name)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+                await _userManager.RemoveAuthenticationTokenAsync(user, "InternshipManagement", name);
+        }
+
+        public async Task<IdentityResult> UpdateProfilePictureUrlAsync(string userId, string profilePictureUrl)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failure(new List<string> { "User not found." });
+
+            user.ProfilePictureUrl = profilePictureUrl;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded
+                ? IdentityResult.Success(userId)
+                : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
         }
 
         public async Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId)
@@ -385,11 +617,17 @@ namespace InternshipManagement.Infrastructure.Identity
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserType = user.UserType,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                RememberMe = user.RememberMe,
+                LockoutEscalationLevel = user.LockoutEscalationLevel,
                 PhoneNumber = user.PhoneNumber,
                 IsActive = user.IsActive,
                 EmailConfirmed = user.EmailConfirmed,
                 RefreshToken = user.RefreshToken,
                 RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
+                AbsoluteSessionExpiresAt = user.AbsoluteSessionExpiresAt,
+                LastSessionActivityAt = user.LastSessionActivityAt,
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt
             };

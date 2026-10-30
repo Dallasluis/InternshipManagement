@@ -13,8 +13,14 @@ namespace InternshipManagement.Infrastructure.Identity
         public bool IsActive { get; set; } = true;
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
+        public DateTime? AbsoluteSessionExpiresAt { get; set; }
+        public DateTime? LastSessionActivityAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
         public string? AccountPreferencesJson { get; set; }
+        public int LockoutEscalationLevel { get; set; }
+        public bool RememberMe { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTimeOffset? FailedLoginWindowStartedAt { get; set; }
     }
 }

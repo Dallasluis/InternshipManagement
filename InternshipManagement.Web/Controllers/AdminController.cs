@@ -58,6 +58,8 @@ namespace InternshipManagement.Web.Controllers
             if (company == null)
                 return NotFound();
 
+            ViewBag.VerificationHistory = await _adminApiClient.GetVerificationHistoryAsync(token, id);
+            ViewBag.VerificationEvidence = await _adminApiClient.GetVerificationEvidenceAsync(token, id);
             return View(company);
         }
 
@@ -94,13 +96,31 @@ namespace InternshipManagement.Web.Controllers
         // ---- AJAX action endpoints used by the views' JS (calls the API server-side, using the session JWT) ----
 
         [HttpPost]
-        public async Task<IActionResult> VerifyCompany(int id, bool approved)
+        public async Task<IActionResult> VerifyCompany(
+            int id,
+            string status,
+            string reasonCode,
+            string notes,
+            bool evidenceReviewed,
+            bool registrationReviewed,
+            bool addressReviewed,
+            bool isAppeal = false)
         {
             var token = Token;
             if (string.IsNullOrEmpty(token))
                 return Json(new { success = false, message = "Not authenticated" });
 
-            var result = await _adminApiClient.ReviewVerificationAsync(token, id, approved, null);
+            if (string.IsNullOrWhiteSpace(reasonCode) || string.IsNullOrWhiteSpace(notes))
+                return Json(new { success = false, message = "A reason code and decision notes are required." });
+
+            var criteria = new Dictionary<string, bool>
+            {
+                ["EvidenceReviewed"] = evidenceReviewed,
+                ["RegistrationReviewed"] = registrationReviewed,
+                ["AddressReviewed"] = addressReviewed
+            };
+            var result = await _adminApiClient.ReviewVerificationAsync(
+                token, id, status, reasonCode, notes, criteria, isAppeal);
             return Json(new { success = result });
         }
 
@@ -132,13 +152,19 @@ namespace InternshipManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResolveReport(int id, bool resolved)
+        public async Task<IActionResult> ResolveReport(
+            int id,
+            bool resolved,
+            string? status,
+            bool fraudUpheld = false,
+            string? response = null)
         {
             var token = Token;
             if (string.IsNullOrEmpty(token))
                 return Json(new { success = false, message = "Not authenticated" });
 
-            var result = await _adminApiClient.ResolveReportAsync(token, id, string.Empty, resolved);
+            var result = await _adminApiClient.ResolveReportAsync(
+                token, id, response ?? string.Empty, resolved, status, fraudUpheld);
             return Json(new { success = result });
         }
 

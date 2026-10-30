@@ -1,0 +1,29 @@
+--- orig/AuthController.cs	2026-10-28 08:48:49.911979290 +0200
++++ new/AuthController.cs	2026-10-28 08:48:50.128048351 +0200
+@@ -50,19 +50,15 @@
+                 : BadRequest(new { Success = false, Message = result.Error });
+         }
+ 
+-        [HttpGet("two-factor/setup")]
++        [HttpPost("security-code")]
+         [Microsoft.AspNetCore.Authorization.Authorize]
+-        public async Task<IActionResult> GetTwoFactorSetup()
++        public async Task<IActionResult> SendSecurityCode()
+         {
+-            return Ok(await _authService.GetTwoFactorSetupAsync(CurrentUserId));
+-        }
+-
+-        [HttpPost("two-factor/enable")]
+-        [Microsoft.AspNetCore.Authorization.Authorize]
+-        public async Task<IActionResult> EnableTwoFactor([FromBody] EnableTwoFactorRequest request)
+-        {
+-            var result = await _authService.EnableTwoFactorAsync(CurrentUserId, request.Code);
+-            return result.Success ? Ok(result) : BadRequest(result);
++            var result = await _authService.SendSecurityCodeAsync(CurrentUserId);
++            return result.Success
++                ? Ok(result)
++                : StatusCode(result.Message?.Contains("wait", StringComparison.OrdinalIgnoreCase) == true
++                    ? StatusCodes.Status429TooManyRequests : StatusCodes.Status400BadRequest, result);
+         }
+ 
+         [HttpGet("preferences")]

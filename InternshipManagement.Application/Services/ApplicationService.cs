@@ -34,14 +34,25 @@ namespace InternshipManagement.Application.Services
             if (studentProfile == null)
                 throw new Exception("Student profile not found.");
 
+            var documentIds = (request.AdditionalDocumentIds ?? new List<Guid>()).Distinct().ToList();
+            if (documentIds.Count > 5)
+                throw new InvalidOperationException("Maximum 5 additional documents allowed.");
+            var ownedDocuments = await _context.PrivateDocuments.CountAsync(document =>
+                documentIds.Contains(document.Id)
+                && document.OwnerUserId == studentId
+                && document.RetentionState == DocumentRetentionState.Active
+                && document.Category != "CompanyEvidence");
+            if (ownedDocuments != documentIds.Count)
+                throw new InvalidOperationException("Applications can only include active documents uploaded by this student.");
+
             // ✅ Use InternshipApplication (singular) - NOT InternshipApplications
             var application = new InternshipApplication
             {
                 StudentProfileId = studentProfile.Id,
                 InternshipId = request.InternshipId,
                 CoverLetter = request.CoverLetter,
-                AdditionalDocuments = request.AdditionalDocumentUrls != null
-                    ? System.Text.Json.JsonSerializer.Serialize(request.AdditionalDocumentUrls)
+                AdditionalDocuments = documentIds.Count > 0
+                    ? System.Text.Json.JsonSerializer.Serialize(documentIds)
                     : null,
                 Status = ApplicationStatus.Applied,
                 StatusUpdatedAt = DateTime.UtcNow
@@ -49,7 +60,7 @@ namespace InternshipManagement.Application.Services
 
             _context.InternshipApplications.Add(application);
             await _context.SaveChangesAsync();
-            AddStatusHistory(application, ApplicationStatus.Applied, ApplicationStatus.Applied, "Application submitted");
+            AddStatusHistory(application, ApplicationStatus.Applied, ApplicationStatus.Applied, "Application submitted", studentId);
 
             var internship = await _context.Internships.FindAsync(request.InternshipId);
             if (internship != null)
@@ -116,34 +127,34 @@ namespace InternshipManagement.Application.Services
             return responses;
         }
 
-        public async Task<bool> UpdateApplicationStatusAsync(int applicationId, UpdateApplicationStatusRequest request)
+        public async Task<bool> UpdateApplicationStatusAsync(int userId, int applicationId, UpdateApplicationStatusRequest request)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
             var newStatus = Enum.Parse<ApplicationStatus>(request.Status);
 
-            if (!IsValidStatusTransition(application.Status, newStatus))
+            if (!IsValidCompanyTransition(application.Status, newStatus))
                 throw new Exception($"Cannot transition from {application.Status} to {newStatus}");
 
             var previousStatus = application.Status;
             application.Status = newStatus;
             application.StatusUpdatedAt = DateTime.UtcNow;
             application.StatusNotes = request.Notes;
-            AddStatusHistory(application, previousStatus, newStatus, request.Notes);
+            AddStatusHistory(application, previousStatus, newStatus, request.Notes, userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> ShortlistApplicationAsync(int applicationId, string? notes)
+        public async Task<bool> ShortlistApplicationAsync(int userId, int applicationId, string? notes)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
-            if (application.Status == ApplicationStatus.Rejected ||
-                application.Status == ApplicationStatus.Withdrawn)
-                throw new Exception("Cannot shortlist a rejected or withdrawn application.");
+            if (application.Status != ApplicationStatus.Applied &&
+                application.Status != ApplicationStatus.UnderReview)
+                throw new Exception("Only applications that are applied or under review can be shortlisted.");
 
             application.IsShortlisted = true;
             application.ShortlistedAt = DateTime.UtcNow;
@@ -151,15 +162,15 @@ namespace InternshipManagement.Application.Services
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.Shortlisted;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.Shortlisted, notes);
+            AddStatusHistory(application, previousStatus, ApplicationStatus.Shortlisted, notes, userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> ScheduleInterviewAsync(int applicationId, ScheduleInterviewRequest request)
+        public async Task<bool> ScheduleInterviewAsync(int userId, int applicationId, ScheduleInterviewRequest request)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
             if (application.Status != ApplicationStatus.Shortlisted)
@@ -172,15 +183,15 @@ namespace InternshipManagement.Application.Services
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.InterviewScheduled;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewScheduled, request.InterviewNotes);
+            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewScheduled, request.InterviewNotes, userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> MarkInterviewCompletedAsync(int applicationId)
+        public async Task<bool> MarkInterviewCompletedAsync(int userId, int applicationId)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
             if (application.Status != ApplicationStatus.InterviewScheduled)
@@ -189,15 +200,15 @@ namespace InternshipManagement.Application.Services
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.InterviewCompleted;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewCompleted, "Interview completed");
+            AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewCompleted, "Interview completed", userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> MakeOfferAsync(int applicationId, MakeOfferRequest request)
+        public async Task<bool> MakeOfferAsync(int userId, int applicationId, MakeOfferRequest request)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
             if (application.Status != ApplicationStatus.InterviewCompleted)
@@ -210,22 +221,37 @@ namespace InternshipManagement.Application.Services
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.OfferMade;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.OfferMade, request.OfferDetails);
+            AddStatusHistory(application, previousStatus, ApplicationStatus.OfferMade, request.OfferDetails, userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> RespondToOfferAsync(int applicationId, bool accepted)
+        public async Task<bool> RespondToOfferAsync(int userId, int applicationId, bool accepted)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindStudentApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
             if (application.Status != ApplicationStatus.OfferMade)
                 throw new Exception("Only offered candidates can accept or decline the offer.");
 
+            if (accepted && application.OfferExpiryDate.HasValue
+                && application.OfferExpiryDate.Value.Date < DateTime.UtcNow.Date)
+                throw new InvalidOperationException(
+                    $"This offer expired on {application.OfferExpiryDate.Value:d MMM yyyy}. Please contact the company.");
+
             if (accepted)
             {
+                var hasAnotherAcceptedOfferAwaitingPlacement = await _context.InternshipApplications
+                    .AnyAsync(other => other.StudentProfileId == application.StudentProfileId
+                        && other.Id != application.Id
+                        && other.Status == ApplicationStatus.Accepted
+                        && !_context.Placements.Any(placement =>
+                            placement.InternshipApplicationId == other.Id));
+                if (hasAnotherAcceptedOfferAwaitingPlacement)
+                    throw new InvalidOperationException(
+                        "You already have an accepted offer waiting for your current placement to end.");
+
                 application.Status = ApplicationStatus.Accepted;
                 application.OfferAcceptedAt = DateTime.UtcNow;
             }
@@ -236,35 +262,61 @@ namespace InternshipManagement.Application.Services
             }
 
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, ApplicationStatus.OfferMade, application.Status, accepted ? "Offer accepted" : "Offer declined");
+            AddStatusHistory(application, ApplicationStatus.OfferMade, application.Status, accepted ? "Offer accepted" : "Offer declined", userId);
             await _context.SaveChangesAsync();
 
             if (accepted)
             {
+                await WithdrawOtherOpenApplicationsAsync(application, userId);
                 await _lifecycleService.CreatePlacementFromAcceptedApplicationAsync(application.Id);
             }
 
             return true;
         }
 
-        public async Task<bool> WithdrawApplicationAsync(int applicationId)
+        public async Task<bool> WithdrawApplicationAsync(int userId, int applicationId)
         {
-            var application = await _context.InternshipApplications.FindAsync(applicationId);
+            var application = await FindStudentApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
-            if (application.Status == ApplicationStatus.Rejected)
-                throw new Exception("Cannot withdraw a rejected application.");
+            if (!IsOpenApplication(application.Status))
+                throw new Exception("Only open applications can be withdrawn. After accepting an offer, withdraw from the placement instead.");
 
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.Withdrawn;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.Withdrawn, "Application withdrawn");
+            AddStatusHistory(application, previousStatus, ApplicationStatus.Withdrawn, "Application withdrawn", userId);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        private void AddStatusHistory(InternshipApplication application, ApplicationStatus previousStatus, ApplicationStatus newStatus, string? notes)
+        private async Task WithdrawOtherOpenApplicationsAsync(InternshipApplication accepted, int userId)
+        {
+            var others = await _context.InternshipApplications
+                .Where(other => other.StudentProfileId == accepted.StudentProfileId
+                    && other.Id != accepted.Id
+                    && !other.IsDeleted)
+                .ToListAsync();
+
+            foreach (var other in others.Where(item => IsOpenApplication(item.Status)))
+            {
+                var previous = other.Status;
+                other.Status = ApplicationStatus.WithdrawnAcceptedElsewhere;
+                other.StatusUpdatedAt = DateTime.UtcNow;
+                AddStatusHistory(other, previous, ApplicationStatus.WithdrawnAcceptedElsewhere,
+                    "The student accepted another offer", userId);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private void AddStatusHistory(
+            InternshipApplication application,
+            ApplicationStatus previousStatus,
+            ApplicationStatus newStatus,
+            string? notes,
+            int changedByUserId)
         {
             _context.ApplicationStatusHistories.Add(new ApplicationStatusHistory
             {
@@ -272,9 +324,28 @@ namespace InternshipManagement.Application.Services
                 PreviousStatus = previousStatus,
                 NewStatus = newStatus,
                 ChangedAt = DateTime.UtcNow,
+                ChangedByUserId = changedByUserId,
                 Notes = notes
             });
         }
+
+        private Task<InternshipApplication?> FindCompanyApplicationAsync(int userId, int applicationId) =>
+            _context.InternshipApplications
+                .Include(a => a.Internship)
+                    .ThenInclude(i => i.CompanyProfile)
+                .FirstOrDefaultAsync(a => a.Id == applicationId
+                    && !a.IsDeleted
+                    && a.Internship.CompanyProfile.UserId == userId
+                    && !a.Internship.CompanyProfile.IsDeleted);
+
+        private Task<InternshipApplication?> FindStudentApplicationAsync(int userId, int applicationId) =>
+            _context.InternshipApplications
+                .Include(a => a.StudentProfile)
+                .Include(a => a.Internship)
+                    .ThenInclude(i => i.CompanyProfile)
+                .FirstOrDefaultAsync(a => a.Id == applicationId
+                    && !a.IsDeleted
+                    && a.StudentProfile.UserId == userId);
 
         public async Task<List<ApplicationResponse>> GetShortlistedApplicationsAsync(int internshipId)
         {
@@ -294,6 +365,23 @@ namespace InternshipManagement.Application.Services
 
             return responses;
         }
+
+        // What a company may do through the generic status update. Accepting or declining an offer belongs to the student
+        // (RespondToOfferAsync) and withdrawing belongs to the student (WithdrawApplicationAsync), so neither is allowed here.
+        private bool IsValidCompanyTransition(ApplicationStatus current, ApplicationStatus newStatus) => current switch
+        {
+            ApplicationStatus.Applied => newStatus is ApplicationStatus.UnderReview or ApplicationStatus.Rejected,
+            ApplicationStatus.UnderReview => newStatus is ApplicationStatus.Shortlisted or ApplicationStatus.Rejected,
+            ApplicationStatus.Shortlisted => newStatus == ApplicationStatus.Rejected,
+            ApplicationStatus.InterviewScheduled => newStatus == ApplicationStatus.Rejected,
+            ApplicationStatus.InterviewCompleted => newStatus == ApplicationStatus.Rejected,
+            ApplicationStatus.OfferMade => newStatus == ApplicationStatus.Rejected,
+            _ => false
+        };
+
+        private static bool IsOpenApplication(ApplicationStatus status) => status is
+            ApplicationStatus.Applied or ApplicationStatus.UnderReview or ApplicationStatus.Shortlisted or
+            ApplicationStatus.InterviewScheduled or ApplicationStatus.InterviewCompleted or ApplicationStatus.OfferMade;
 
         private bool IsValidStatusTransition(ApplicationStatus current, ApplicationStatus newStatus)
         {
@@ -351,10 +439,41 @@ namespace InternshipManagement.Application.Services
                     University = application.StudentProfile.University,
                     Programme = application.StudentProfile.Programme,
                     YearOfStudy = application.StudentProfile.YearOfStudy,
-                    ResumeUrl = application.StudentProfile.ResumeUrl,
-                    ProfilePictureUrl = application.StudentProfile.ProfilePictureUrl
+                    ProfilePictureUrl = application.StudentProfile.ProfilePictureUrl,
+                    ApplicationDocuments = await GetApplicationDocumentsAsync(application)
                 } : null
             };
+        }
+
+        private async Task<List<ApplicationDocumentInfo>> GetApplicationDocumentsAsync(InternshipApplication application)
+        {
+            if (string.IsNullOrWhiteSpace(application.AdditionalDocuments))
+                return new List<ApplicationDocumentInfo>();
+
+            List<Guid>? documentIds;
+            try
+            {
+                documentIds = System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(application.AdditionalDocuments);
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                return new List<ApplicationDocumentInfo>();
+            }
+
+            if (documentIds == null || documentIds.Count == 0)
+                return new List<ApplicationDocumentInfo>();
+
+            return await _context.PrivateDocuments
+                .Where(document => documentIds.Contains(document.Id)
+                    && document.OwnerUserId == application.StudentProfile.UserId
+                    && document.RetentionState != DocumentRetentionState.Deleted)
+                .Select(document => new ApplicationDocumentInfo
+                {
+                    Id = document.Id,
+                    FileName = document.OriginalFileName,
+                    Category = document.Category
+                })
+                .ToListAsync();
         }
     }
 }

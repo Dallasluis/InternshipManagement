@@ -13,9 +13,17 @@
     }
 }
 
-<div class="mb-4">
-    <h1>Browse Internships</h1>
-    <p class="text-muted">@Model.TotalCount opportunities found</p>
+<div class="mb-4 d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h1>Browse Internships</h1>
+        <p class="text-muted mb-0">@Model.TotalCount opportunities found</p>
+    </div>
+    @if (Context.Session.GetString("UserType") == "Student")
+    {
+        <a asp-controller="StudentAi" asp-action="Matches" class="btn btn-primary">
+            <i class="fas fa-bullseye me-1"></i> Recommended for you
+        </a>
+    }
 </div>
 
 <form method="get" asp-action="Index" class="row g-2 mb-4">
@@ -29,22 +37,15 @@
         <input type="text" name="Industry" value="@filters.Industry" class="form-control" placeholder="Industry" />
     </div>
     <div class="col-md-2">
-        <select name="InternshipType" class="form-select">
-            <option value="">Any type</option>
-            @foreach (var type in new[] { "FullTime", "PartTime", "Summer", "Winter", "YearRound", "Flexible" })
+        <select name="WorkArrangement" class="form-select">
+            <option value="">Any work arrangement</option>
+            @foreach (var arrangement in new[] { "OnSite", "Remote", "Hybrid" })
             {
-                <option value="@type" selected="@(filters.InternshipType == type)">@SplitWords(type)</option>
+                <option value="@arrangement" selected="@(filters.WorkArrangement == arrangement)">@SplitWords(arrangement)</option>
             }
         </select>
     </div>
-    <div class="col-md-2 d-flex align-items-center">
-        <div class="form-check">
-            <input type="checkbox" name="IsRemote" value="true" class="form-check-input" id="isRemote"
-                   checked="@(filters.IsRemote == true)" />
-            <label class="form-check-label" for="isRemote">Remote only</label>
-        </div>
-    </div>
-    <div class="col-md-1">
+    <div class="col-md-3">
         <button type="submit" class="btn btn-dark w-100">Search</button>
     </div>
 </form>
@@ -65,10 +66,10 @@ else
                         <h6 class="card-subtitle mb-2 text-muted">@internship.CompanyName</h6>
                         <p class="card-text small text-muted mb-2">
                             @internship.Industry &middot;
-                            @(internship.IsRemote ? "Remote" : internship.Location)
+                            @SplitWords(internship.WorkArrangement)@(internship.WorkArrangement == "OnSite" && !string.IsNullOrWhiteSpace(internship.Location) ? $" · {internship.Location}" : string.Empty)
                         </p>
                         <div class="mb-3">
-                            <span class="badge bg-light text-dark border">@SplitWords(internship.InternshipType)</span>
+                            <span class="badge bg-light text-dark border">Full-time</span>
                             <span class="badge bg-light text-dark border">@SplitWords(internship.Duration)</span>
                         </div>
                         <p class="card-text small text-muted">
@@ -95,8 +96,7 @@ else
                            asp-route-Keyword="@filters.Keyword"
                            asp-route-Location="@filters.Location"
                            asp-route-Industry="@filters.Industry"
-                           asp-route-InternshipType="@filters.InternshipType"
-                           asp-route-IsRemote="@filters.IsRemote"
+                           asp-route-WorkArrangement="@filters.WorkArrangement"
                            asp-route-PageNumber="@p">@p</a>
                     </li>
                 }

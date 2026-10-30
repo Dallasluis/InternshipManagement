@@ -27,6 +27,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> Apply([FromBody] ApplyRequest request)
         {
             try
@@ -42,6 +43,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetMyApplications()
         {
             var userId = GetUserId();
@@ -50,6 +52,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("student/stats")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetStudentStats()
         {
             var userId = GetUserId();
@@ -71,6 +74,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("company")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetCompanyApplications()
         {
             var userId = GetUserId();
@@ -94,6 +98,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("company/stats")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetCompanyStats()
         {
             var userId = GetUserId();
@@ -116,15 +121,23 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("internship/{internshipId}")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetInternshipApplications(int internshipId)
         {
+            if (!await OwnsInternshipAsync(internshipId))
+                return NotFound();
+
             var applications = await _applicationService.GetInternshipApplicationsAsync(internshipId);
             return Ok(applications);
         }
 
         [HttpGet("internship/{internshipId}/shortlisted")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetShortlisted(int internshipId)
         {
+            if (!await OwnsInternshipAsync(internshipId))
+                return NotFound();
+
             var applications = await _applicationService.GetShortlistedApplicationsAsync(internshipId);
             return Ok(applications);
         }
@@ -132,6 +145,9 @@ namespace InternshipManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            if (!await CanAccessApplicationAsync(id))
+                return NotFound();
+
             var application = await _applicationService.GetApplicationByIdAsync(id);
             if (application == null)
                 return NotFound();
@@ -142,16 +158,23 @@ namespace InternshipManagement.Api.Controllers
         [HttpGet("{id}/status-history")]
         public async Task<IActionResult> GetStatusHistory(int id)
         {
+            if (!await CanAccessApplicationAsync(id))
+                return NotFound();
+
             var history = await _lifecycleService.GetApplicationStatusHistoryAsync(id);
             return Ok(history);
         }
 
         [HttpPut("{id}/status")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateApplicationStatusRequest request)
         {
             try
             {
-                var result = await _applicationService.UpdateApplicationStatusAsync(id, request);
+                var userId = GetUserId();
+                var result = await _applicationService.UpdateApplicationStatusAsync(userId, id, request);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -161,11 +184,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/shortlist")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> Shortlist(int id, [FromBody] ShortlistRequest request)
         {
             try
             {
-                var result = await _applicationService.ShortlistApplicationAsync(id, request.Notes);
+                var userId = GetUserId();
+                var result = await _applicationService.ShortlistApplicationAsync(userId, id, request.Notes);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -175,11 +202,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/schedule-interview")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> ScheduleInterview(int id, [FromBody] ScheduleInterviewRequest request)
         {
             try
             {
-                var result = await _applicationService.ScheduleInterviewAsync(id, request);
+                var userId = GetUserId();
+                var result = await _applicationService.ScheduleInterviewAsync(userId, id, request);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -189,11 +220,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/mark-interview-completed")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> MarkInterviewCompleted(int id)
         {
             try
             {
-                var result = await _applicationService.MarkInterviewCompletedAsync(id);
+                var userId = GetUserId();
+                var result = await _applicationService.MarkInterviewCompletedAsync(userId, id);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -203,11 +238,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/make-offer")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> MakeOffer(int id, [FromBody] MakeOfferRequest request)
         {
             try
             {
-                var result = await _applicationService.MakeOfferAsync(id, request);
+                var userId = GetUserId();
+                var result = await _applicationService.MakeOfferAsync(userId, id, request);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -217,11 +256,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/respond-to-offer")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> RespondToOffer(int id, [FromBody] RespondToOfferRequest request)
         {
             try
             {
-                var result = await _applicationService.RespondToOfferAsync(id, request.Accepted);
+                var userId = GetUserId();
+                var result = await _applicationService.RespondToOfferAsync(userId, id, request.Accepted);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -231,11 +274,15 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("{id}/withdraw")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> Withdraw(int id)
         {
             try
             {
-                var result = await _applicationService.WithdrawApplicationAsync(id);
+                var userId = GetUserId();
+                var result = await _applicationService.WithdrawApplicationAsync(userId, id);
+                if (!result)
+                    return NotFound();
                 return Ok(new { Success = result });
             }
             catch (Exception ex)
@@ -247,6 +294,29 @@ namespace InternshipManagement.Api.Controllers
         private int GetUserId()
         {
             return int.Parse(User.FindFirst("userId")?.Value ?? "0");
+        }
+
+        private Task<bool> OwnsInternshipAsync(int internshipId)
+        {
+            var userId = GetUserId();
+            return _context.Internships.AnyAsync(i =>
+                i.Id == internshipId &&
+                !i.IsDeleted &&
+                !i.CompanyProfile.IsDeleted &&
+                i.CompanyProfile.UserId == userId);
+        }
+
+        private Task<bool> CanAccessApplicationAsync(int applicationId)
+        {
+            var userId = GetUserId();
+            var isStudent = User.IsInRole("Student");
+            var isCompany = User.IsInRole("Company");
+
+            return _context.InternshipApplications.AnyAsync(a =>
+                a.Id == applicationId &&
+                !a.IsDeleted &&
+                ((isStudent && a.StudentProfile.UserId == userId) ||
+                 (isCompany && a.Internship.CompanyProfile.UserId == userId)));
         }
     }
 }

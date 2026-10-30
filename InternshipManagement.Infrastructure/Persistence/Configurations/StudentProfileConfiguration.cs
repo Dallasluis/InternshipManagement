@@ -76,6 +76,31 @@ namespace InternshipManagement.Domain.Configurations
             builder.HasIndex(s => s.Programme);
             builder.HasIndex(s => s.University);
             builder.HasIndex(s => s.Location);
+
+            builder.HasMany(s => s.Education)
+                .WithOne(e => e.StudentProfile)
+                .HasForeignKey(e => e.StudentProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.WorkExperience)
+                .WithOne(w => w.StudentProfile)
+                .HasForeignKey(w => w.StudentProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.Skills)
+                .WithOne(sk => sk.StudentProfile)
+                .HasForeignKey(sk => sk.StudentProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.Certifications)
+                .WithOne(c => c.StudentProfile)
+                .HasForeignKey(c => c.StudentProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.Projects)
+                .WithOne(p => p.StudentProfile)
+                .HasForeignKey(p => p.StudentProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

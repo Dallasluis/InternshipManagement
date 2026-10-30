@@ -1,0 +1,12 @@
+--- orig/LoginSecurityOptions.cs	2026-10-28 08:48:49.911931550 +0200
++++ new/LoginSecurityOptions.cs	2026-10-28 08:48:50.126396015 +0200
+@@ -13,6 +13,9 @@
+         public int AdminCompanyIdleTimeoutMinutes { get; set; } = 30;
+         public int AbsoluteSessionHours { get; set; } = 12;
+         public int RememberStudentDays { get; set; } = 30;
++        public int OtpLifetimeMinutes { get; set; } = 5;
++        public int OtpMaxAttempts { get; set; } = 5;
++        public int OtpResendSeconds { get; set; } = 60;
+         public int SecurityEventRetentionMonths { get; set; } = 12;
+     }
+ }

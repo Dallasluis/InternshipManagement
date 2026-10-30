@@ -1,162 +1,112 @@
 ﻿@model InternshipManagement.Web.ViewModels.StudentDashboardViewModel
 @{
     ViewData["Title"] = "Student Dashboard";
+    var other = Math.Max(0, Model.TotalApplications - Model.PendingApplications - Model.ShortlistedCount - Model.RejectedCount);
+    double Pct(int n) => Model.TotalApplications == 0 ? 0 : Math.Round(n * 100.0 / Model.TotalApplications, 1);
 }
+@section Styles { <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" /> }
 
-<div class="dashboard-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="dash">
+    <div class="dash-hero dash-in">
         <div>
-            <h1 class="h2 mb-1">Welcome back, @(Model.Profile?.FirstName ?? "Student")!</h1>
-            <p class="text-muted">Track your applications and manage your profile</p>
+            <div class="dash-date" id="dash-date"></div>
+            <h1><span id="dash-greeting">Welcome back</span>, @(Model.Profile?.FirstName ?? "there")</h1>
+            <p>@(Model.TotalApplications == 0 ? "Find your first internship and apply in a few clicks." : $"You have {Model.PendingApplications} application{(Model.PendingApplications == 1 ? "" : "s")} under review.")</p>
         </div>
-        <a asp-controller="Internships" asp-action="Index" class="btn btn-primary">
-            <i class="fas fa-search me-1"></i> Find Internships
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-controller="StudentAi" asp-action="Matches" class="btn btn-ghost"><i class="fas fa-bullseye me-1"></i> Recommended for you</a>
+            <a asp-controller="Internships" asp-action="Index" class="btn btn-light"><i class="fas fa-search me-1"></i> Find internships</a>
+        </div>
     </div>
 
     @if (Model.Profile == null)
     {
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Complete your profile to get better matches.
-            <a asp-controller="Student" asp-action="Profile" class="alert-link">Update Profile</a>
-        </div>
+        <div class="alert alert-warning dash-in"><i class="fas fa-exclamation-triangle me-2"></i>Complete your profile to get better matches.
+            <a asp-controller="Student" asp-action="Profile" class="alert-link">Update profile</a></div>
     }
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #2563eb;">
-                <div class="stat-number">@Model.TotalApplications</div>
-                <div class="stat-label">Total Applications</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #d97706;">
-                <div class="stat-number">@Model.PendingApplications</div>
-                <div class="stat-label">Under Review</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #059669;">
-                <div class="stat-number">@Model.ShortlistedCount</div>
-                <div class="stat-label">Shortlisted</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #dc2626;">
-                <div class="stat-number">@Model.RejectedCount</div>
-                <div class="stat-label">Rejected</div>
-            </div>
-        </div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#2563eb" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-paper-plane"></i></span><span><div class="num" data-count="@Model.TotalApplications">@Model.TotalApplications</div><div class="lbl">Applications</div></span></a></div>
+        <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#d97706" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-hourglass-half"></i></span><span><div class="num" data-count="@Model.PendingApplications">@Model.PendingApplications</div><div class="lbl">Under review</div></span></a></div>
+        <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#059669" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-star"></i></span><span><div class="num" data-count="@Model.ShortlistedCount">@Model.ShortlistedCount</div><div class="lbl">Shortlisted</div></span></a></div>
+        <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#dc2626" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-times-circle"></i></span><span><div class="num" data-count="@Model.RejectedCount">@Model.RejectedCount</div><div class="lbl">Rejected</div></span></a></div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h6 class="mb-1">Profile Completion</h6>
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-primary" style="width: @Model.ProfileCompletion%">
-                            @Model.ProfileCompletion%
+    <div class="row g-3">
+        <div class="col-lg-8 d-flex flex-column gap-3">
+            @if (Model.TotalApplications > 0)
+            {
+                <div class="dash-card dash-in" style="height:auto">
+                    <div class="head"><h2>Where your applications stand</h2></div>
+                    <div class="body">
+                        <div class="pipe" role="img" aria-label="Application status breakdown">
+                            <span data-w="@Pct(Model.PendingApplications).ToString(System.Globalization.CultureInfo.InvariantCulture)" style="background:#f59e0b"></span>
+                            <span data-w="@Pct(Model.ShortlistedCount).ToString(System.Globalization.CultureInfo.InvariantCulture)" style="background:#10b981"></span>
+                            <span data-w="@Pct(Model.RejectedCount).ToString(System.Globalization.CultureInfo.InvariantCulture)" style="background:#ef4444"></span>
+                            <span data-w="@Pct(other).ToString(System.Globalization.CultureInfo.InvariantCulture)" style="background:#94a3b8"></span>
+                        </div>
+                        <div class="pipe-legend">
+                            <span><i style="background:#f59e0b"></i><b>@Model.PendingApplications</b> under review</span>
+                            <span><i style="background:#10b981"></i><b>@Model.ShortlistedCount</b> shortlisted</span>
+                            <span><i style="background:#ef4444"></i><b>@Model.RejectedCount</b> rejected</span>
+                            @if (other > 0) { <span><i style="background:#94a3b8"></i><b>@other</b> other</span> }
                         </div>
                     </div>
-                    <small class="text-muted">
-                        @(100 - Model.ProfileCompletion)% remaining
-                    </small>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a asp-controller="Student" asp-action="Profile" class="btn btn-outline-primary">
-                        <i class="fas fa-user-edit me-1"></i> Update
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+            }
 
-    <div class="card">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">Recent Applications</h6>
-            <a asp-controller="Student" asp-action="Applications" class="text-primary">View All</a>
-        </div>
-        <div class="card-body p-0">
-            @if (Model.RecentApplications.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Internship</th>
-                                <th>Company</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="dash-card dash-in">
+                <div class="head">
+                    <h2>Recent applications</h2>
+                    <a asp-controller="Student" asp-action="Applications" class="small">View all</a>
+                </div>
+                @if (Model.RecentApplications.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>Internship</th><th>Company</th><th>Status</th><th></th></tr></thead>
+                            <tbody>
                             @foreach (var app in Model.RecentApplications)
                             {
                                 <tr>
-                                    <td>@app.InternshipTitle</td>
-                                    <td>@app.CompanyName</td>
-                                    <td>
-                                        <span class="badge @GetStatusBadgeClass(app.Status)">
-                                            @app.Status
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a asp-controller="Student" asp-action="ApplicationDetails" asp-route-id="@app.Id"
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
+                                    <td class="fw-semibold">@app.InternshipTitle</td>
+                                    <td class="text-muted">@app.CompanyName</td>
+                                    <td><span class="badge @InternshipManagement.Web.Helpers.StatusDisplay.Badge(app.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(app.Status)</span></td>
+                                    <td class="text-end"><a asp-controller="Student" asp-action="ApplicationDetails" asp-route-id="@app.Id" class="btn btn-sm btn-outline-primary" aria-label="View application"><i class="fas fa-arrow-right"></i></a></td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="dash-empty"><div class="big"><i class="fas fa-inbox"></i></div><p class="mb-2">No applications yet.</p><a asp-controller="Internships" asp-action="Index" class="btn btn-primary btn-sm">Browse internships</a></div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4 d-flex flex-column gap-3">
+            <div class="dash-card dash-in" style="height:auto">
+                <div class="body d-flex align-items-center gap-3">
+                    <div class="ring" data-p="@Model.ProfileCompletion"><span>@Model.ProfileCompletion%</span></div>
+                    <div>
+                        <div class="fw-semibold">Profile completion</div>
+                        <div class="small text-muted mb-2">A fuller profile gives better matches.</div>
+                        <a asp-controller="Student" asp-action="Profile" class="btn btn-outline-primary btn-sm"><i class="fas fa-user-edit me-1"></i> Update profile</a>
+                    </div>
                 </div>
-            }
-            else
-            {
-                <div class="text-center py-4">
-                    <p class="text-muted">No applications yet.</p>
-                    <a asp-controller="Internships" asp-action="Index" class="btn btn-primary">Browse Internships</a>
+            </div>
+            <div class="dash-card dash-in" style="height:auto">
+                <div class="head"><h2>Do more with AI</h2></div>
+                <div class="body p-2">
+                    <a class="dash-action" asp-controller="StudentAi" asp-action="CvAnalysis"><span class="ico"><i class="fas fa-file-alt"></i></span><span>Analyse my CV<small>Fill your profile from your CV</small></span></a>
+                    <a class="dash-action" asp-controller="StudentAi" asp-action="SkillGaps"><span class="ico"><i class="fas fa-chart-line"></i></span><span>Check my skill gaps<small>See what to learn next</small></span></a>
+                    <a class="dash-action" asp-controller="ProfileSections" asp-action="Index"><span class="ico"><i class="fas fa-graduation-cap"></i></span><span>Education &amp; skills<small>Keep your record up to date</small></span></a>
                 </div>
-            }
+            </div>
         </div>
     </div>
 </div>
 
-@functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Applied" => "bg-info",
-        "UnderReview" => "bg-warning",
-        "Shortlisted" => "bg-success",
-        "Rejected" => "bg-danger",
-        "Withdrawn" => "bg-secondary",
-        _ => "bg-secondary"
-    };
-}
-
-<style>
-    .stat-card {
-        background: white;
-        padding: 1.25rem;
-        border-radius: 12px;
-        border-left: 4px solid #2563eb;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .stat-number {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: #64748b;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-</style>
+@section Scripts { <script src="~/js/dashboard.js" asp-append-version="true"></script> }

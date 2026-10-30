@@ -1,0 +1,94 @@
+--- orig/ApplicationService.cs	2026-10-27 21:46:53.362760231 +0200
++++ new/ApplicationService.cs	2026-10-27 21:46:53.430752078 +0200
+@@ -134,7 +134,7 @@
+ 
+             var newStatus = Enum.Parse<ApplicationStatus>(request.Status);
+ 
+-            if (!IsValidStatusTransition(application.Status, newStatus))
++            if (!IsValidCompanyTransition(application.Status, newStatus))
+                 throw new Exception($"Cannot transition from {application.Status} to {newStatus}");
+ 
+             var previousStatus = application.Status;
+@@ -152,9 +152,9 @@
+             var application = await FindCompanyApplicationAsync(userId, applicationId);
+             if (application == null) return false;
+ 
+-            if (application.Status == ApplicationStatus.Rejected ||
+-                application.Status == ApplicationStatus.Withdrawn)
+-                throw new Exception("Cannot shortlist a rejected or withdrawn application.");
++            if (application.Status != ApplicationStatus.Applied &&
++                application.Status != ApplicationStatus.UnderReview)
++                throw new Exception("Only applications that are applied or under review can be shortlisted.");
+ 
+             application.IsShortlisted = true;
+             application.ShortlistedAt = DateTime.UtcNow;
+@@ -262,6 +262,7 @@
+ 
+             if (accepted)
+             {
++                await WithdrawOtherOpenApplicationsAsync(application, userId);
+                 await _lifecycleService.CreatePlacementFromAcceptedApplicationAsync(application.Id);
+             }
+ 
+@@ -273,8 +274,8 @@
+             var application = await FindStudentApplicationAsync(userId, applicationId);
+             if (application == null) return false;
+ 
+-            if (application.Status == ApplicationStatus.Rejected)
+-                throw new Exception("Cannot withdraw a rejected application.");
++            if (!IsOpenApplication(application.Status))
++                throw new Exception("Only open applications can be withdrawn. After accepting an offer, withdraw from the placement instead.");
+ 
+             var previousStatus = application.Status;
+             application.Status = ApplicationStatus.Withdrawn;
+@@ -285,6 +286,26 @@
+             return true;
+         }
+ 
++        private async Task WithdrawOtherOpenApplicationsAsync(InternshipApplication accepted, int userId)
++        {
++            var others = await _context.InternshipApplications
++                .Where(other => other.StudentProfileId == accepted.StudentProfileId
++                    && other.Id != accepted.Id
++                    && !other.IsDeleted)
++                .ToListAsync();
++
++            foreach (var other in others.Where(item => IsOpenApplication(item.Status)))
++            {
++                var previous = other.Status;
++                other.Status = ApplicationStatus.WithdrawnAcceptedElsewhere;
++                other.StatusUpdatedAt = DateTime.UtcNow;
++                AddStatusHistory(other, previous, ApplicationStatus.WithdrawnAcceptedElsewhere,
++                    "The student accepted another offer", userId);
++            }
++
++            await _context.SaveChangesAsync();
++        }
++
+         private void AddStatusHistory(
+             InternshipApplication application,
+             ApplicationStatus previousStatus,
+@@ -340,6 +361,23 @@
+             return responses;
+         }
+ 
++        // What a company may do through the generic status update. Accepting or declining an offer belongs to the student
++        // (RespondToOfferAsync) and withdrawing belongs to the student (WithdrawApplicationAsync), so neither is allowed here.
++        private bool IsValidCompanyTransition(ApplicationStatus current, ApplicationStatus newStatus) => current switch
++        {
++            ApplicationStatus.Applied => newStatus is ApplicationStatus.UnderReview or ApplicationStatus.Rejected,
++            ApplicationStatus.UnderReview => newStatus is ApplicationStatus.Shortlisted or ApplicationStatus.Rejected,
++            ApplicationStatus.Shortlisted => newStatus == ApplicationStatus.Rejected,
++            ApplicationStatus.InterviewScheduled => newStatus == ApplicationStatus.Rejected,
++            ApplicationStatus.InterviewCompleted => newStatus == ApplicationStatus.Rejected,
++            ApplicationStatus.OfferMade => newStatus == ApplicationStatus.Rejected,
++            _ => false
++        };
++
++        private static bool IsOpenApplication(ApplicationStatus status) => status is
++            ApplicationStatus.Applied or ApplicationStatus.UnderReview or ApplicationStatus.Shortlisted or
++            ApplicationStatus.InterviewScheduled or ApplicationStatus.InterviewCompleted or ApplicationStatus.OfferMade;
++
+         private bool IsValidStatusTransition(ApplicationStatus current, ApplicationStatus newStatus)
+         {
+             return current switch

@@ -1,0 +1,104 @@
+@model List<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse>
+@{
+    ViewData["Title"] = "My documents";
+    var categories = (IEnumerable<(string Value, string Label)>)ViewBag.Categories;
+    string Label(string value) => categories.FirstOrDefault(c => c.Value == value).Label ?? value;
+    string Size(long bytes) => bytes >= 1_048_576 ? $"{bytes / 1_048_576.0:0.#} MB" : $"{Math.Max(1, bytes / 1024)} KB";
+}
+
+<h1 class="h2 mb-1">My documents</h1>
+<p class="text-muted">Keep as many qualifications, certificates and other documents as you need. You choose which ones to send with each application.</p>
+
+@if (TempData["SuccessMessage"] != null) { <div class="alert alert-success">@TempData["SuccessMessage"]</div> }
+@if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger">@TempData["ErrorMessage"]</div> }
+
+<div class="card mb-4">
+    <div class="card-header bg-white"><h6 class="mb-0">Add documents</h6></div>
+    <div class="card-body">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" id="upload-form">
+            @Html.AntiForgeryToken()
+            <div id="upload-rows"></div>
+            <div class="d-flex gap-2 mt-2">
+                <button type="button" id="add-row" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus me-1"></i> Add another document</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-upload me-1"></i> Upload</button>
+            </div>
+            <div class="form-text mt-2">PDF, Word or image files. Up to 20 at a time.</div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white"><h6 class="mb-0">Uploaded documents (@Model.Count)</h6></div>
+    @if (Model.Count == 0)
+    {
+        <div class="card-body text-muted">You have not uploaded any documents yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th>File</th><th>Type</th><th>Size</th><th>Added</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var document in Model)
+                    {
+                        <tr>
+                            <td class="text-break">@document.OriginalFileName</td>
+                            <td>@Label(document.Category)</td>
+                            <td>@Size(document.Length)</td>
+                            <td>@document.CreatedAt.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" asp-controller="Documents" asp-action="Download" asp-route-id="@document.Id">Download</a>
+                                <form asp-action="Remove" method="post" class="d-inline" onsubmit="return confirm('Remove this document?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@document.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<template id="row-template">
+    <div class="row g-2 align-items-center mb-2 upload-row">
+        <div class="col-md-4">
+            <select name="categories" class="form-select">
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Value">@category.Label</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-7">
+            <input type="file" name="files" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+        </div>
+        <div class="col-md-1 text-end">
+            <button type="button" class="btn btn-outline-secondary btn-sm remove-row" title="Remove this row" aria-label="Remove this row"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        (function () {
+            var rows = document.getElementById('upload-rows');
+            var template = document.getElementById('row-template');
+            function addRow() {
+                if (rows.querySelectorAll('.upload-row').length >= 20) return;
+                rows.appendChild(template.content.cloneNode(true));
+            }
+            document.getElementById('add-row').addEventListener('click', addRow);
+            rows.addEventListener('click', function (e) {
+                var btn = e.target.closest('.remove-row');
+                if (!btn) return;
+                var row = btn.closest('.upload-row');
+                if (rows.querySelectorAll('.upload-row').length > 1) row.remove();
+                else row.querySelector('input[type=file]').value = '';
+            });
+            addRow();
+        })();
+    </script>
+}

@@ -27,6 +27,13 @@ namespace InternshipManagement.Domain.Entities
         public string? IdentificationDocumentUrl { get; set; }
         public string? CertificatesUrl { get; set; }
         public string? OtherSupportingDocumentsUrl { get; set; }
+        public Guid? ResumeDocumentId { get; set; }
+        public Guid? CoverLetterDocumentId { get; set; }
+        public Guid? AcademicTranscriptDocumentId { get; set; }
+        public Guid? QualificationDocumentId { get; set; }
+        public Guid? IdentificationDocumentId { get; set; }
+        public Guid? CertificatesDocumentId { get; set; }
+        public Guid? OtherSupportingDocumentsId { get; set; }
         public string? ProfilePictureUrl { get; set; }
 
         // Navigation Properties
@@ -34,6 +41,8 @@ namespace InternshipManagement.Domain.Entities
         public virtual ICollection<Education> Education { get; set; }
         public virtual ICollection<WorkExperience> WorkExperience { get; set; }
         public virtual ICollection<Skill> Skills { get; set; }
+        public virtual ICollection<StudentCertification> Certifications { get; set; }
+        public virtual ICollection<StudentProject> Projects { get; set; }
     }
 
     public class Education : BaseEntity
@@ -47,6 +56,8 @@ namespace InternshipManagement.Domain.Entities
         public DateTime? EndDate { get; set; }
         public bool IsCurrent { get; set; }
         public string? Grade { get; set; }
+        public string? CompletionStatus { get; set; }
+        public string? SupportingDocumentUrl { get; set; }
     }
 
     public class WorkExperience : BaseEntity
@@ -67,5 +78,31 @@ namespace InternshipManagement.Domain.Entities
         public virtual StudentProfile StudentProfile { get; set; }
         public string Name { get; set; }
         public string? ProficiencyLevel { get; set; }
+    }
+
+    public class StudentCertification : BaseEntity
+    {
+        public int StudentProfileId { get; set; }
+        public virtual StudentProfile StudentProfile { get; set; }
+        public string Name { get; set; }
+        public string IssuingOrganization { get; set; }
+        public DateTime? IssueDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+        public string? CredentialUrl { get; set; }
+        public string? CertificateFileUrl { get; set; }
+    }
+
+    public class StudentProject : BaseEntity
+    {
+        public int StudentProfileId { get; set; }
+        public virtual StudentProfile StudentProfile { get; set; }
+        public string Title { get; set; }
+        public string? Description { get; set; }
+        public string? Role { get; set; }
+        public string? Technologies { get; set; }
+        public string? ProjectUrl { get; set; }
+        public string? RepositoryUrl { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

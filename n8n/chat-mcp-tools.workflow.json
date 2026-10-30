@@ -1,0 +1,161 @@
+{
+  "name": "Internship - MCP tools (career assistant)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "chat-tools",
+        "instructions": "Read-only tools for the student career assistant. Every tool needs the runToken from your instructions."
+      },
+      "id": "b1000000-0000-4000-8000-000000000001",
+      "name": "MCP Server Trigger",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "b2000000-0000-4000-8000-000000000001",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": null,
+          "name": "MCP server key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the student's programme, year of study, skills (with level), education, certifications, jobs and project titles. No name or contact details. Parameters: reason = one short sentence on why you call it; runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/chat/profile-summary",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "b1000000-0000-4000-8000-000000000002",
+      "name": "get_my_profile_summary",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the student's best open internships, ranked by the platform: targetId, title, subtitle (company), matchScore (0 to 100), matchingSkills, matchingQualifications, missingPreferredSkills. Parameters: reason = one short sentence on why you call it; maxResults = how many (1 to 10); runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/chat/my-matches",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "maxResults",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "b1000000-0000-4000-8000-000000000003",
+      "name": "get_my_matches",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns what the student's profile lacks for ONE internship or for their top matches, and certifications from the platform's list that could help (covers = the gaps each one addresses). Parameters: reason = one short sentence on why you call it; internshipId = the targetId of one internship from get_my_matches, or 0 for the student's top matches; runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/chat/skill-gaps",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "internshipId",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "b1000000-0000-4000-8000-000000000004",
+      "name": "get_my_skill_gaps",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "get_my_profile_summary": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_my_matches": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_my_skill_gaps": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

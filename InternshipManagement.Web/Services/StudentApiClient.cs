@@ -40,10 +40,10 @@ namespace InternshipManagement.Web.Services
             return null;
         }
 
-        public async Task<bool> UploadResumeAsync(string token, int userId, string resumeUrl)
+        public async Task<bool> UploadResumeAsync(string token, int userId, Guid resumeDocumentId)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync("api/Students/resume", new { ResumeUrl = resumeUrl });
+            var response = await _httpClient.PostAsJsonAsync("api/Students/resume", new { ResumeDocumentId = resumeDocumentId });
             return response.IsSuccessStatusCode;
         }
 

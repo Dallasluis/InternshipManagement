@@ -1,0 +1,26 @@
+--- orig/InternshipLifecycleService.cs	2026-10-27 21:46:53.367061314 +0200
++++ new/InternshipLifecycleService.cs	2026-10-28 08:59:51.471506460 +0200
+@@ -50,12 +50,12 @@
+                 CompanyProfileId = application.Internship.CompanyProfileId,
+                 InternshipId = application.InternshipId,
+                 InternshipApplicationId = application.Id,
+-                Status = PlacementStatus.Active,
++                Status = startDate.Date > DateTime.UtcNow.Date ? PlacementStatus.Pending : PlacementStatus.Active,
+                 OriginalStartDate = startDate,
+                 OriginalEndDate = application.Internship.EndDate,
+                 CurrentStartDate = startDate,
+                 CurrentEndDate = application.Internship.EndDate,
+-                ActivatedAt = DateTime.UtcNow
++                ActivatedAt = startDate.Date > DateTime.UtcNow.Date ? null : DateTime.UtcNow
+             };
+ 
+             _context.Placements.Add(placement);
+@@ -252,7 +252,7 @@
+             if (placement == null)
+                 throw new Exception("Placement not found for this student.");
+ 
+-            if (placement.Status != PlacementStatus.Active && placement.Status != PlacementStatus.Extended)
++            if (placement.Status != PlacementStatus.Pending && placement.Status != PlacementStatus.Active && placement.Status != PlacementStatus.Extended)
+                 throw new Exception("Only active placements can be withdrawn.");
+ 
+             var existingOpenRequest = await _context.InternshipWithdrawalRequests

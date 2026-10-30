@@ -15,10 +15,14 @@
         {
             <div class="alert alert-success">@TempData["SuccessMessage"]</div>
         }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
 
         <div class="card">
             <div class="card-body">
-                <form asp-controller="Company" asp-action="Verification" method="post">
+                <form asp-controller="Company" asp-action="Verification" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <div class="alert alert-info">
@@ -32,10 +36,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Verification Documents</label>
-                        <textarea name="VerificationDocuments" class="form-control" rows="3"
-                                  placeholder="Provide details about your verification documents..."></textarea>
-                        <small class="text-muted">Describe the documents you have for verification.</small>
+                        <label asp-for="EvidenceFiles" class="form-label">Verification documents</label>
+                        <input asp-for="EvidenceFiles" type="file" class="form-control" multiple
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" />
+                        <small class="text-muted">Upload your business registration and tax evidence. Files must be 10 MB or smaller.</small>
+                        <span asp-validation-for="EvidenceFiles" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -52,6 +57,25 @@
                     </a>
                 </form>
             </div>
+            @if (ViewBag.Profile is InternshipManagement.Web.Models.Company.CompanyProfileResponse profile
+                && profile.VerificationStatus == "Rejected"
+                && !profile.HasUsedVerificationAppeal)
+            {
+                <div class="card mt-4">
+                    <div class="card-header bg-white"><h6 class="mb-0">Appeal the decision</h6></div>
+                    <div class="card-body">
+                        <p class="text-muted">You may appeal once within 30 days of the rejection. A different administrator will review it.</p>
+                        <form asp-controller="Company" asp-action="AppealVerification" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label for="Reason" class="form-label">Reason for appeal</label>
+                                <textarea id="Reason" name="Reason" class="form-control" rows="4" minlength="20" maxlength="2000" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary">Submit appeal</button>
+                        </form>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>

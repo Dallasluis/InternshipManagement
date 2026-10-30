@@ -1,20 +1,55 @@
 using InternshipManagement.Api.Extensions;
 using InternshipManagement.Api.Middleware;
+using InternshipManagement.Infrastructure.Integrations.N8n;
 using InternshipManagement.Infrastructure.Identity;
 using InternshipManagement.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddIdentityServices();
+builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
+builder.Services.AddSmtpEmail(builder.Configuration);
+builder.Services.AddHostedService<InternshipManagement.Api.Jobs.EmailVerificationHousekeepingService>();
+builder.Services.AddHostedService<InternshipManagement.Api.Jobs.InternshipDeadlineService>();
 builder.Services.AddValidation();
 builder.Services.AddCorsPolicy();
 builder.Services.AddOpenApiDocumentation();  // ✅ Using new OpenAPI
+
+// n8n automation (AI workflows run in n8n; the API stays in control of rules and data)
+builder.Services.AddN8nIntegration(builder.Configuration);
+
+// Each AI call costs Gemini quota: limit each signed-in user to 10 per hour
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("ai-generation", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.FindFirst("userId")?.Value
+                ?? context.Connection.RemoteIpAddress?.ToString()
+                ?? "anonymous",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromHours(1),
+                QueueLimit = 0
+            }));
+    options.AddPolicy("login", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue("LoginSecurity:LoginAttemptsPerIpPerMinute", 20),
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
 
 // Add controllers
 builder.Services.AddControllers();
@@ -38,7 +73,10 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
+app.UseMiddleware<SessionSecurityMiddleware>();
+app.UseMiddleware<UnverifiedAccountMiddleware>();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

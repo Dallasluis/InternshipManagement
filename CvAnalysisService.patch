@@ -1,0 +1,45 @@
+--- cvfix/orig.cs	2026-10-28 14:36:11.168391403 +0200
++++ cvfix/CvAnalysisService.cs	2026-10-28 14:36:11.227120783 +0200
+@@ -394,7 +394,7 @@
+                 if (name == null || !seen.Add(TextCleaner.Key(name))) continue;
+ 
+                 var issued = ParseDate(item!.IssueDate);
+-                var expires = ParseDate(item.ExpirationDate);
++                var expires = ParseEndDate(item.ExpirationDate);
+                 if (issued.HasValue && expires.HasValue && expires < issued) expires = null;
+ 
+                 result.Add(new CvSuggestedCertification
+@@ -443,7 +443,7 @@
+                 || (end != null && Array.Exists(CurrentWords, w => string.Equals(w, end.Trim(), StringComparison.OrdinalIgnoreCase)));
+ 
+             var startDate = ParseDate(start);
+-            var endDate = current ? null : ParseDate(end);
++            var endDate = current ? null : ParseEndDate(end);
+ 
+             if (startDate.HasValue && endDate.HasValue && endDate < startDate)
+                 endDate = null;
+@@ -462,6 +462,24 @@
+             return IsPlausibleYear(parsed.Year) ? parsed : null;
+         }
+ 
++        /// <summary>
++        /// An end date written as just a year ("2022") or a month ("2022-06") means the END of that period, so a course
++        /// that started and finished in the same year is not read as ending on 1 January.
++        /// </summary>
++        private static DateTime? ParseEndDate(string? value)
++        {
++            var parsed = ParseDate(value);
++            if (!parsed.HasValue) return null;
++
++            var text = value!.Trim();
++            if (text.Length == 4)                       // yyyy
++                return new DateTime(parsed.Value.Year, 12, 31);
++            if (text.Length == 7)                       // yyyy-MM
++                return new DateTime(parsed.Value.Year, parsed.Value.Month,
++                    DateTime.DaysInMonth(parsed.Value.Year, parsed.Value.Month));
++            return parsed;
++        }
++
+         private static bool IsPlausibleYear(int year) => year >= 1950 && year <= DateTime.UtcNow.Year + 8;
+ 
+         private static string? ParseLevel(string? value)

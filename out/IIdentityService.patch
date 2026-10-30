@@ -1,0 +1,15 @@
+--- orig/IIdentityService.cs	2026-10-28 08:48:49.911797835 +0200
++++ new/IIdentityService.cs	2026-10-28 08:48:50.127092327 +0200
+@@ -51,9 +51,9 @@
+         Task<IdentityResult> SetEmailAfterConfirmationAsync(string userId, string newEmail);
+         Task<IdentityResult> ConfirmEmailAddressAsync(string userId);
+         Task<IdentityResult> DeleteUserAsync(string userId);
+-        Task<string> GetAuthenticatorKeyAsync(string userId);
+-        Task<bool> VerifyAuthenticatorCodeAsync(string userId, string code);
+-        Task<IdentityResult> SetTwoFactorEnabledAsync(string userId, bool enabled);
++        Task<string?> GetUserTokenAsync(string userId, string name);
++        Task SetUserTokenAsync(string userId, string name, string value);
++        Task RemoveUserTokenAsync(string userId, string name);
+         Task<IdentityResult> UpdateProfilePictureUrlAsync(string userId, string profilePictureUrl);
+         Task<AccountPreferencesDto> GetAccountPreferencesAsync(string userId);
+         Task<IdentityResult> UpdateAccountPreferencesAsync(string userId, AccountPreferencesDto preferences);

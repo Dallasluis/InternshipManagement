@@ -16,11 +16,16 @@ namespace InternshipManagement.Domain.Entities
         public string? Requirements { get; set; }
         public string? Qualifications { get; set; }
         public string? Skills { get; set; }
+        public string? RequiredQualifications { get; set; }
+        public string? PreferredQualifications { get; set; }
+        public string? RequiredSkills { get; set; }
+        public string? PreferredSkills { get; set; }
 
         public string Industry { get; set; }
         public string? Location { get; set; }
         public bool IsRemote { get; set; }
         public InternshipType InternshipType { get; set; }
+        public InternshipWorkArrangement WorkArrangement { get; set; } = InternshipWorkArrangement.OnSite;
         public InternshipDuration Duration { get; set; }
 
         public DateTime StartDate { get; set; }

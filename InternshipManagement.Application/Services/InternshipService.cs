@@ -22,16 +22,17 @@ namespace InternshipManagement.Application.Services
         public async Task<InternshipResponse> CreateInternshipAsync(int userId, CreateInternshipRequest request)
         {
             var companyProfile = await _context.CompanyProfiles
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+                .FirstOrDefaultAsync(c => c.UserId == userId && !c.IsDeleted);
 
             if (companyProfile == null)
                 throw new Exception("Company profile not found.");
 
-            if (companyProfile.VerificationStatus != CompanyVerificationStatus.Verified)
-                throw new Exception("Company must be verified to create internships.");
-
             if (_configuration.GetValue<bool>("Internships:RequireSubscription") && !companyProfile.IsSubscribed)
                 throw new Exception("Active subscription required.");
+
+            if (!string.Equals(request.InternshipType, nameof(InternshipType.FullTime), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Only full-time internships can be posted.");
+            var workArrangement = ParseWorkArrangement(request.WorkArrangement, request.IsRemote);
 
             var eligibleProgrammesJson = request.EligibleProgrammes != null && request.EligibleProgrammes.Any()
                 ? JsonSerializer.Serialize(request.EligibleProgrammes)
@@ -46,10 +47,15 @@ namespace InternshipManagement.Application.Services
                 Requirements = request.Requirements,
                 Qualifications = request.Qualifications,
                 Skills = request.Skills,
+                RequiredQualifications = request.RequiredQualifications,
+                PreferredQualifications = request.PreferredQualifications,
+                RequiredSkills = request.RequiredSkills,
+                PreferredSkills = request.PreferredSkills,
                 Industry = request.Industry,
                 Location = request.Location,
-                IsRemote = request.IsRemote,
-                InternshipType = Enum.Parse<InternshipType>(request.InternshipType),
+                IsRemote = workArrangement != InternshipWorkArrangement.OnSite,
+                InternshipType = InternshipType.FullTime,
+                WorkArrangement = workArrangement,
                 Duration = Enum.Parse<InternshipDuration>(request.Duration),
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
@@ -69,17 +75,24 @@ namespace InternshipManagement.Application.Services
             return await MapToResponse(internship);
         }
 
-        public async Task<InternshipResponse> UpdateInternshipAsync(int internshipId, UpdateInternshipRequest request)
+        public async Task<InternshipResponse?> UpdateInternshipAsync(int userId, int internshipId, UpdateInternshipRequest request)
         {
             var internship = await _context.Internships
                 .Include(i => i.CompanyProfile)
-                .FirstOrDefaultAsync(i => i.Id == internshipId);
+                .FirstOrDefaultAsync(i => i.Id == internshipId
+                    && !i.IsDeleted
+                    && i.CompanyProfile.UserId == userId
+                    && !i.CompanyProfile.IsDeleted);
 
             if (internship == null)
-                throw new Exception("Internship not found");
+                return null;
 
             if (internship.Status != InternshipStatus.Draft)
                 throw new Exception("Only draft internships can be edited.");
+
+            if (!string.Equals(request.InternshipType, nameof(InternshipType.FullTime), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Only full-time internships can be posted.");
+            var workArrangement = ParseWorkArrangement(request.WorkArrangement, request.IsRemote);
 
             var eligibleProgrammesJson = request.EligibleProgrammes != null && request.EligibleProgrammes.Any()
                 ? JsonSerializer.Serialize(request.EligibleProgrammes)
@@ -91,10 +104,15 @@ namespace InternshipManagement.Application.Services
             internship.Requirements = request.Requirements;
             internship.Qualifications = request.Qualifications;
             internship.Skills = request.Skills;
+            internship.RequiredQualifications = request.RequiredQualifications;
+            internship.PreferredQualifications = request.PreferredQualifications;
+            internship.RequiredSkills = request.RequiredSkills;
+            internship.PreferredSkills = request.PreferredSkills;
             internship.Industry = request.Industry;
             internship.Location = request.Location;
-            internship.IsRemote = request.IsRemote;
-            internship.InternshipType = Enum.Parse<InternshipType>(request.InternshipType);
+            internship.IsRemote = workArrangement != InternshipWorkArrangement.OnSite;
+            internship.InternshipType = InternshipType.FullTime;
+            internship.WorkArrangement = workArrangement;
             internship.Duration = Enum.Parse<InternshipDuration>(request.Duration);
             internship.StartDate = request.StartDate;
             internship.EndDate = request.EndDate;
@@ -111,28 +129,42 @@ namespace InternshipManagement.Application.Services
             return await MapToResponse(internship);
         }
 
-        public async Task<bool> PublishInternshipAsync(int internshipId)
+        public async Task<bool> PublishInternshipAsync(int userId, int internshipId)
         {
-            var internship = await _context.Internships.FindAsync(internshipId);
+            var internship = await _context.Internships
+                .Include(i => i.CompanyProfile)
+                .FirstOrDefaultAsync(i => i.Id == internshipId
+                    && !i.IsDeleted
+                    && i.CompanyProfile.UserId == userId
+                    && !i.CompanyProfile.IsDeleted);
             if (internship == null) return false;
 
             if (internship.Status != InternshipStatus.Draft)
                 throw new Exception("Only draft internships can be published.");
+
+            if (internship.CompanyProfile.VerificationStatus != CompanyVerificationStatus.Verified)
+                throw new InvalidOperationException("Company verification is required before publishing internships.");
+
+            if (_configuration.GetValue<bool>("Internships:RequireSubscription") && !internship.CompanyProfile.IsSubscribed)
+                throw new InvalidOperationException("An active subscription is required before publishing internships.");
 
             if (internship.ApplicationDeadline < DateTime.UtcNow)
                 throw new Exception("Cannot publish internship with past application deadline.");
 
             internship.Status = InternshipStatus.Published;
             internship.PublishedAt = DateTime.UtcNow;
-            internship.ModerationStatus = ModerationStatus.Approved;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> CloseInternshipAsync(int internshipId)
+        public async Task<bool> CloseInternshipAsync(int userId, int internshipId)
         {
-            var internship = await _context.Internships.FindAsync(internshipId);
+            var internship = await _context.Internships
+                .FirstOrDefaultAsync(i => i.Id == internshipId
+                    && !i.IsDeleted
+                    && i.CompanyProfile.UserId == userId
+                    && !i.CompanyProfile.IsDeleted);
             if (internship == null) return false;
 
             internship.Status = InternshipStatus.Closed;
@@ -142,16 +174,32 @@ namespace InternshipManagement.Application.Services
             return true;
         }
 
-        public async Task<InternshipResponse> GetInternshipByIdAsync(int id)
+        public async Task<InternshipResponse?> GetInternshipByIdAsync(int id, int? requestingUserId = null)
         {
             var internship = await _context.Internships
                 .Include(i => i.CompanyProfile)
-                .FirstOrDefaultAsync(i => i.Id == id && !i.IsDeleted);
+                .FirstOrDefaultAsync(i => i.Id == id
+                    && !i.IsDeleted
+                    && ((i.Status == InternshipStatus.Published
+                            && i.ModerationStatus == ModerationStatus.Approved
+                            && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
+                                || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
+                                    && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
+                            && i.ApplicationDeadline >= DateTime.UtcNow)
+                        || (requestingUserId.HasValue && i.CompanyProfile.UserId == requestingUserId.Value)));
 
             if (internship == null) return null;
 
-            internship.Views++;
-            await _context.SaveChangesAsync();
+            if (internship.Status == InternshipStatus.Published
+                && internship.ModerationStatus == ModerationStatus.Approved
+                && (internship.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
+                    || (internship.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
+                        && internship.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
+                && internship.ApplicationDeadline >= DateTime.UtcNow)
+            {
+                internship.Views++;
+                await _context.SaveChangesAsync();
+            }
 
             return await MapToResponse(internship);
         }
@@ -162,6 +210,9 @@ namespace InternshipManagement.Application.Services
                 .Include(i => i.CompanyProfile)
                 .Where(i => i.Status == InternshipStatus.Published
                     && i.ModerationStatus == ModerationStatus.Approved
+                    && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
+                        || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
+                            && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
                     && !i.IsDeleted
                     && i.ApplicationDeadline >= DateTime.UtcNow);
 
@@ -171,6 +222,10 @@ namespace InternshipManagement.Application.Services
                     i.Title.Contains(request.Keyword) ||
                     i.Description.Contains(request.Keyword) ||
                     (i.Skills != null && i.Skills.Contains(request.Keyword)) ||
+                    (i.RequiredSkills != null && i.RequiredSkills.Contains(request.Keyword)) ||
+                    (i.PreferredSkills != null && i.PreferredSkills.Contains(request.Keyword)) ||
+                    (i.RequiredQualifications != null && i.RequiredQualifications.Contains(request.Keyword)) ||
+                    (i.PreferredQualifications != null && i.PreferredQualifications.Contains(request.Keyword)) ||
                     i.Industry.Contains(request.Keyword));
             }
 
@@ -186,10 +241,10 @@ namespace InternshipManagement.Application.Services
                 query = query.Where(i => i.Industry == request.Industry);
             }
 
-            if (!string.IsNullOrEmpty(request.InternshipType))
+            if (!string.IsNullOrWhiteSpace(request.WorkArrangement))
             {
-                var type = Enum.Parse<InternshipType>(request.InternshipType);
-                query = query.Where(i => i.InternshipType == type);
+                var arrangement = ParseWorkArrangement(request.WorkArrangement);
+                query = query.Where(i => i.WorkArrangement == arrangement);
             }
 
             if (request.MinStipend.HasValue)
@@ -199,7 +254,7 @@ namespace InternshipManagement.Application.Services
 
             if (request.IsRemote.HasValue)
             {
-                query = query.Where(i => i.IsRemote == request.IsRemote);
+                query = query.Where(i => (i.WorkArrangement != InternshipWorkArrangement.OnSite) == request.IsRemote);
             }
 
             if (!string.IsNullOrEmpty(request.Programme) && request.ShowOnlyMatchingProgrammes)
@@ -278,9 +333,13 @@ namespace InternshipManagement.Application.Services
             return true;
         }
 
-        public async Task<bool> DeleteInternshipAsync(int internshipId)
+        public async Task<bool> DeleteInternshipAsync(int userId, int internshipId)
         {
-            var internship = await _context.Internships.FindAsync(internshipId);
+            var internship = await _context.Internships
+                .FirstOrDefaultAsync(i => i.Id == internshipId
+                    && !i.IsDeleted
+                    && i.CompanyProfile.UserId == userId
+                    && !i.CompanyProfile.IsDeleted);
             if (internship == null) return false;
 
             internship.IsDeleted = true;
@@ -296,6 +355,9 @@ namespace InternshipManagement.Application.Services
                 .FirstOrDefaultAsync(i => i.Id == internshipId &&
                     i.Status == InternshipStatus.Published &&
                     i.ModerationStatus == ModerationStatus.Approved &&
+                    (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
+                        || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
+                            && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7))) &&
                     !i.IsDeleted);
 
             if (internship == null) return false;
@@ -370,10 +432,15 @@ namespace InternshipManagement.Application.Services
                 Requirements = internship.Requirements,
                 Qualifications = internship.Qualifications,
                 Skills = internship.Skills,
+                RequiredQualifications = internship.RequiredQualifications,
+                PreferredQualifications = internship.PreferredQualifications,
+                RequiredSkills = internship.RequiredSkills,
+                PreferredSkills = internship.PreferredSkills,
                 Industry = internship.Industry,
                 Location = internship.Location,
-                IsRemote = internship.IsRemote,
-                InternshipType = internship.InternshipType.ToString(),
+                IsRemote = internship.WorkArrangement != InternshipWorkArrangement.OnSite,
+                WorkArrangement = internship.WorkArrangement.ToString(),
+                InternshipType = InternshipType.FullTime.ToString(),
                 Duration = internship.Duration.ToString(),
                 StartDate = internship.StartDate,
                 EndDate = internship.EndDate,
@@ -389,6 +456,20 @@ namespace InternshipManagement.Application.Services
                 ApplicationsCount = internship.ApplicationsCount,
                 ModerationStatus = internship.ModerationStatus.ToString()
             };
+        }
+
+        private static InternshipWorkArrangement ParseWorkArrangement(string? value, bool legacyIsRemote = false)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return legacyIsRemote ? InternshipWorkArrangement.Remote : InternshipWorkArrangement.OnSite;
+
+            if (Enum.TryParse<InternshipWorkArrangement>(value, true, out var arrangement)
+                && Enum.IsDefined(arrangement))
+            {
+                return arrangement;
+            }
+
+            throw new InvalidOperationException("Work arrangement must be OnSite, Remote, or Hybrid.");
         }
     }
 }

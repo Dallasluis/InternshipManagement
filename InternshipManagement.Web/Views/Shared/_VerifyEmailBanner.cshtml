@@ -1,0 +1,36 @@
+@{
+    var unverified = Context.Session.GetString("EmailConfirmed") == "False";
+    var email = Context.Session.GetString("UserEmail");
+    var message = TempData["VerificationMessage"] as string;
+    var restricted = Context.Session.GetString("UserType") switch
+    {
+        "Company" => "post internships, make offers, upload documents or change your profile",
+        "Student" => "apply for internships, upload documents or change your profile",
+        _ => "make changes"
+    };
+}
+
+@if (unverified)
+{
+    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-3" role="alert">
+        <div class="flex-grow-1">
+            <strong>Verify your email address.</strong>
+            We sent a link to @email. Until you verify it, you cannot @restricted.
+        </div>
+        <form asp-controller="AccountRecovery" asp-action="RefreshSession" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+            <button type="submit" class="btn btn-sm btn-outline-dark">I have verified</button>
+        </form>
+        <form asp-controller="AccountRecovery" asp-action="ResendVerification" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+            <button type="submit" class="btn btn-sm btn-warning">Resend link</button>
+        </form>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info mb-3" role="status">@message</div>
+}

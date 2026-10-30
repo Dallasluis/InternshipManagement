@@ -9,6 +9,8 @@ namespace InternshipManagement.Domain.Entities
     {
         public int UserId { get; set; }
         public string CompanyName { get; set; }
+        public string? LegalName { get; set; }
+        public string? RegistrationNumber { get; set; }
         public string? Description { get; set; }
         public string Industry { get; set; }
         public string? Website { get; set; }
@@ -22,6 +24,13 @@ namespace InternshipManagement.Domain.Entities
         // Verification
         public CompanyVerificationStatus VerificationStatus { get; set; }
         public DateTime? VerifiedAt { get; set; }
+        public DateTime? VerificationSubmittedAt { get; set; }
+        public DateTime? ReverificationRequiredAt { get; set; }
+        public DateTime? AppealSubmittedAt { get; set; }
+        public DateTime? AppealReviewedAt { get; set; }
+        public bool HasUsedVerificationAppeal { get; set; }
+        public bool AppealPending { get; set; }
+        public CompanyVerificationStatus? StatusBeforeSuspension { get; set; }
         public string? VerificationDocuments { get; set; }
         public string? AdminNotes { get; set; }
 
@@ -29,6 +38,7 @@ namespace InternshipManagement.Domain.Entities
         public bool IsSubscribed { get; set; } = false;
         public DateTime? SubscriptionStartDate { get; set; }
         public DateTime? SubscriptionEndDate { get; set; }
+        public DateTime? SubscriptionInactiveAt { get; set; }
 
         // Navigation Properties
         public virtual ICollection<Internship> Internships { get; set; }

@@ -1,0 +1,70 @@
+--- orig/IdentityService.cs	2026-10-28 08:48:49.911951942 +0200
++++ new/IdentityService.cs	2026-10-28 08:48:56.802964301 +0200
+@@ -536,56 +536,26 @@
+                 : IdentityResult.Failure(result.Errors.Select(e => e.Description).ToList());
+         }
+ 
+-        public async Task<string> GetAuthenticatorKeyAsync(string userId)
++        public async Task<string?> GetUserTokenAsync(string userId, string name)
+         {
+             var user = await _userManager.FindByIdAsync(userId);
+-            if (user == null)
+-                throw new InvalidOperationException("User not found.");
+-
+-            var key = await _userManager.GetAuthenticatorKeyAsync(user);
+-            if (string.IsNullOrWhiteSpace(key))
+-            {
+-                var result = await _userManager.ResetAuthenticatorKeyAsync(user);
+-                if (!result.Succeeded)
+-                    throw new InvalidOperationException(string.Join("; ", result.Errors.Select(error => error.Description)));
+-                key = await _userManager.GetAuthenticatorKeyAsync(user);
+-            }
+-
+-            return key ?? throw new InvalidOperationException("Unable to generate authenticator key.");
++            return user == null ? null : await _userManager.GetAuthenticationTokenAsync(user, "InternshipManagement", name);
+         }
+ 
+-        public async Task<bool> VerifyAuthenticatorCodeAsync(string userId, string code)
++        public async Task SetUserTokenAsync(string userId, string name, string value)
+         {
+-            var user = await _userManager.FindByIdAsync(userId);
+-            return user != null && await _userManager.VerifyTwoFactorTokenAsync(
+-                user,
+-                _userManager.Options.Tokens.AuthenticatorTokenProvider,
+-                code.Replace(" ", string.Empty, StringComparison.Ordinal));
++            var user = await _userManager.FindByIdAsync(userId)
++                ?? throw new InvalidOperationException("User not found.");
++            var result = await _userManager.SetAuthenticationTokenAsync(user, "InternshipManagement", name, value);
++            if (!result.Succeeded)
++                throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+         }
+ 
+-        public async Task<IdentityResult> SetTwoFactorEnabledAsync(string userId, bool enabled)
++        public async Task RemoveUserTokenAsync(string userId, string name)
+         {
+             var user = await _userManager.FindByIdAsync(userId);
+-            if (user == null)
+-                return IdentityResult.Failure(new List<string> { "User not found." });
+-
+-            var result = await _userManager.SetTwoFactorEnabledAsync(user, enabled);
+-            if (!result.Succeeded)
+-                return IdentityResult.Failure(result.Errors.Select(error => error.Description).ToList());
+-
+-            var revokedSessions = await _context.Users
+-                .Where(candidate => candidate.Id == user.Id)
+-                .ExecuteUpdateAsync(setters => setters
+-                    .SetProperty(candidate => candidate.RefreshToken, (string?)null)
+-                    .SetProperty(candidate => candidate.RefreshTokenExpiryTime, (DateTime?)null)
+-                    .SetProperty(candidate => candidate.AbsoluteSessionExpiresAt, (DateTime?)null)
+-                    .SetProperty(candidate => candidate.LastSessionActivityAt, (DateTime?)null));
+-            if (revokedSessions != 1)
+-                return IdentityResult.Failure(new List<string> { "Unable to revoke existing sessions." });
+-
+-            return result.Succeeded
+-                ? IdentityResult.Success(userId)
+-                : IdentityResult.Failure(result.Errors.Select(error => error.Description).ToList());
++            if (user != null)
++                await _userManager.RemoveAuthenticationTokenAsync(user, "InternshipManagement", name);
+         }
+ 
+         public async Task<IdentityResult> UpdateProfilePictureUrlAsync(string userId, string profilePictureUrl)

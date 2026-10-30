@@ -18,12 +18,14 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpGet("placements/student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetStudentPlacements()
         {
             return Ok(await _lifecycleService.GetStudentPlacementsAsync(GetUserId()));
         }
 
         [HttpGet("placements/company")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> GetCompanyPlacements()
         {
             return Ok(await _lifecycleService.GetCompanyPlacementsAsync(GetUserId()));
@@ -32,11 +34,12 @@ namespace InternshipManagement.Api.Controllers
         [HttpGet("placements/{id}")]
         public async Task<IActionResult> GetPlacement(int id)
         {
-            var placement = await _lifecycleService.GetPlacementAsync(id);
+            var placement = await _lifecycleService.GetPlacementAsync(GetUserId(), id);
             return placement == null ? NotFound() : Ok(placement);
         }
 
         [HttpPost("placements/{id}/progress-reports")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmitProgressReport(int id, [FromBody] SubmitProgressReportRequest request)
         {
             try
@@ -53,10 +56,12 @@ namespace InternshipManagement.Api.Controllers
         [HttpGet("placements/{id}/progress-reports")]
         public async Task<IActionResult> GetProgressReports(int id)
         {
-            return Ok(await _lifecycleService.GetProgressReportsAsync(id));
+            var reports = await _lifecycleService.GetProgressReportsAsync(GetUserId(), id);
+            return reports == null ? NotFound() : Ok(reports);
         }
 
         [HttpPut("progress-reports/{id}/review")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> ReviewProgressReport(int id, [FromBody] ReviewProgressReportRequest request)
         {
             try
@@ -71,6 +76,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("placements/{id}/extensions")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> ProposeExtension(int id, [FromBody] ProposeExtensionRequest request)
         {
             try
@@ -85,6 +91,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("extensions/{id}/respond")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> RespondToExtension(int id, [FromBody] RespondToExtensionRequest request)
         {
             try
@@ -99,6 +106,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("placements/{id}/withdrawals")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> RequestWithdrawal(int id, [FromBody] RequestWithdrawalRequest request)
         {
             try
@@ -113,6 +121,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("withdrawals/{id}/review")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> ReviewWithdrawal(int id, [FromBody] ReviewWithdrawalRequest request)
         {
             try
@@ -127,6 +136,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("placements/{id}/complete")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> CompletePlacement(int id, [FromBody] CompletePlacementRequest request)
         {
             try
@@ -141,6 +151,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPut("placements/{id}/terminate")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> TerminatePlacement(int id, [FromBody] TerminatePlacementRequest request)
         {
             try
@@ -155,6 +166,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("placements/{id}/evaluations")]
+        [Authorize(Roles = "Company")]
         public async Task<IActionResult> SubmitEvaluation(int id, [FromBody] SubmitEvaluationRequest request)
         {
             try
@@ -171,7 +183,8 @@ namespace InternshipManagement.Api.Controllers
         [HttpGet("placements/{id}/evaluations")]
         public async Task<IActionResult> GetEvaluations(int id)
         {
-            return Ok(await _lifecycleService.GetEvaluationsAsync(id));
+            var evaluations = await _lifecycleService.GetEvaluationsAsync(GetUserId(), id);
+            return evaluations == null ? NotFound() : Ok(evaluations);
         }
 
         private int GetUserId()

@@ -19,18 +19,20 @@ namespace InternshipManagement.Application.DTOs.Student
         public string? YearOfStudy { get; set; }
         public string? ExpectedGraduationYear { get; set; }
 
-        public string? ResumeUrl { get; set; }
-        public string? CoverLetterUrl { get; set; }
-        public string? AcademicTranscriptUrl { get; set; }
-        public string? QualificationDocumentUrl { get; set; }
-        public string? IdentificationDocumentUrl { get; set; }
-        public string? CertificatesUrl { get; set; }
-        public string? OtherSupportingDocumentsUrl { get; set; }
+        public Guid? ResumeDocumentId { get; set; }
+        public Guid? CoverLetterDocumentId { get; set; }
+        public Guid? AcademicTranscriptDocumentId { get; set; }
+        public Guid? QualificationDocumentId { get; set; }
+        public Guid? IdentificationDocumentId { get; set; }
+        public Guid? CertificatesDocumentId { get; set; }
+        public Guid? OtherSupportingDocumentsId { get; set; }
         public string? ProfilePictureUrl { get; set; }
 
         public List<EducationDto> Education { get; set; }
         public List<WorkExperienceDto> WorkExperience { get; set; }
         public List<SkillDto> Skills { get; set; }
+        public List<StudentCertificationDto> Certifications { get; set; }
+        public List<StudentProjectDto> Projects { get; set; }
     }
 
     public class UpdateStudentProfileRequest
@@ -46,13 +48,14 @@ namespace InternshipManagement.Application.DTOs.Student
         public string? Programme { get; set; }
         public string? YearOfStudy { get; set; }
         public string? ExpectedGraduationYear { get; set; }
-        public string? ResumeUrl { get; set; }
-        public string? CoverLetterUrl { get; set; }
-        public string? AcademicTranscriptUrl { get; set; }
-        public string? QualificationDocumentUrl { get; set; }
-        public string? IdentificationDocumentUrl { get; set; }
-        public string? CertificatesUrl { get; set; }
-        public string? OtherSupportingDocumentsUrl { get; set; }
+        public Guid? ResumeDocumentId { get; set; }
+        public Guid? CoverLetterDocumentId { get; set; }
+        public Guid? AcademicTranscriptDocumentId { get; set; }
+        public Guid? QualificationDocumentId { get; set; }
+        public Guid? IdentificationDocumentId { get; set; }
+        public Guid? CertificatesDocumentId { get; set; }
+        public Guid? OtherSupportingDocumentsId { get; set; }
+        public string? ProfilePictureUrl { get; set; }
     }
 
     public class EducationDto
@@ -65,6 +68,7 @@ namespace InternshipManagement.Application.DTOs.Student
         public DateTime? EndDate { get; set; }
         public bool IsCurrent { get; set; }
         public string? Grade { get; set; }
+        public string? CompletionStatus { get; set; }
     }
 
     public class WorkExperienceDto
@@ -83,5 +87,25 @@ namespace InternshipManagement.Application.DTOs.Student
         public int Id { get; set; }
         public string Name { get; set; }
         public string? ProficiencyLevel { get; set; }
+    }
+
+    public class StudentCertificationDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string IssuingOrganization { get; set; }
+        public DateTime? IssueDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+    }
+
+    public class StudentProjectDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string? Description { get; set; }
+        public string? Role { get; set; }
+        public string? Technologies { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

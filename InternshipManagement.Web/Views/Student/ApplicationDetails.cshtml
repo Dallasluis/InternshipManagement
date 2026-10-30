@@ -29,7 +29,7 @@
 <div class="card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">@application.InternshipTitle</h5>
-        <span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span>
+        <span class="badge @GetStatusBadgeClass(application.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(application.Status)</span>
     </div>
     <div class="card-body">
         <div class="row">
@@ -87,12 +87,40 @@
                         }
                     </div>
 
+                    var offerExpired = application.OfferExpiryDate.HasValue && application.OfferExpiryDate.Value.Date < DateTime.UtcNow.Date;
+                    if (offerExpired)
+                    {
+                        <div class="alert alert-warning">This offer expired on @application.OfferExpiryDate!.Value.ToString("MMMM dd, yyyy"). Please contact the company if you are still interested.</div>
+                    }
                     <form asp-controller="Student" asp-action="RespondToOffer" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@application.Id" />
-                        <button type="submit" name="accepted" value="true" class="btn btn-success me-2">Accept Offer</button>
+                        @if (!offerExpired)
+                        {
+                            <button type="submit" name="accepted" value="true" class="btn btn-success me-2">Accept Offer</button>
+                        }
                         <button type="submit" name="accepted" value="false" class="btn btn-outline-danger">Decline Offer</button>
                     </form>
+                }
+                else if (application.Status == "Accepted")
+                {
+                    <div class="alert alert-success">
+                        <strong>Offer accepted.</strong>
+                        @if (application.OfferStartDate.HasValue && application.OfferStartDate.Value.Date > DateTime.UtcNow.Date)
+                        {
+                            <text> Your placement starts on <strong>@application.OfferStartDate.Value.ToString("MMMM dd, yyyy")</strong>. It becomes active automatically on that day.</text>
+                        }
+                        else
+                        {
+                            <text> Your placement is active. Submit progress reports from your Placements page.</text>
+                        }
+                        <div class="mt-2">
+                            <a asp-controller="Student" asp-action="Placements" class="btn btn-sm btn-success">Go to my placements</a>
+                        </div>
+                        <div class="small mt-2 mb-0">
+                            If you are still on another placement, this one starts after it ends: ask to withdraw from the current one on its Placements page.
+                        </div>
+                    </div>
                 }
             </div>
             <div class="col-md-4">
@@ -100,7 +128,7 @@
                     <div class="card-body">
                         <h6>Application Status</h6>
                         <p>
-                            <span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span>
+                            <span class="badge @GetStatusBadgeClass(application.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(application.Status)</span>
                         </p>
                         <hr />
                         <h6>Timeline</h6>
@@ -146,7 +174,7 @@
                             <tr>
                                 <td>@item.ChangedAt.ToString("MMM d, yyyy h:mm tt")</td>
                                 <td>@item.PreviousStatus</td>
-                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@item.NewStatus</span></td>
+                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(item.NewStatus)</span></td>
                                 <td>@(string.IsNullOrWhiteSpace(item.Notes) ? "-" : item.Notes)</td>
                             </tr>
                         }
@@ -158,19 +186,5 @@
 </div>
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Applied" => "bg-info",
-        "UnderReview" => "bg-warning",
-        "Shortlisted" => "bg-success",
-        "InterviewScheduled" => "bg-primary",
-        "InterviewCompleted" => "bg-secondary",
-        "OfferMade" => "bg-dark",
-        "Accepted" => "bg-success",
-        "OfferDeclined" => "bg-danger",
-        "Rejected" => "bg-danger",
-        "Withdrawn" => "bg-secondary",
-        "WithdrawnAcceptedElsewhere" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

@@ -1,0 +1,27 @@
+@host = http://localhost:5003
+@studentEmail = teststudent@example.com
+@studentPassword = Test@12345
+
+### 1. Log in as the student
+# @name studentLogin
+POST {{host}}/api/Auth/login
+Content-Type: application/json
+
+{ "email": "{{studentEmail}}", "password": "{{studentPassword}}" }
+
+### 2. Instant: gaps + suggested certifications for ONE internship (replace 1 with a real, open internship id)
+GET {{host}}/api/students/skill-gaps?internshipId=1
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+
+### 3. Instant: gaps across the student's top 5 matches
+GET {{host}}/api/students/skill-gaps
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+
+### 4. Background job: same result plus the AI summary and a reason per certification (202 + job id)
+# @name gapJob
+POST {{host}}/api/students/skill-gaps
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+
+### 5. Poll it until status is Done
+GET {{host}}/api/ai-jobs/{{gapJob.response.body.$.id}}
+Authorization: Bearer {{studentLogin.response.body.$.token}}

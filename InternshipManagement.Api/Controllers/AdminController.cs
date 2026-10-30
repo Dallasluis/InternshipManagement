@@ -53,10 +53,16 @@ namespace InternshipManagement.Api.Controllers
         {
             try
             {
-                var result = await _companyService.ReviewVerificationAsync(companyId, new ReviewVerificationRequest
+                var result = await _companyService.ReviewVerificationAsync(
+                    companyId,
+                    int.Parse(User.FindFirst("userId")?.Value ?? "0"),
+                    new ReviewVerificationRequest
                 {
                     Approved = request.Approved,
-                    Notes = request.Notes
+                    Status = request.Status,
+                    ReasonCode = request.ReasonCode,
+                    Notes = request.Notes,
+                    CriteriaAssessment = request.CriteriaAssessment
                 });
                 return Ok(new { Success = result });
             }
@@ -64,6 +70,61 @@ namespace InternshipManagement.Api.Controllers
             {
                 return BadRequest(new { Error = ex.Message });
             }
+        }
+
+        [HttpGet("companies/{companyId}/verification/history")]
+        public async Task<IActionResult> GetVerificationHistory(int companyId)
+        {
+            var history = await _companyService.GetVerificationHistoryAsync(companyId);
+            return Ok(history.Select(entry => new
+            {
+                Status = entry.Status.ToString(),
+                entry.ReasonCode,
+                entry.Notes,
+                entry.CriteriaAssessmentJson,
+                entry.ChangedByUserId,
+                entry.IsAppeal,
+                entry.CreatedAt
+            }));
+        }
+
+        [HttpGet("companies/{companyId}/verification/evidence")]
+        public async Task<IActionResult> GetVerificationEvidence(int companyId)
+        {
+            var evidence = await _companyService.GetVerificationEvidenceAsync(companyId);
+            return Ok(evidence);
+        }
+
+        [HttpPut("companies/{companyId}/verification/appeal")]
+        public async Task<IActionResult> ReviewVerificationAppeal(
+            int companyId,
+            [FromBody] AdminReviewVerificationRequest request)
+        {
+            var result = await _companyService.ReviewVerificationAppealAsync(
+                companyId,
+                int.Parse(User.FindFirst("userId")?.Value ?? "0"),
+                new ReviewVerificationAppealRequest
+                {
+                    Approved = request.Approved,
+                    ReasonCode = request.ReasonCode,
+                    Notes = request.Notes,
+                    CriteriaAssessment = request.CriteriaAssessment
+                });
+            return Ok(new { Success = result });
+        }
+
+        [HttpPost("companies/verification/reverification")]
+        public async Task<IActionResult> RunAgedCompanyReverification()
+        {
+            var updatedCount = await _companyService.UpdateAgedVerificationsAsync();
+            return Ok(new { UpdatedCount = updatedCount });
+        }
+
+        [HttpGet("companies/verification/sla")]
+        public async Task<IActionResult> GetVerificationSla()
+        {
+            var sla = await _companyService.GetVerificationSlaAsync();
+            return Ok(sla);
         }
 
         [HttpGet("internships")]
@@ -107,7 +168,16 @@ namespace InternshipManagement.Api.Controllers
         [HttpPut("reports/{id}/resolve")]
         public async Task<IActionResult> ResolveReport(int id, [FromBody] ResolveReportRequest request)
         {
-            var result = await _adminService.ResolveReportAsync(id, request.Response, request.Resolved);
+            var status = string.IsNullOrWhiteSpace(request.Status)
+                ? (request.Resolved ? ReportStatus.Resolved : ReportStatus.Dismissed)
+                : Enum.TryParse<ReportStatus>(request.Status, true, out var parsed) && Enum.IsDefined(parsed)
+                    ? parsed
+                    : (ReportStatus?)null;
+            if (!status.HasValue)
+                return BadRequest(new { Error = "Invalid report status." });
+
+            var result = await _adminService.ResolveReportAsync(id, request.Response,
+                status.Value, request.FraudUpheld, int.Parse(User.FindFirst("userId")?.Value ?? "0"));
             return Ok(new { Success = result });
         }
 
@@ -121,7 +191,8 @@ namespace InternshipManagement.Api.Controllers
         [HttpPost("users/{id}/suspend")]
         public async Task<IActionResult> SuspendUser(int id, [FromQuery] bool suspend = true)
         {
-            var result = await _adminService.SuspendUserAsync(id, suspend);
+            var result = await _adminService.SuspendUserAsync(
+                id, suspend, int.Parse(User.FindFirst("userId")?.Value ?? "0"));
             return Ok(new { Success = result });
         }
     }
@@ -129,7 +200,10 @@ namespace InternshipManagement.Api.Controllers
     public class AdminReviewVerificationRequest
     {
         public bool Approved { get; set; }
+        public string? Status { get; set; }
+        public string? ReasonCode { get; set; }
         public string? Notes { get; set; }
+        public Dictionary<string, bool>? CriteriaAssessment { get; set; }
     }
 
     public class AdminModerateInternshipRequest

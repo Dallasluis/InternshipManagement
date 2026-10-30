@@ -1,0 +1,11 @@
+.ai-note { background: #f3f0ff; border-left: 4px solid #6f42c1; border-radius: .375rem; padding: .75rem 1rem; }
+.ai-note-label { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #6f42c1; margin-bottom: .25rem; }
+
+.chat-log { height: 55vh; min-height: 320px; overflow-y: auto; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: .5rem; padding: 1rem; }
+.chat-row { display: flex; margin-bottom: .75rem; }
+.chat-row.user { justify-content: flex-end; }
+.chat-bubble { max-width: 80%; padding: .6rem .9rem; border-radius: 1rem; white-space: pre-wrap; word-wrap: break-word; }
+.chat-row.assistant .chat-bubble { background: #fff; border: 1px solid #dee2e6; }
+.chat-row.user .chat-bubble { background: #0d6efd; color: #fff; }
+.chat-bubble.error { background: #f8d7da; border-color: #f1aeb5; color: #58151c; }
+.chat-bubble.typing:empty::after { content: "…"; color: #6c757d; }

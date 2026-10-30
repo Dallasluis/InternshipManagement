@@ -1,0 +1,12 @@
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\bin\Release\net10.0\InternshipManagement.Domain.deps.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\bin\Release\net10.0\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\bin\Release\net10.0\InternshipManagement.Domain.pdb
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.AssemblyInfoInputs.cache
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.AssemblyInfo.cs
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.sourcelink.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\refint\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\InternshipManagement.Domain.pdb
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\Release\net10.0\ref\InternshipManagement.Domain.dll

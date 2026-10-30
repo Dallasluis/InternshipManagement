@@ -72,7 +72,7 @@ else
                                 <td>@app.AppliedAt.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     <span class="badge @GetStatusBadgeClass(app.Status)">
-                                        @app.Status
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.Label(app.Status)
                                     </span>
                                 </td>
                                 <td>
@@ -95,8 +95,8 @@ else
                                             </form>
                                         }
 
-                                        <!-- Reject (only if not already rejected/withdrawn) -->
-                                        @if (app.Status != "Rejected" && app.Status != "Withdrawn")
+                                        <!-- Reject (only while the application is still open; the API refuses it after an offer is accepted/declined) -->
+                                        @if (app.Status is "Applied" or "UnderReview" or "Shortlisted" or "InterviewScheduled" or "InterviewCompleted" or "OfferMade")
                                         {
                                             <form asp-controller="Company" asp-action="RejectApplication" method="post" class="d-inline">
                                                 @Html.AntiForgeryToken()
@@ -118,16 +118,7 @@ else
 }
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Applied" => "bg-info",
-        "UnderReview" => "bg-warning",
-        "Shortlisted" => "bg-success",
-        "Rejected" => "bg-danger",
-        "Withdrawn" => "bg-secondary",
-        "WithdrawnAcceptedElsewhere" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }
 
 <style>

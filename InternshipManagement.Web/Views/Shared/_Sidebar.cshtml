@@ -30,8 +30,28 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="ProfileSections" asp-action="Index">
+                            <i class="fas fa-graduation-cap me-2"></i> Education &amp; Skills
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Internships" asp-action="Index">
                             <i class="fas fa-search me-2"></i> Browse Internships
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="StudentAi" asp-action="Matches">
+                            <i class="fas fa-bullseye me-2"></i> Recommended for me
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="StudentAi" asp-action="CvAnalysis">
+                            <i class="fas fa-file-pdf me-2"></i> CV Analysis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="StudentAi" asp-action="SkillGaps">
+                            <i class="fas fa-chart-line me-2"></i> Skill Gaps
                         </a>
                     </li>
                     <li class="nav-item">
@@ -63,6 +83,11 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Company" asp-action="Profile">
                             <i class="fas fa-building me-2"></i> Company Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="VerificationHistory" asp-action="Index">
+                            <i class="fas fa-clipboard-check me-2"></i> Verification History
                         </a>
                     </li>
                     <li class="nav-item">
@@ -127,6 +152,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="VerificationAdmin" asp-action="Index">
+                            <i class="fas fa-stopwatch me-2"></i> Verification Turnaround
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Account" asp-action="Settings">
                             <i class="fas fa-cog me-2"></i> Settings
                         </a>
@@ -143,3 +173,27 @@
         </div>
     </aside>
 }
+
+<script>
+    // Highlight the menu item for the page you are on.
+    (function () {
+        var links = document.querySelectorAll('.sidebar .nav-link[href]');
+        var path = location.pathname.replace(/\/+$/, '').toLowerCase() || '/';
+        var alias = { applicationdetails: 'applications', placementdetails: 'placements', applicationreview: 'applications',
+                      companydetails: 'companies', editinternship: 'manageinternships', details: 'index' };
+        function norm(h) { try { return new URL(h, location.origin).pathname.replace(/\/+$/, '').toLowerCase(); } catch (e) { return ''; } }
+        var best = null, bestLen = -1;
+        links.forEach(function (a) {
+            a.classList.remove('active'); a.removeAttribute('aria-current');
+            var h = norm(a.getAttribute('href'));
+            if (!h) return;
+            var match = path === h || path.indexOf(h + '/') === 0;
+            if (!match) {
+                var parts = path.split('/').filter(Boolean);
+                if (parts.length >= 2 && alias[parts[1]]) match = h === '/' + parts[0] + '/' + alias[parts[1]];
+            }
+            if (match && h.length > bestLen) { best = a; bestLen = h.length; }
+        });
+        if (best) { best.classList.add('active'); best.setAttribute('aria-current', 'page'); }
+    })();
+</script>

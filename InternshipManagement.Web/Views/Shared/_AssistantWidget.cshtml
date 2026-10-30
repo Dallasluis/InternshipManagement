@@ -1,0 +1,41 @@
+@* Floating career assistant for students: a round button bottom-right that opens the chat in a small panel on any page. *@
+@if (Context.Session.GetString("UserType") == "Student")
+{
+    <style>
+        .ca-fab { position: fixed; right: 24px; bottom: 24px; z-index: 1050; width: 56px; height: 56px; border-radius: 50%;
+                  border: 0; background: #2563eb; color: #fff; font-size: 1.4rem; box-shadow: 0 6px 18px rgba(37,99,235,.4); cursor: pointer; }
+        .ca-fab:hover { background: #1d4ed8; }
+        .ca-panel { position: fixed; right: 24px; bottom: 92px; z-index: 1050; width: 400px; max-width: calc(100vw - 32px);
+                    height: 600px; max-height: calc(100vh - 120px); background: #fff; border-radius: 14px; overflow: hidden;
+                    box-shadow: 0 12px 40px rgba(15,23,42,.25); display: none; flex-direction: column; border: 1px solid #e2e8f0; }
+        .ca-panel.open { display: flex; }
+        .ca-head { background: #2563eb; color: #fff; padding: .6rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .ca-head button { background: transparent; border: 0; color: #fff; font-size: 1.1rem; cursor: pointer; }
+        .ca-panel iframe { border: 0; width: 100%; flex: 1 1 auto; }
+        @@media (max-width: 480px) { .ca-panel { right: 8px; bottom: 84px; } }
+    </style>
+    <button type="button" id="ca-fab" class="ca-fab" aria-label="Open career assistant" aria-expanded="false" aria-controls="ca-panel" title="Career assistant">
+        <i class="fas fa-robot"></i>
+    </button>
+    <div id="ca-panel" class="ca-panel" role="dialog" aria-label="Career assistant">
+        <div class="ca-head">
+            <strong><i class="fas fa-robot me-2"></i>Career assistant</strong>
+            <button type="button" id="ca-close" aria-label="Close">&times;</button>
+        </div>
+        <iframe id="ca-frame" title="Career assistant" data-src="@Url.Action("Assistant", "StudentAi", new { embed = 1 })"></iframe>
+    </div>
+    <script>
+        (function () {
+            var fab = document.getElementById('ca-fab'), panel = document.getElementById('ca-panel'),
+                frame = document.getElementById('ca-frame'), close = document.getElementById('ca-close');
+            function setOpen(open) {
+                panel.classList.toggle('open', open);
+                fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (open && !frame.getAttribute('src')) frame.setAttribute('src', frame.getAttribute('data-src'));
+            }
+            fab.addEventListener('click', function () { setOpen(!panel.classList.contains('open')); });
+            close.addEventListener('click', function () { setOpen(false); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+        })();
+    </script>
+}

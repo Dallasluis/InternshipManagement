@@ -4,3 +4,82 @@ GET {{InternshipManagement.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+@host = http://localhost:5003
+@companyEmail = testco@example.com
+@companyPassword = Test@12345
+
+### 1. Register a Company user (run once)
+POST {{host}}/api/Auth/register
+Content-Type: application/json
+
+{
+  "email": "{{companyEmail}}",
+  "password": "{{companyPassword}}",
+  "confirmPassword": "{{companyPassword}}",
+  "firstName": "Test",
+  "lastName": "Company",
+  "userType": "Company",
+  "companyName": "Test Co",
+  "industry": "Technology"
+}
+
+### 2. Log in as the company
+# @name companyLogin
+POST {{host}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "{{companyEmail}}",
+  "password": "{{companyPassword}}"
+}
+
+### 3. Log in as the seeded admin
+# @name adminLogin
+POST {{host}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@internshipmanagement.com",
+  "password": "Admin@123456"
+}
+
+### 4. Get the company profile (we need its Id for step 5)
+# @name companyProfile
+GET {{host}}/api/Companies/profile
+Authorization: Bearer {{companyLogin.response.body.$.token}}
+
+### 5. Admin verifies the company (subscription is separate and deferred)
+PUT {{host}}/api/Companies/verification/{{companyProfile.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "approved": true,
+  "notes": "approved for testing"
+}
+
+### 6. Generate an AI draft (the new endpoint)
+POST {{host}}/api/internships/ai-draft
+Authorization: Bearer {{companyLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "prompt": "We want a junior backend intern for three months in Windhoek. C# and SQL are a must, Docker is a plus. They will help build REST APIs and write unit tests."
+}
+
+### 7. Should return 401: no token
+POST {{host}}/api/internships/ai-draft
+Content-Type: application/json
+
+{
+  "prompt": "We want a junior backend intern for three months in Windhoek. C# and SQL are a must."
+}
+
+### 8. Should return 400 validation error: prompt too short
+POST {{host}}/api/internships/ai-draft
+Authorization: Bearer {{companyLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "prompt": "intern"
+}

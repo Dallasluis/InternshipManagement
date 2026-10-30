@@ -287,3 +287,56 @@ body {
 .breadcrumb-item.active {
     color: #64748b;
 }
+
+/* ===== Fixed sidebar (stays in place, own scroll if the menu is taller than the screen) ===== */
+@media (min-width: 768px) {
+    .row > aside.sidebar {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100vh;
+        min-height: 0 !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 0 0 260px;
+        width: 260px;
+        max-width: 260px;
+    }
+
+    .row > aside.sidebar + main {
+        flex: 1 1 0;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+}
+
+/* Menu text wraps neatly beside its icon instead of running under it or over the next item */
+.sidebar .nav-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+    .sidebar .nav-link i {
+        flex: 0 0 20px;
+        margin-right: 0 !important;
+        margin-top: 0.2rem;
+        text-align: center;
+    }
+
+.sidebar .fw-bold,
+.sidebar small {
+    overflow-wrap: anywhere;
+}
+
+.sidebar .d-flex.align-items-center > div:last-child {
+    min-width: 0;
+}
+
+.sidebar .avatar-circle {
+    flex: 0 0 40px;
+}

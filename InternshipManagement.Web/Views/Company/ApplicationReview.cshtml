@@ -36,7 +36,7 @@
 
         <dl class="row">
             <dt class="col-sm-3">Status</dt>
-            <dd class="col-sm-9"><span class="badge @GetStatusBadgeClass(application.Status)">@application.Status</span></dd>
+            <dd class="col-sm-9"><span class="badge @GetStatusBadgeClass(application.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(application.Status)</span></dd>
             <dt class="col-sm-3">Applied</dt>
             <dd class="col-sm-9">@application.AppliedAt.ToString("MMM d, yyyy")</dd>
         </dl>
@@ -47,15 +47,22 @@
             <p class="border rounded p-3">@application.CoverLetter</p>
         }
 
-        @if (!string.IsNullOrWhiteSpace(application.Student?.ResumeUrl))
+        @if (application.Student?.ApplicationDocuments?.Count > 0)
         {
-            <a href="@application.Student.ResumeUrl" target="_blank" rel="noopener" class="btn btn-primary">
-                <i class="fas fa-file-pdf me-1"></i> View CV / Resume
-            </a>
+            <h6>Documents attached to this application</h6>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var document in application.Student.ApplicationDocuments)
+                {
+                    <a asp-controller="Documents" asp-action="Download" asp-route-id="@document.Id"
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-file-download me-1"></i> @document.FileName
+                    </a>
+                }
+            </div>
         }
         else
         {
-            <p class="text-muted">This student has not provided a CV link.</p>
+            <p class="text-muted">No documents were attached to this application.</p>
         }
     </div>
 </div>
@@ -151,6 +158,31 @@
                 </div>
             }
 
+            @if (application.Status == "OfferMade")
+            {
+                <div class="alert alert-info mb-0"><i class="fas fa-hourglass-half me-1"></i> Offer sent. Waiting for the student to accept or decline@(application.OfferExpiryDate.HasValue ? $" before {application.OfferExpiryDate.Value:MMM d, yyyy}" : "").</div>
+            }
+            else if (application.Status == "Accepted")
+            {
+                <div class="alert alert-success mb-0">
+                    <i class="fas fa-check-circle me-1"></i> <strong>Offer accepted.</strong>
+                    @if (application.OfferStartDate.HasValue && application.OfferStartDate.Value.Date > DateTime.UtcNow.Date)
+                    {
+                        <text> The placement starts on @application.OfferStartDate.Value.ToString("MMM d, yyyy") and becomes active automatically.</text>
+                    }
+                    else
+                    {
+                        <text> The placement is active.</text>
+                    }
+                    <div class="mt-2"><a asp-controller="Company" asp-action="Placements" class="btn btn-sm btn-success">Open placements</a></div>
+                    <div class="small mt-2">If the student is finishing another placement first, this one is created when that placement ends.</div>
+                </div>
+            }
+            else if (application.Status == "OfferDeclined")
+            {
+                <div class="alert alert-secondary mb-0">The student declined this offer.</div>
+            }
+
             @if (application.Status == "InterviewCompleted")
             {
                 <form asp-controller="Company" asp-action="MakeOffer" method="post">
@@ -208,7 +240,7 @@
                             <tr>
                                 <td>@item.ChangedAt.ToString("MMM d, yyyy h:mm tt")</td>
                                 <td>@item.PreviousStatus</td>
-                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@item.NewStatus</span></td>
+                                <td><span class="badge @GetStatusBadgeClass(item.NewStatus)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(item.NewStatus)</span></td>
                                 <td>@(string.IsNullOrWhiteSpace(item.Notes) ? "-" : item.Notes)</td>
                             </tr>
                         }
@@ -220,19 +252,5 @@
 </div>
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Applied" => "bg-info",
-        "UnderReview" => "bg-warning",
-        "Shortlisted" => "bg-success",
-        "InterviewScheduled" => "bg-primary",
-        "InterviewCompleted" => "bg-secondary",
-        "OfferMade" => "bg-dark",
-        "Accepted" => "bg-success",
-        "OfferDeclined" => "bg-danger",
-        "Rejected" => "bg-danger",
-        "Withdrawn" => "bg-secondary",
-        "WithdrawnAcceptedElsewhere" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

@@ -49,18 +49,21 @@
                                 <td>@report.ReporterName</td>
                                 <td>
                                     <span class="badge @GetReportBadgeClass(report.Status)">
-                                        @report.Status
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.Label(report.Status)
                                     </span>
                                 </td>
                                 <td>@report.CreatedAt.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     @if (report.Status == "Pending" || report.Status == "UnderInvestigation")
                                     {
-                                        <button class="btn btn-sm btn-success" onclick="resolveReport(@report.Id, true)">
-                                            <i class="fas fa-check"></i>
+                                        <button class="btn btn-sm btn-info" onclick="resolveReport(@report.Id, 'UnderInvestigation', '@report.Type')">
+                                            <i class="fas fa-search"></i> Investigate
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="resolveReport(@report.Id, false)">
-                                            <i class="fas fa-times"></i>
+                                        <button class="btn btn-sm btn-success" onclick="resolveReport(@report.Id, 'Resolved', '@report.Type')">
+                                            <i class="fas fa-check"></i> Resolve
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="resolveReport(@report.Id, 'Dismissed', '@report.Type')">
+                                            <i class="fas fa-times"></i> Dismiss
                                         </button>
                                     }
                                     @if (report.Status == "Resolved" || report.Status == "Dismissed")
@@ -84,22 +87,27 @@
 </div>
 
 @functions {
-    private string GetReportBadgeClass(string status) => status switch
-    {
-        "Resolved" => "bg-success",
-        "Pending" => "bg-warning",
-        "UnderInvestigation" => "bg-info",
-        "Dismissed" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetReportBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }
 
 @section Scripts {
     <script>
-        function resolveReport(id, resolved) {
-            const action = resolved ? 'resolve' : 'dismiss';
-            if (confirm(`Are you sure you want to ${action} this report?`)) {
-                fetch(`/Admin/ResolveReport?id=${id}&resolved=${resolved}`, { method: 'POST' })
+        function resolveReport(id, status, reportType) {
+            const response = prompt('Add an audit note for this report decision:');
+            if (!response) return;
+            const fraudUpheld = (reportType === 'Fraud' || reportType === 'Scam')
+                && status === 'Resolved'
+                && confirm('Was the fraud/scam allegation upheld?');
+            const resolved = status === 'Resolved' || status === 'Dismissed';
+            const query = new URLSearchParams({
+                id: id,
+                resolved: resolved,
+                status: status,
+                fraudUpheld: fraudUpheld,
+                response: response
+            });
+            if (confirm(`Are you sure you want to mark this report ${status}?`)) {
+                fetch(`/Admin/ResolveReport?${query}`, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {

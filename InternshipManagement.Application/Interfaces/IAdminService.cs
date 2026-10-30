@@ -1,4 +1,5 @@
 using InternshipManagement.Application.DTOs.Admin;
+using InternshipManagement.Domain.Enums;
 
 namespace InternshipManagement.Application.Interfaces
 {
@@ -13,9 +14,9 @@ namespace InternshipManagement.Application.Interfaces
 
         Task<List<ReportListResponse>> GetAllReportsAsync();
         Task<List<ReportSummaryResponse>> GetRecentReportsAsync(int count);
-        Task<bool> ResolveReportAsync(int reportId, string response, bool resolved);
+        Task<bool> ResolveReportAsync(int reportId, string response, ReportStatus status, bool fraudUpheld, int adminUserId);
 
         Task<List<UserListResponse>> GetAllUsersAsync();
-        Task<bool> SuspendUserAsync(int userId, bool suspend);
+        Task<bool> SuspendUserAsync(int userId, bool suspend, int adminUserId);
     }
 }

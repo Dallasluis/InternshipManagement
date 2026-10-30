@@ -1,0 +1,23 @@
+@model InternshipManagement.Web.Models.Auth.TwoFactorSetupViewModel
+@{
+    ViewData["Title"] = "Authenticator setup";
+}
+
+<div class="container py-5" style="max-width: 640px;">
+    <h1 class="h3 mb-3">Set up authenticator app</h1>
+    <p>Add an account in your authenticator app using this setup key or URI:</p>
+    <div class="alert alert-secondary">
+        <strong>Setup key:</strong>
+        <code class="user-select-all">@Model.SharedKey</code>
+    </div>
+    <div class="mb-4">
+        <label class="form-label" for="authenticatorUri">Authenticator URI</label>
+        <textarea id="authenticatorUri" class="form-control" rows="3" readonly>@Model.AuthenticatorUri</textarea>
+    </div>
+    <form asp-action="EnableTwoFactor" method="post">
+        @Html.AntiForgeryToken()
+        <label asp-for="Code" class="form-label">6-digit code</label>
+        <input asp-for="Code" class="form-control mb-3" inputmode="numeric" autocomplete="one-time-code" required />
+        <button type="submit" class="btn btn-primary">Verify and enable</button>
+    </form>
+</div>

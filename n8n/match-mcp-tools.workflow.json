@@ -1,0 +1,77 @@
+{
+  "name": "Internship - MCP tools (match explain)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "match-tools",
+        "instructions": "Read-only tool for explaining internship matches. Needs the runToken from your instructions."
+      },
+      "id": "f1000000-0000-4000-8000-000000000001",
+      "name": "MCP Server Trigger",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "f2000000-0000-4000-8000-000000000001",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": null,
+          "name": "MCP server key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the student's best internship matches, ranked by the platform: targetId, title, subtitle, matchScore (0 to 100), matchingSkills, matchingQualifications and missingPreferredSkills. Call it once. Parameters: reason = one short sentence on why you call it; maxResults = how many matches to return (1 to 10); runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/matching/my-matches",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "maxResults",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "f1000000-0000-4000-8000-000000000002",
+      "name": "get_my_matches",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "get_my_matches": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

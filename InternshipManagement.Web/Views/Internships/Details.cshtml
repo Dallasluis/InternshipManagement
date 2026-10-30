@@ -23,13 +23,10 @@
         <h5 class="text-muted mb-3">@Model.CompanyName</h5>
 
         <div class="mb-4">
-            <span class="badge bg-light text-dark border me-1">@SplitWords(Model.InternshipType)</span>
+            <span class="badge bg-light text-dark border me-1">Full-time</span>
+            <span class="badge bg-light text-dark border me-1">@SplitWords(Model.WorkArrangement)</span>
             <span class="badge bg-light text-dark border me-1">@SplitWords(Model.Duration)</span>
             <span class="badge bg-light text-dark border me-1">@Model.Industry</span>
-            @if (Model.IsRemote)
-            {
-                <span class="badge bg-light text-dark border">Remote</span>
-            }
         </div>
 
         <h5>Description</h5>
@@ -65,7 +62,9 @@
             <div class="card-body">
                 <dl class="row mb-0">
                     <dt class="col-6">Location</dt>
-                    <dd class="col-6">@(Model.IsRemote ? "Remote" : Model.Location)</dd>
+                    <dd class="col-6">@(Model.WorkArrangement == "OnSite" && !string.IsNullOrWhiteSpace(Model.Location)
+                        ? $"{SplitWords(Model.WorkArrangement)} · {Model.Location}"
+                        : SplitWords(Model.WorkArrangement))</dd>
 
                     <dt class="col-6">Positions</dt>
                     <dd class="col-6">@Model.NumberOfPositions</dd>
@@ -106,6 +105,22 @@
                     <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div>
                 }
 
+                @if (isLoggedIn && userType == "Student")
+                {
+                    <div class="fit-box mb-3" id="fit-box"
+                         data-gaps-url="@Url.Action("Gaps", "StudentAi", new { internshipId = Model.Id })">
+                        <div class="d-grid gap-2">
+                            <button type="button" id="fit-btn" class="btn btn-outline-primary" aria-expanded="false" aria-controls="fit-panel">
+                                <i class="fas fa-bullseye me-1"></i> How do I match?
+                            </button>
+                            <a class="btn btn-outline-secondary" asp-controller="StudentAi" asp-action="SkillGaps" asp-route-internshipId="@Model.Id">
+                                <i class="fas fa-chart-line me-1"></i> What am I missing?
+                            </a>
+                        </div>
+                        <div id="fit-panel" class="fit-panel mt-3" hidden aria-live="polite"></div>
+                    </div>
+                }
+
                 @if (Model.HasApplied)
                 {
                     <button class="btn btn-secondary w-100" disabled>Already applied</button>
@@ -115,6 +130,25 @@
                     <form asp-controller="Applications" asp-action="Apply" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="InternshipId" value="@Model.Id" />
+                        @if (ViewBag.ApplicationDocuments is IEnumerable<InternshipManagement.Web.Models.Documents.PrivateDocumentResponse> documents)
+                        {
+                            var activeDocuments = documents.Where(document => document.RetentionState == "Active").ToList();
+                            if (activeDocuments.Count > 0)
+                            {
+                                <fieldset class="mb-3">
+                                    <legend class="fs-6">Documents to include (up to 5)</legend>
+                                    @foreach (var document in activeDocuments)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="AdditionalDocumentIds" value="@document.Id" id="document-@document.Id" />
+                                            <label class="form-check-label" for="document-@document.Id">
+                                                @document.OriginalFileName (@document.Category)
+                                            </label>
+                                        </div>
+                                    }
+                                </fieldset>
+                            }
+                        }
                         <button type="submit" class="btn btn-dark w-100">Apply now</button>
                     </form>
                 }
@@ -122,7 +156,118 @@
                 {
                     <a asp-controller="Account" asp-action="Login" class="btn btn-dark w-100">Log in to apply</a>
                 }
+
+                @if (isLoggedIn && userType == "Student")
+                {
+                    <hr />
+                    <details>
+                        <summary class="text-danger">Report this internship</summary>
+                        <form asp-action="Report" method="post" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="InternshipId" value="@Model.Id" />
+                            <div class="mb-2">
+                                <label for="reportType" class="form-label">Reason</label>
+                                <select id="reportType" name="Type" class="form-select" required>
+                                    <option value="">Select a reason</option>
+                                    <option value="Fraud">Fraud</option>
+                                    <option value="Scam">Scam</option>
+                                    <option value="MisleadingInformation">Misleading information</option>
+                                    <option value="InappropriateContent">Inappropriate content</option>
+                                    <option value="Harassment">Harassment</option>
+                                    <option value="Discrimination">Discrimination</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="reportDescription" class="form-label">Details</label>
+                                <textarea id="reportDescription" name="Description" class="form-control" rows="3" minlength="10" maxlength="4000" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-outline-danger">Submit report</button>
+                        </form>
+                    </details>
+                }
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+        <script>
+            (function () {
+                var box = document.getElementById('fit-box');
+                if (!box) return;
+                var button = document.getElementById('fit-btn');
+                var panel = document.getElementById('fit-panel');
+                var loaded = false;
+
+                function el(tag, cls, text) {
+                    var node = document.createElement(tag);
+                    if (cls) node.className = cls;
+                    if (text != null) node.textContent = text;
+                    return node;
+                }
+                function chips(title, items, cls) {
+                    var wrap = el('div', 'mb-2');
+                    wrap.appendChild(el('div', 'small fw-semibold mb-1', title));
+                    var row = el('div', 'd-flex flex-wrap gap-1');
+                    items.forEach(function (item) { row.appendChild(el('span', 'badge rounded-pill ' + cls, item)); });
+                    wrap.appendChild(row);
+                    return wrap;
+                }
+                function render(data) {
+                    panel.textContent = '';
+                    var target = data && data.targets && data.targets[0];
+                    if (!target) {
+                        panel.appendChild(el('p', 'small text-muted mb-0', 'This internship could not be compared with your profile right now.'));
+                        return;
+                    }
+                    if (target.matchScore != null) {
+                        var score = Math.max(0, Math.min(100, Math.round(target.matchScore)));
+                        var head = el('div', 'd-flex justify-content-between small mb-1');
+                        head.appendChild(el('span', 'fw-semibold', 'Match'));
+                        head.appendChild(el('span', null, score + '%'));
+                        panel.appendChild(head);
+                        var bar = el('div', 'progress mb-3');
+                        bar.style.height = '8px';
+                        var fill = el('div', 'progress-bar ' + (score >= 70 ? 'bg-success' : score >= 40 ? 'bg-warning' : 'bg-danger'));
+                        fill.style.width = score + '%';
+                        fill.setAttribute('role', 'progressbar');
+                        fill.setAttribute('aria-valuenow', String(score));
+                        bar.appendChild(fill);
+                        panel.appendChild(bar);
+                    } else {
+                        panel.appendChild(el('p', 'small text-muted', 'This one is not among your top matches, so no score is shown.'));
+                    }
+                    var rs = target.missingRequiredSkills || [], rq = target.missingRequiredQualifications || [];
+                    var ps = target.missingPreferredSkills || [], pq = target.missingPreferredQualifications || [];
+                    if (!rs.length && !rq.length) {
+                        panel.appendChild(el('p', 'small text-success mb-2', 'You have everything this internship requires.'));
+                    }
+                    if (rs.length) panel.appendChild(chips('Required skills you are missing', rs, 'text-bg-danger'));
+                    if (rq.length) panel.appendChild(chips('Required qualifications you are missing', rq, 'text-bg-danger'));
+                    if (ps.length) panel.appendChild(chips('Nice to have, not on your profile', ps, 'text-bg-secondary'));
+                    if (pq.length) panel.appendChild(chips('Preferred qualifications not on your profile', pq, 'text-bg-secondary'));
+                    panel.appendChild(el('p', 'small text-muted mb-0 mt-2', 'Worked out from the skills and qualifications on your profile. Use "What am I missing?" for AI advice and certificate ideas.'));
+                }
+
+                button.addEventListener('click', function () {
+                    var open = !panel.hidden;
+                    if (open) { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); return; }
+                    panel.hidden = false;
+                    button.setAttribute('aria-expanded', 'true');
+                    if (loaded) return;
+                    panel.textContent = 'Checking your profile…';
+                    fetch(box.dataset.gapsUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                        .then(function (response) {
+                            if (!response.ok) throw new Error(String(response.status));
+                            return response.json();
+                        })
+                        .then(function (data) { loaded = true; render(data); })
+                        .catch(function () {
+                            panel.textContent = '';
+                            panel.appendChild(el('p', 'small text-danger mb-0', 'Could not check this right now. Please try again.'));
+                        });
+                });
+            })();
+        </script>
+}

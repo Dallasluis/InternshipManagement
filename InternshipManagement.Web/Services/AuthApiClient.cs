@@ -32,6 +32,13 @@ namespace InternshipManagement.Web.Services
             return await ReadResultAsync(response);
         }
 
+        public async Task<AuthApiResult> UpdateProfilePictureAsync(string token, string profilePictureUrl)
+        {
+            AddAuthorization(token);
+            var response = await _httpClient.PutAsJsonAsync("api/Auth/profile-picture", new { ProfilePictureUrl = profilePictureUrl });
+            return await ReadResultAsync(response);
+        }
+
         public async Task<AuthApiResult> LoginAsync(LoginViewModel model)
         {
             try
@@ -39,7 +46,9 @@ namespace InternshipManagement.Web.Services
                 var payload = new
                 {
                     email = model.Email,
-                    password = model.Password
+                    password = model.Password,
+                    rememberMe = model.RememberMe,
+                    twoFactorCode = model.TwoFactorCode
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("api/Auth/login", payload);
@@ -58,7 +67,7 @@ namespace InternshipManagement.Web.Services
         public async Task<AuthApiResult> ChangePasswordAsync(string token, ChangePasswordViewModel model)
         {
             AddAuthorization(token);
-            var response = await _httpClient.PostAsJsonAsync("api/Auth/change-password", new { model.CurrentPassword, model.NewPassword });
+            var response = await _httpClient.PostAsJsonAsync("api/Auth/change-password", new { model.CurrentPassword, model.NewPassword, model.TwoFactorCode });
             return await ReadResultAsync(response);
         }
 
@@ -129,6 +138,11 @@ namespace InternshipManagement.Web.Services
                 Email = GetString(root, "email"),
                 FirstName = GetString(root, "firstName"),
                 LastName = GetString(root, "lastName"),
+                ProfilePictureUrl = GetString(root, "profilePictureUrl"),
+                EmailConfirmed = GetBoolean(root, "emailConfirmed") ?? false,
+                RequiresTwoFactor = GetBoolean(root, "requiresTwoFactor") ?? false,
+                RequiresTwoFactorSetup = GetBoolean(root, "requiresTwoFactorSetup") ?? false,
+                RefreshTokenExpiresAt = GetString(root, "refreshTokenExpiresAt"),
                 Message = GetString(root, "message"),
                 Errors = ReadErrors(root)
             };

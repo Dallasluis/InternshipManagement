@@ -1,0 +1,47 @@
+@host = http://localhost:5003
+@studentEmail = teststudent@example.com
+@studentPassword = Test@12345
+
+### 1. Log in as the student
+# @name studentLogin
+POST {{host}}/api/Auth/login
+Content-Type: application/json
+
+{ "email": "{{studentEmail}}", "password": "{{studentPassword}}" }
+
+### 2. Ask the assistant. The reply streams as server-sent events (data: {"text":"..."} ... event: done).
+# Insomnia may show the whole reply only when it has finished. To SEE it stream, use curl.exe -N (see MCP_STEP7_CAREER_ASSISTANT.md).
+POST {{host}}/api/students/career-assistant/chat
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "message": "What skills am I missing and what should I learn first?",
+  "history": []
+}
+
+### 3. A follow-up: the app sends the earlier turns back every time (the API stores nothing)
+POST {{host}}/api/students/career-assistant/chat
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "message": "Which of those is the quickest to do?",
+  "history": [
+    { "role": "user", "content": "What skills am I missing and what should I learn first?" },
+    { "role": "assistant", "content": "(paste the reply from request 2 here)" }
+  ]
+}
+
+### 4. Should return 400: empty message
+POST {{host}}/api/students/career-assistant/chat
+Authorization: Bearer {{studentLogin.response.body.$.token}}
+Content-Type: application/json
+
+{ "message": "   " }
+
+### 5. Should return 401: no token
+POST {{host}}/api/students/career-assistant/chat
+Content-Type: application/json
+
+{ "message": "hello" }

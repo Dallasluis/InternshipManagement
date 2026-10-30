@@ -50,7 +50,7 @@
                                 <td>@company.InternshipCount</td>
                                 <td>
                                     <span class="badge @GetVerificationBadgeClass(company.VerificationStatus)">
-                                        @company.VerificationStatus
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.VerificationLabel(company.VerificationStatus)
                                     </span>
                                 </td>
                                 <td>@company.CreatedAt.ToString("MMM dd, yyyy")</td>
@@ -97,15 +97,7 @@
 </div>
 
 @functions {
-    private string GetVerificationBadgeClass(string status) => status switch
-    {
-        "Verified" => "bg-success",
-        "Pending" => "bg-warning",
-        "UnderReview" => "bg-info",
-        "Rejected" => "bg-danger",
-        "Suspended" => "bg-secondary",
-        _ => "bg-secondary"
-    };
+    private string GetVerificationBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.VerificationBadge(status);
 }
 
 @section Scripts {

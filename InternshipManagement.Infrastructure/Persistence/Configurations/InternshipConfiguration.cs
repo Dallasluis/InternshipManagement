@@ -33,6 +33,18 @@ namespace InternshipManagement.Domain.Configurations
             builder.Property(i => i.Skills)
                 .HasMaxLength(500);
 
+            builder.Property(i => i.RequiredQualifications)
+                .HasMaxLength(2000);
+
+            builder.Property(i => i.PreferredQualifications)
+                .HasMaxLength(2000);
+
+            builder.Property(i => i.RequiredSkills)
+                .HasMaxLength(1000);
+
+            builder.Property(i => i.PreferredSkills)
+                .HasMaxLength(1000);
+
             builder.Property(i => i.Industry)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -51,6 +63,9 @@ namespace InternshipManagement.Domain.Configurations
 
             builder.Property(i => i.Status)
                 .HasDefaultValue(InternshipStatus.Draft);
+
+            builder.Property(i => i.WorkArrangement)
+                .HasDefaultValue(InternshipWorkArrangement.OnSite);
 
             builder.Property(i => i.ModerationStatus)
                 .HasDefaultValue(ModerationStatus.Pending);

@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Education & Skills";
+}
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
+<div id="ai-root" data-page="sections"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-profile-url="@Url.Action("ProfileData", "ProfileSections")"
+     data-add-url="@Url.Action("Add", "ProfileSections")"
+     data-remove-url="@Url.Action("Remove", "ProfileSections")">
+    @Html.AntiForgeryToken()
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+        <div>
+            <h1 class="h2 mb-1">Education &amp; Skills</h1>
+            <p class="text-muted mb-0">Keep these up to date: matching, skill gaps and the career assistant all read them.</p>
+        </div>
+        <a asp-controller="StudentAi" asp-action="CvAnalysis" class="btn btn-outline-primary">
+            <i class="fas fa-file-pdf me-1"></i> Fill in from my CV
+        </a>
+    </div>
+
+    <div id="sections-errors"></div>
+    <div id="sections-root"><div class="text-muted py-4 text-center">Loading your profile…</div></div>
+</div>
+
+@section Scripts { <script src="~/js/profile-sections.js" asp-append-version="true"></script> }

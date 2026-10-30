@@ -10,6 +10,6 @@ namespace InternshipManagement.Application.DTOs.Application
 
         public string? CoverLetter { get; set; }
 
-        public List<string>? AdditionalDocumentUrls { get; set; }
+        public List<Guid>? AdditionalDocumentIds { get; set; }
     }
 }

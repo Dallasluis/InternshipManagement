@@ -1,0 +1,216 @@
+--- orig/AuthService.cs	2026-10-28 08:48:49.909145824 +0200
++++ new/AuthService.cs	2026-10-28 08:48:56.772238215 +0200
+@@ -186,32 +186,31 @@
+                 return new AuthResponse { Success = false, Errors = new List<string> { "Invalid email or password." } };
+             }
+ 
+-            if (user.TwoFactorEnabled)
++            if (RequiresEmailOtp(user.UserType))
+             {
+                 if (string.IsNullOrWhiteSpace(request.TwoFactorCode))
+-                    return new AuthResponse { Success = false, RequiresTwoFactor = true, Errors = new List<string> { "Enter your authenticator code." } };
+-                if (!await _identityService.VerifyAuthenticatorCodeAsync(user.Id.ToString(), request.TwoFactorCode))
+                 {
+-                    await RecordSecurityEventAsync(user.Id, "TwoFactorLoginFailed", request.ClientIpAddress);
+-                    return new AuthResponse { Success = false, Errors = new List<string> { "Invalid email or password." } };
++                    var sent = await SendOtpAsync(user, "Login");
++                    return new AuthResponse
++                    {
++                        Success = false,
++                        RequiresTwoFactor = true,
++                        Message = sent
++                            ? $"We emailed a 6-digit code to {MaskEmail(user.Email)}. It is valid for {_loginSecurityOptions.OtpLifetimeMinutes} minutes."
++                            : "A code was sent a moment ago. Check your email, or wait a minute before asking for another."
++                    };
+                 }
+-            }
+ 
+-            if (RequiresMandatoryTwoFactor(user.UserType) && !user.TwoFactorEnabled)
+-            {
+-                return new AuthResponse
++                if (!await VerifyOtpAsync(user.Id, "Login", request.TwoFactorCode))
+                 {
+-                    Success = true,
+-                    Token = await _identityService.GenerateJwtTokenAsync(user.Id.ToString(), false, twoFactorSetupOnly: true),
+-                    UserId = user.Id.ToString(),
+-                    UserType = user.UserType,
+-                    Email = user.Email,
+-                    FirstName = user.FirstName,
+-                    LastName = user.LastName,
+-                    EmailConfirmed = user.EmailConfirmed,
+-                    RequiresTwoFactorSetup = true,
+-                    Message = "Set up authenticator-app two-factor authentication to continue."
+-                };
++                    await RecordSecurityEventAsync(user.Id, "OtpLoginFailed", request.ClientIpAddress);
++                    return new AuthResponse
++                    {
++                        Success = false,
++                        RequiresTwoFactor = true,
++                        Errors = new List<string> { "The code is incorrect or has expired. Leave the code empty and sign in again to get a new one." }
++                    };
++                }
+             }
+ 
+             var rememberMe = request.RememberMe && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase);
+@@ -487,11 +486,11 @@
+             var user = await _identityService.FindUserByIdAsync(userId.ToString());
+             if (user == null)
+                 return IdentityResult.Failure(new List<string> { "User not found." });
+-            if ((user.TwoFactorEnabled || RequiresMandatoryTwoFactor(user.UserType))
++            if (RequiresEmailOtp(user.UserType)
+                 && (string.IsNullOrWhiteSpace(request.TwoFactorCode)
+-                    || !await _identityService.VerifyAuthenticatorCodeAsync(userId.ToString(), request.TwoFactorCode)))
++                    || !await VerifyOtpAsync(userId, "StepUp", request.TwoFactorCode)))
+             {
+-                return IdentityResult.Failure(new List<string> { "A valid authenticator code is required." });
++                return IdentityResult.Failure(new List<string> { "Enter the code we emailed you. Use \"Send me a code\" first if you do not have one." });
+             }
+ 
+             return await _identityService.ChangePasswordAsync(userId.ToString(), request.CurrentPassword, request.NewPassword);
+@@ -503,10 +502,10 @@
+             if (user == null || !await _identityService.CheckPasswordAsync(user.Email, request.CurrentPassword))
+                 return IdentityResult.Failure(new List<string> { "Current password is incorrect." });
+ 
+-            if ((user.TwoFactorEnabled || RequiresMandatoryTwoFactor(user.UserType))
++            if (RequiresEmailOtp(user.UserType)
+                 && (string.IsNullOrWhiteSpace(request.TwoFactorCode)
+-                    || !await _identityService.VerifyAuthenticatorCodeAsync(userId.ToString(), request.TwoFactorCode)))
+-                return IdentityResult.Failure(new List<string> { "A valid authenticator code is required." });
++                    || !await VerifyOtpAsync(userId, "StepUp", request.TwoFactorCode)))
++                return IdentityResult.Failure(new List<string> { "Enter the code we emailed you. Use \"Send me a code\" first if you do not have one." });
+ 
+             var existingUser = await _identityService.FindUserByEmailAsync(request.NewEmail);
+             if (existingUser != null)
+@@ -536,28 +535,107 @@
+             return IdentityResult.Success(userId.ToString());
+         }
+ 
+-        public async Task<AuthResponse> EnableTwoFactorAsync(int userId, string code)
++        public async Task<AuthResponse> SendSecurityCodeAsync(int userId)
+         {
+-            if (!await _identityService.VerifyAuthenticatorCodeAsync(userId.ToString(), code))
+-                return new AuthResponse { Success = false, Errors = new List<string> { "The authenticator code is invalid." } };
++            var user = await _identityService.FindUserByIdAsync(userId.ToString());
++            if (user == null || !RequiresEmailOtp(user.UserType))
++                return new AuthResponse { Success = false, Errors = new List<string> { "A code is not required for this account." } };
+ 
+-            var result = await _identityService.SetTwoFactorEnabledAsync(userId.ToString(), true);
+-            if (!result.Succeeded)
+-                return new AuthResponse { Success = false, Errors = result.Errors };
++            var sent = await SendOtpAsync(user, "StepUp");
++            return new AuthResponse
++            {
++                Success = sent,
++                Message = sent
++                    ? $"We emailed a 6-digit code to {MaskEmail(user.Email)}."
++                    : "A code was sent a moment ago. Please wait a minute before asking for another."
++            };
++        }
++
++        // ---- Emailed one-time codes -------------------------------------------------------------------------
++        // Stored (hashed, single use, expiring, attempt-limited) in the Identity user-tokens table, so no migration is needed.
++        // Token value: salt|hash|expiryTicks|attempts|issuedTicks
++
++        private static string OtpTokenName(string purpose) => $"EmailOtp:{purpose}";
++
++        private static string HashOtp(int userId, string purpose, string salt, string code)
++        {
++            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{userId}|{purpose}|{salt}|{code}"));
++            return Convert.ToBase64String(bytes);
++        }
++
++        private async Task<bool> SendOtpAsync(IdentityUserDto user, string purpose)
++        {
++            var name = OtpTokenName(purpose);
++            var existing = await _identityService.GetUserTokenAsync(user.Id.ToString(), name);
++            var now = DateTime.UtcNow;
++            if (!string.IsNullOrEmpty(existing))
++            {
++                var parts = existing.Split('|');
++                if (parts.Length == 5
++                    && long.TryParse(parts[4], out var issuedTicks)
++                    && now - new DateTime(issuedTicks, DateTimeKind.Utc) < TimeSpan.FromSeconds(_loginSecurityOptions.OtpResendSeconds)
++                    && long.TryParse(parts[2], out var existingExpiry)
++                    && existingExpiry > now.Ticks)
++                    return false;
++            }
++
++            var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
++            var salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16));
++            var expiry = now.AddMinutes(_loginSecurityOptions.OtpLifetimeMinutes);
++            await _identityService.SetUserTokenAsync(user.Id.ToString(), name,
++                $"{salt}|{HashOtp(user.Id, purpose, salt, code)}|{expiry.Ticks}|0|{now.Ticks}");
++
++            var reason = purpose == "Login" ? "sign in" : "confirm this change to your account";
++            await _emailSender.SendEmailAsync(
++                user.Email,
++                "Your Internship Management security code",
++                $"Your code to {reason} is {code}. It expires in {_loginSecurityOptions.OtpLifetimeMinutes} minutes and can be used once. " +
++                "If you did not request it, someone may know your password - please change it and contact support.");
++            await RecordSecurityEventAsync(user.Id, "OtpIssued");
++            return true;
++        }
++
++        private async Task<bool> VerifyOtpAsync(int userId, string purpose, string code)
++        {
++            var name = OtpTokenName(purpose);
++            var stored = await _identityService.GetUserTokenAsync(userId.ToString(), name);
++            if (string.IsNullOrEmpty(stored)) return false;
++
++            var parts = stored.Split('|');
++            if (parts.Length != 5
++                || !long.TryParse(parts[2], out var expiryTicks)
++                || !int.TryParse(parts[3], out var attempts))
++            {
++                await _identityService.RemoveUserTokenAsync(userId.ToString(), name);
++                return false;
++            }
++
++            if (expiryTicks <= DateTime.UtcNow.Ticks || attempts >= _loginSecurityOptions.OtpMaxAttempts)
++            {
++                await _identityService.RemoveUserTokenAsync(userId.ToString(), name);
++                return false;
++            }
++
++            var candidate = HashOtp(userId, purpose, parts[0], code.Trim().Replace(" ", string.Empty));
++            var matches = CryptographicOperations.FixedTimeEquals(
++                Encoding.UTF8.GetBytes(candidate), Encoding.UTF8.GetBytes(parts[1]));
++
++            if (matches)
++            {
++                await _identityService.RemoveUserTokenAsync(userId.ToString(), name);
++                return true;
++            }
+ 
+-            await RecordSecurityEventAsync(userId, "TwoFactorEnabled");
+-            return new AuthResponse { Success = true, Message = "Two-factor authentication enabled. Sign in again to continue." };
++            await _identityService.SetUserTokenAsync(userId.ToString(), name,
++                $"{parts[0]}|{parts[1]}|{parts[2]}|{attempts + 1}|{parts[4]}");
++            return false;
+         }
+ 
+-        public async Task<AuthenticatorSetupResponse> GetTwoFactorSetupAsync(int userId)
++        private static string MaskEmail(string email)
+         {
+-            var user = await _identityService.FindUserByIdAsync(userId.ToString())
+-                ?? throw new InvalidOperationException("User not found.");
+-            var key = await _identityService.GetAuthenticatorKeyAsync(userId.ToString());
+-            var issuer = Uri.EscapeDataString("Internship Management");
+-            var account = Uri.EscapeDataString(user.Email);
+-            var uri = $"otpauth://totp/{issuer}:{account}?secret={Uri.EscapeDataString(key)}&issuer={issuer}&digits=6";
+-            return new AuthenticatorSetupResponse { SharedKey = key, AuthenticatorUri = uri };
++            var at = email.IndexOf('@');
++            if (at <= 1) return email;
++            return email[0] + new string('*', Math.Min(at - 1, 6)) + email[at..];
+         }
+ 
+         public Task<IdentityResult> UpdateProfilePictureUrlAsync(int userId, string profilePictureUrl) =>
+@@ -683,7 +761,7 @@
+             return Convert.ToBase64String(randomNumber);
+         }
+ 
+-        private static bool RequiresMandatoryTwoFactor(string userType) =>
++        private static bool RequiresEmailOtp(string userType) =>
+             userType.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+             || userType.Equals("Company", StringComparison.OrdinalIgnoreCase);
+ 

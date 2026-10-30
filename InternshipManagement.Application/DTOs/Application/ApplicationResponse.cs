@@ -39,7 +39,14 @@ namespace InternshipManagement.Application.DTOs.Application
         public string? Programme { get; set; }
         public string? YearOfStudy { get; set; }
 
-        public string? ResumeUrl { get; set; }
         public string? ProfilePictureUrl { get; set; }
+        public List<ApplicationDocumentInfo> ApplicationDocuments { get; set; } = new();
+    }
+
+    public class ApplicationDocumentInfo
+    {
+        public Guid Id { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
     }
 }

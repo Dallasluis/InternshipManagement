@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "CV analysis";
+}
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
+<div id="ai-root" data-page="cv"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-job-url="@Url.Action("Job", "StudentAi")"
+     data-details-url="@Url.Action("Details", "Internships")"
+     data-start-url="@Url.Action("StartCv", "StudentAi")"
+     data-confirm-url="@Url.Action("ConfirmCv", "StudentAi")"
+     data-profile-url="@Url.Action("Profile", "Student")">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-4">
+        <h1 class="h2 mb-1">CV analysis</h1>
+        <p class="text-muted mb-0">Upload your CV and let AI suggest skills, education, work experience, certificates and projects for your profile.</p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="cv-form" novalidate>
+                <div class="mb-3">
+                    <label for="cv-file" class="form-label">Your CV (PDF, up to 5 MB)</label>
+                    <input id="cv-file" type="file" class="form-control" accept="application/pdf,.pdf" />
+                </div>
+                <button id="cv-btn" type="submit" class="btn btn-primary">Analyse my CV</button>
+                <span id="cv-note" class="small text-muted ms-2" aria-live="polite"></span>
+            </form>
+            <p class="small text-muted mt-3 mb-0">
+                Your contact details are removed before the text is analysed, and the PDF itself is not stored.
+                You review every suggestion, and nothing is added to your profile until you confirm.
+            </p>
+        </div>
+    </div>
+
+    <div id="cv-errors"></div>
+    <div id="cv-result"></div>
+</div>
+
+@section Scripts { <script src="~/js/student-ai.js" asp-append-version="true"></script> }

@@ -11,5 +11,6 @@ namespace InternshipManagement.Web.Services
         Task<AccountPreferencesViewModel?> GetPreferencesAsync(string token);
         Task<AuthApiResult> UpdatePreferencesAsync(string token, AccountPreferencesViewModel model);
         Task<AuthApiResult> DeactivateAsync(string token);
+        Task<AuthApiResult> UpdateProfilePictureAsync(string token, string profilePictureUrl);
     }
 }

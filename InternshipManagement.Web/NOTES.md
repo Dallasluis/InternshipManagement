@@ -1,0 +1,5 @@
+Student UI: dashboard 2-column with quick actions; Recommended button on Dashboard and Browse; Career assistant moved from sidebar into a floating button (bottom-right) on every student page (opens Assistant page in a panel via ?embed=1). Files overwrite the same paths in InternshipManagement.Web/Views. _Layout and _Sidebar are based on the stage 3 + verification pages versions; site.css from mcp-ui-sidebar.zip is separate.
+
+Sidebar: the page you are on is highlighted (blue) on every page; sub-pages highlight their parent.
+Profile page: under Transcript, Qualification, Certificates and Other supporting documents there is an "+ Add another file" link; each click adds one more file box (up to 10). Everything is uploaded when you press Save Changes, as separate documents. A new card "All my uploaded documents" lists every document with Download and Remove. The apply form already lets a student pick up to 5 of them per application.
+Files: Controllers/StudentController.cs (replaces the original; adds RemoveDocument and extra uploads), Views/Student/Profile.cshtml.

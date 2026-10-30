@@ -1,0 +1,42 @@
+@model List<InternshipManagement.Web.Controllers.VerificationHistoryEntry>
+@{ ViewData["Title"] = "Verification history"; }
+
+<div class="container-fluid py-3">
+    <h3 class="mb-1">Verification history</h3>
+    <p class="text-muted">Every decision on your company's verification, with the reason given.</p>
+
+    @if (ViewBag.Error != null) { <div class="alert alert-danger">@ViewBag.Error</div> }
+
+    @if (Model.Count == 0 && ViewBag.Error == null)
+    {
+        <div class="alert alert-info">There are no verification decisions yet.</div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead><tr><th>Date</th><th>Result</th><th>Reason</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        @foreach (var entry in Model)
+                        {
+                            <tr>
+                                <td>@(entry.CreatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                <td>
+                                    <span class="badge @InternshipManagement.Web.Helpers.StatusDisplay.VerificationBadge(entry.Status)">
+                                        @InternshipManagement.Web.Helpers.StatusDisplay.VerificationLabel(entry.Status)
+                                    </span>
+                                    @if (entry.IsAppeal) { <span class="badge bg-secondary ms-1">Appeal</span> }
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(entry.ReasonCode) ? "-" : entry.ReasonCode)</td>
+                                <td>@(string.IsNullOrWhiteSpace(entry.Notes) ? "-" : entry.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <a class="btn btn-link mt-3" asp-controller="Company" asp-action="Profile">Back to company profile</a>
+</div>

@@ -29,7 +29,7 @@
 <div class="card mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">@placement.InternshipTitle</h5>
-        <span class="badge @GetStatusBadgeClass(placement.Status)">@placement.Status</span>
+        <span class="badge @GetStatusBadgeClass(placement.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(placement.Status)</span>
     </div>
     <div class="card-body">
         <dl class="row mb-0">
@@ -47,6 +47,60 @@
         </dl>
     </div>
 </div>
+
+@if (placement.ExtensionRequests.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Extension requests</h5>
+        </div>
+        <div class="card-body">
+            @foreach (var extension in placement.ExtensionRequests.OrderByDescending(request => request.ProposedEndDate))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>@extension.Status</strong>
+                        <span>Proposed end date: @extension.ProposedEndDate.ToString("MMM d, yyyy")</span>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(extension.Reason))
+                    {
+                        <p class="mt-2 mb-1">@extension.Reason</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(extension.ResponseNotes))
+                    {
+                        <p class="mb-1"><strong>Your response:</strong> @extension.ResponseNotes</p>
+                    }
+                    @if (extension.Status == "Proposed")
+                    {
+                        <form asp-controller="Student" asp-action="RespondToExtension" method="post" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@placement.Id" />
+                            <input type="hidden" name="extensionRequestId" value="@extension.Id" />
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control mb-2" name="notes" rows="2"></textarea>
+                            <button type="submit" name="accepted" value="true" class="btn btn-success me-2">Accept extension</button>
+                            <button type="submit" name="accepted" value="false" class="btn btn-outline-secondary">Decline</button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (placement.WithdrawalRequests.Any())
+{
+    <div class="alert alert-info">
+        @foreach (var withdrawal in placement.WithdrawalRequests.OrderByDescending(request => request.ReviewedAt))
+        {
+            <p class="mb-1">Withdrawal request: <strong>@withdrawal.Status</strong></p>
+            @if (!string.IsNullOrWhiteSpace(withdrawal.CompanyDecisionNotes))
+            {
+                <p class="mb-0">Company notes: @withdrawal.CompanyDecisionNotes</p>
+            }
+        }
+    </div>
+}
 
 @if (placement.Status == "Active" || placement.Status == "Extended")
 {
@@ -152,31 +206,30 @@
     </div>
 }
 
-@if (placement.Status == "Active" || placement.Status == "Extended")
+@if (placement.Status == "Pending" || placement.Status == "Active" || placement.Status == "Extended")
 {
     <div class="card">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Request Withdrawal</h5>
+            <h5 class="mb-0">Request withdrawal</h5>
         </div>
         <div class="card-body">
-            <form asp-controller="Student" asp-action="RequestWithdrawal" asp-route-id="@placement.Id" method="post">
-                @Html.AntiForgeryToken()
-                <label class="form-label">Reason</label>
-                <textarea class="form-control" name="Reason" rows="3" required></textarea>
-                <button type="submit" class="btn btn-outline-danger mt-3">Submit Request</button>
-            </form>
+            @if (placement.WithdrawalRequests.Any(request => request.Status == "Requested"))
+            {
+                <p class="text-muted mb-0">A withdrawal request is already awaiting the company's decision.</p>
+            }
+            else
+            {
+                <form asp-controller="Student" asp-action="RequestWithdrawal" asp-route-id="@placement.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <label class="form-label">Reason</label>
+                    <textarea class="form-control" name="Reason" rows="3" required></textarea>
+                    <button type="submit" class="btn btn-outline-danger mt-3">Submit Request</button>
+                </form>
+            }
         </div>
     </div>
 }
 
 @functions {
-    private string GetStatusBadgeClass(string status) => status switch
-    {
-        "Active" => "bg-success",
-        "Extended" => "bg-primary",
-        "Completed" => "bg-secondary",
-        "Terminated" => "bg-danger",
-        "Pending" => "bg-warning",
-        _ => "bg-secondary"
-    };
+    private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }
