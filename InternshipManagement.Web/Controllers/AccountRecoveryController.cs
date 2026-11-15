@@ -60,6 +60,12 @@ namespace InternshipManagement.Web.Controllers
             var result = await _api.SendAsync(string.Empty, HttpMethod.Post, "api/Auth/reset-password",
                 Json(new { email = model.Email, token = model.Token, newPassword = model.NewPassword }), ct);
 
+            if (result.StatusCode == 429)
+            {
+                ModelState.AddModelError(string.Empty, "Too many reset attempts. Please wait 15 minutes and try again.");
+                return View(model);
+            }
+
             if (result.StatusCode >= 500)
             {
                 ModelState.AddModelError(string.Empty, "We could not reset the password right now. Please try again in a few minutes.");

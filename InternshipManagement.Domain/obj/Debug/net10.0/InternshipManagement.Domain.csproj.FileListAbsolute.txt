@@ -27,3 +27,6 @@ C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagemen
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Domain.deps.json
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Domain.dll
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Domain.pdb
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\serial-audit\Debug\net10.0\InternshipManagement.Domain.deps.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\serial-audit\Debug\net10.0\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Domain\obj\serial-audit\Debug\net10.0\InternshipManagement.Domain.pdb

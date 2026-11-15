@@ -50,6 +50,23 @@ namespace InternshipManagement.Web.Controllers
         public Task<IActionResult> Draft(int id, CancellationToken ct) =>
             Forward(HttpMethod.Get, $"api/internships/ai-draft/{id}", null, ct);
 
+        // Discards a saved draft. The API answers 204 (no body), so it is mapped to a small JSON reply here.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteDraft(int id, CancellationToken ct)
+        {
+            if (id <= 0)
+                return BadRequest(new { error = "Unknown draft." });
+            if (!TryGetCompanyToken(out var token))
+                return Unauthorized(new { error = "Your session has expired. Please log in again." });
+
+            var result = await _ai.SendAsync(token, HttpMethod.Delete, $"api/internships/ai-draft/{id}", null, ct);
+            if (result.StatusCode is >= 200 and < 300)
+                return Ok(new { deleted = true });
+
+            var body = string.IsNullOrWhiteSpace(result.Body) ? "{}" : result.Body;
+            return new ContentResult { StatusCode = result.StatusCode, Content = body, ContentType = "application/json; charset=utf-8" };
+        }
+
         [HttpGet]
         public Task<IActionResult> CandidatesData(int internshipId, int maxResults = 10, CancellationToken ct = default) =>
             Forward(HttpMethod.Get,

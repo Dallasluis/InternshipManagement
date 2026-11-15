@@ -7,6 +7,9 @@ namespace InternshipManagement.Application.Interfaces
     {
         Task<AuthResponse> RegisterAsync(RegisterRequest request);
         Task<AuthResponse> LoginAsync(LoginRequest request);
+        Task<AuthResponse> CompleteTwoFactorLoginAsync(int userId, string challengeId, string code, bool rememberMe, string? ipAddress);
+        Task<AuthResponse> ResendTwoFactorLoginCodeAsync(int userId, string challengeId);
+        Task<bool> CancelTwoFactorLoginAsync(int userId, string challengeId);
         Task<AuthResponse> RefreshTokenAsync(string refreshToken);
         Task<bool> LogoutAsync(int userId);
         Task<bool> VerifyEmailAsync(int userId, string token);

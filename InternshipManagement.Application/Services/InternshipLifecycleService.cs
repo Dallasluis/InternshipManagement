@@ -10,10 +10,12 @@ namespace InternshipManagement.Application.Services
     public class InternshipLifecycleService : IInternshipLifecycleService
     {
         private readonly IApplicationDbContext _context;
+        private readonly INotificationService _notifications;
 
-        public InternshipLifecycleService(IApplicationDbContext context)
+        public InternshipLifecycleService(IApplicationDbContext context, INotificationService notifications)
         {
             _context = context;
+            _notifications = notifications;
         }
 
         public async Task<PlacementResponse?> CreatePlacementFromAcceptedApplicationAsync(int applicationId)
@@ -50,16 +52,32 @@ namespace InternshipManagement.Application.Services
                 CompanyProfileId = application.Internship.CompanyProfileId,
                 InternshipId = application.InternshipId,
                 InternshipApplicationId = application.Id,
-                Status = PlacementStatus.Active,
+                Status = startDate.Date > DateTime.UtcNow.Date ? PlacementStatus.Pending : PlacementStatus.Active,
                 OriginalStartDate = startDate,
                 OriginalEndDate = application.Internship.EndDate,
                 CurrentStartDate = startDate,
                 CurrentEndDate = application.Internship.EndDate,
-                ActivatedAt = DateTime.UtcNow
+                ActivatedAt = startDate.Date > DateTime.UtcNow.Date ? null : DateTime.UtcNow
             };
 
             _context.Placements.Add(placement);
             await _context.SaveChangesAsync();
+
+            var created = await TryGetPartiesAsync(placement.Id);
+            if (created != null)
+            {
+                var when = placement.Status == PlacementStatus.Pending
+                    ? $"starts on {startDate:d MMM yyyy}"
+                    : "is active now";
+                await _notifications.NotifyAsync(created.StudentUserId, NotificationTypes.Placement,
+                    "Your placement is set up",
+                    $"Your placement for \"{created.InternshipTitle}\" at {created.CompanyName} {when}.",
+                    $"/Student/PlacementDetails/{placement.Id}", sendEmail: true);
+                await _notifications.NotifyAsync(created.CompanyUserId, NotificationTypes.Placement,
+                    "Placement created",
+                    $"{created.StudentName} accepted the offer for \"{created.InternshipTitle}\". The placement {when}.",
+                    $"/Company/PlacementDetails/{placement.Id}");
+            }
 
             return MapPlacement(placement);
         }
@@ -156,6 +174,13 @@ namespace InternshipManagement.Application.Services
 
             _context.ProgressReports.Add(report);
             await _context.SaveChangesAsync();
+
+            var reportParties = await TryGetPartiesAsync(placementId);
+            if (reportParties != null)
+                await _notifications.NotifyAsync(reportParties.CompanyUserId, NotificationTypes.Report,
+                    "Progress report submitted",
+                    $"{reportParties.StudentName} submitted a progress report for \"{reportParties.InternshipTitle}\".",
+                    $"/Company/PlacementDetails/{placementId}");
             return MapProgressReport(report);
         }
 
@@ -185,6 +210,13 @@ namespace InternshipManagement.Application.Services
             report.ReviewedByUserId = userId;
 
             await _context.SaveChangesAsync();
+
+            var reviewParties = await TryGetPartiesAsync(report.PlacementId);
+            if (reviewParties != null)
+                await _notifications.NotifyAsync(reviewParties.StudentUserId, NotificationTypes.Report,
+                    "Your progress report was reviewed",
+                    $"{reviewParties.CompanyName} reviewed your progress report for \"{reviewParties.InternshipTitle}\".",
+                    $"/Student/PlacementDetails/{report.PlacementId}");
             return true;
         }
 
@@ -213,6 +245,13 @@ namespace InternshipManagement.Application.Services
 
             _context.InternshipExtensionRequests.Add(extension);
             await _context.SaveChangesAsync();
+
+            var extParties = await TryGetPartiesAsync(placementId);
+            if (extParties != null)
+                await _notifications.NotifyAsync(extParties.StudentUserId, NotificationTypes.Extension,
+                    "Extension proposed",
+                    $"{extParties.CompanyName} proposed extending your placement for \"{extParties.InternshipTitle}\" until {request.ProposedEndDate:d MMM yyyy}. Please accept or decline.",
+                    $"/Student/PlacementDetails/{placementId}", sendEmail: true);
             return MapExtension(extension);
         }
 
@@ -243,6 +282,13 @@ namespace InternshipManagement.Application.Services
             }
 
             await _context.SaveChangesAsync();
+
+            var answerParties = await TryGetPartiesAsync(extension.PlacementId);
+            if (answerParties != null)
+                await _notifications.NotifyAsync(answerParties.CompanyUserId, NotificationTypes.Extension,
+                    request.Accepted ? "Extension accepted" : "Extension declined",
+                    $"{answerParties.StudentName} {(request.Accepted ? "accepted" : "declined")} the extension for \"{answerParties.InternshipTitle}\".",
+                    $"/Company/PlacementDetails/{extension.PlacementId}", sendEmail: true);
             return true;
         }
 
@@ -252,7 +298,7 @@ namespace InternshipManagement.Application.Services
             if (placement == null)
                 throw new Exception("Placement not found for this student.");
 
-            if (placement.Status != PlacementStatus.Active && placement.Status != PlacementStatus.Extended)
+            if (placement.Status != PlacementStatus.Pending && placement.Status != PlacementStatus.Active && placement.Status != PlacementStatus.Extended)
                 throw new Exception("Only active placements can be withdrawn.");
 
             var existingOpenRequest = await _context.InternshipWithdrawalRequests
@@ -271,6 +317,13 @@ namespace InternshipManagement.Application.Services
 
             _context.InternshipWithdrawalRequests.Add(withdrawal);
             await _context.SaveChangesAsync();
+
+            var wdParties = await TryGetPartiesAsync(placementId);
+            if (wdParties != null)
+                await _notifications.NotifyAsync(wdParties.CompanyUserId, NotificationTypes.Withdrawal,
+                    "Withdrawal requested",
+                    $"{wdParties.StudentName} asked to withdraw from \"{wdParties.InternshipTitle}\". Please review the request.",
+                    $"/Company/PlacementDetails/{placementId}", sendEmail: true);
             return MapWithdrawal(withdrawal);
         }
 
@@ -301,7 +354,129 @@ namespace InternshipManagement.Application.Services
             }
 
             await _context.SaveChangesAsync();
+
+            var decisionParties = await TryGetPartiesAsync(withdrawal.PlacementId);
+            if (decisionParties != null)
+                await _notifications.NotifyAsync(decisionParties.StudentUserId, NotificationTypes.Withdrawal,
+                    request.Approved ? "Withdrawal approved" : "Withdrawal not approved",
+                    request.Approved
+                        ? $"Your withdrawal from \"{decisionParties.InternshipTitle}\" was approved."
+                        : $"{decisionParties.CompanyName} did not approve your withdrawal from \"{decisionParties.InternshipTitle}\".",
+                    $"/Student/PlacementDetails/{withdrawal.PlacementId}", sendEmail: true);
+
             if (request.Approved)
+                await CreateNextAcceptedPlacementAsync(withdrawal.Placement.StudentProfileId);
+            return true;
+        }
+
+        public async Task<WithdrawalRequestResponse> DisputeWithdrawalAsync(int userId, int withdrawalRequestId, string reason)
+        {
+            var withdrawal = await _context.InternshipWithdrawalRequests
+                .FirstOrDefaultAsync(w => w.Id == withdrawalRequestId);
+            if (withdrawal == null)
+                throw new Exception("Withdrawal request not found.");
+
+            var placement = await GetStudentPlacementForUser(userId, withdrawal.PlacementId);
+            if (placement == null)
+                throw new Exception("Withdrawal request not found.");
+
+            if (withdrawal.Status != WithdrawalStatus.Rejected || withdrawal.DisputedAt != null)
+                throw new Exception("Only a rejected withdrawal request can be disputed, and only once.");
+
+            if (string.IsNullOrWhiteSpace(reason) || reason.Trim().Length < 5)
+                throw new Exception("Please explain why you are disputing the decision.");
+
+            withdrawal.Status = WithdrawalStatus.Disputed;
+            withdrawal.DisputeReason = reason.Trim();
+            withdrawal.DisputedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            var parties = await TryGetPartiesAsync(withdrawal.PlacementId);
+            if (parties != null)
+                await _notifications.NotifyAsync(parties.CompanyUserId, NotificationTypes.Withdrawal,
+                    "Withdrawal decision disputed",
+                    $"{parties.StudentName} disputed your decision on their withdrawal from \"{parties.InternshipTitle}\". An administrator will review it.",
+                    $"/Company/PlacementDetails/{withdrawal.PlacementId}");
+
+            return MapWithdrawal(withdrawal);
+        }
+
+        public async Task<List<DisputedWithdrawalResponse>> GetDisputedWithdrawalsAsync()
+        {
+            return await _context.InternshipWithdrawalRequests
+                .AsNoTracking()
+                .Where(w => w.Status == WithdrawalStatus.Disputed && !w.IsDeleted)
+                .OrderBy(w => w.DisputedAt)
+                .Select(w => new DisputedWithdrawalResponse
+                {
+                    Id = w.Id,
+                    PlacementId = w.PlacementId,
+                    StudentName = w.Placement.StudentProfile.FirstName + " " + w.Placement.StudentProfile.LastName,
+                    CompanyName = w.Placement.CompanyProfile.CompanyName,
+                    InternshipTitle = w.Placement.Internship.Title,
+                    PlacementStatus = w.Placement.Status.ToString(),
+                    StudentReason = w.Reason,
+                    CompanyDecisionNotes = w.CompanyDecisionNotes,
+                    DisputeReason = w.DisputeReason,
+                    RequestedAt = w.CreatedAt,
+                    DisputedAt = w.DisputedAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> ResolveWithdrawalDisputeAsync(int adminUserId, int withdrawalRequestId, ResolveWithdrawalDisputeRequest request)
+        {
+            var withdrawal = await _context.InternshipWithdrawalRequests
+                .Include(w => w.Placement)
+                .FirstOrDefaultAsync(w => w.Id == withdrawalRequestId);
+            if (withdrawal == null) return false;
+
+            if (withdrawal.Status != WithdrawalStatus.Disputed)
+                throw new Exception("Only a disputed withdrawal can be decided here.");
+
+            withdrawal.AdminDecisionNotes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim();
+            withdrawal.AdminReviewedByUserId = adminUserId;
+            withdrawal.AdminDecidedAt = DateTime.UtcNow;
+
+            var ended = false;
+            if (request.Approved)
+            {
+                withdrawal.Status = WithdrawalStatus.Approved;
+                withdrawal.EffectiveTerminationDate = request.EffectiveTerminationDate ?? DateTime.UtcNow;
+
+                var placement = withdrawal.Placement;
+                if (placement.Status == PlacementStatus.Pending || placement.Status == PlacementStatus.Active || placement.Status == PlacementStatus.Extended)
+                {
+                    placement.Status = PlacementStatus.Terminated;
+                    placement.TerminatedAt = withdrawal.EffectiveTerminationDate;
+                    placement.TerminationReason = withdrawal.Reason;
+                    ended = true;
+                }
+            }
+            else
+            {
+                withdrawal.Status = WithdrawalStatus.Rejected; // final: DisputedAt is set, so it cannot be disputed again
+            }
+
+            await _context.SaveChangesAsync();
+
+            var parties = await TryGetPartiesAsync(withdrawal.PlacementId);
+            if (parties != null)
+            {
+                var outcome = request.Approved
+                    ? $"An administrator approved the withdrawal from \"{parties.InternshipTitle}\"."
+                    : $"An administrator reviewed the dispute and kept the company's decision on the withdrawal from \"{parties.InternshipTitle}\".";
+                var tail = string.IsNullOrWhiteSpace(withdrawal.AdminDecisionNotes) ? string.Empty : $" Note: {withdrawal.AdminDecisionNotes}";
+
+                await _notifications.NotifyAsync(parties.StudentUserId, NotificationTypes.Withdrawal,
+                    "Withdrawal dispute decided", outcome + tail,
+                    $"/Student/PlacementDetails/{withdrawal.PlacementId}", sendEmail: true);
+                await _notifications.NotifyAsync(parties.CompanyUserId, NotificationTypes.Withdrawal,
+                    "Withdrawal dispute decided", outcome + tail,
+                    $"/Company/PlacementDetails/{withdrawal.PlacementId}", sendEmail: true);
+            }
+
+            if (ended)
                 await CreateNextAcceptedPlacementAsync(withdrawal.Placement.StudentProfileId);
             return true;
         }
@@ -319,6 +494,14 @@ namespace InternshipManagement.Application.Services
             placement.Status = PlacementStatus.Completed;
             placement.CompletedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
+
+            var doneParties = await TryGetPartiesAsync(placementId);
+            if (doneParties != null)
+                await _notifications.NotifyAsync(doneParties.StudentUserId, NotificationTypes.Placement,
+                    "Placement completed",
+                    $"Your placement for \"{doneParties.InternshipTitle}\" at {doneParties.CompanyName} is complete. Congratulations!",
+                    $"/Student/PlacementDetails/{placementId}", sendEmail: true);
+
             await CreateNextAcceptedPlacementAsync(placement.StudentProfileId);
             return true;
         }
@@ -337,8 +520,41 @@ namespace InternshipManagement.Application.Services
             placement.TerminatedAt = request.EffectiveTerminationDate ?? DateTime.UtcNow;
             placement.TerminationReason = request.Reason;
             await _context.SaveChangesAsync();
+
+            var endParties = await TryGetPartiesAsync(placementId);
+            if (endParties != null)
+                await _notifications.NotifyAsync(endParties.StudentUserId, NotificationTypes.Placement,
+                    "Placement ended",
+                    $"{endParties.CompanyName} ended your placement for \"{endParties.InternshipTitle}\".",
+                    $"/Student/PlacementDetails/{placementId}", sendEmail: true);
+
             await CreateNextAcceptedPlacementAsync(placement.StudentProfileId);
             return true;
+        }
+
+        private sealed record PlacementParties(
+            int StudentUserId, int CompanyUserId, string InternshipTitle, string StudentName, string CompanyName);
+
+        // Who to tell about a placement. Never throws: a notification problem must not break the action itself.
+        private async Task<PlacementParties?> TryGetPartiesAsync(int placementId)
+        {
+            try
+            {
+                return await _context.Placements
+                    .AsNoTracking()
+                    .Where(p => p.Id == placementId)
+                    .Select(p => new PlacementParties(
+                        p.StudentProfile.UserId,
+                        p.CompanyProfile.UserId,
+                        p.Internship.Title,
+                        p.StudentProfile.FirstName + " " + p.StudentProfile.LastName,
+                        p.CompanyProfile.CompanyName))
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private async Task CreateNextAcceptedPlacementAsync(int studentProfileId)
@@ -385,6 +601,13 @@ namespace InternshipManagement.Application.Services
 
             _context.InternshipEvaluations.Add(evaluation);
             await _context.SaveChangesAsync();
+
+            var evalParties = await TryGetPartiesAsync(placementId);
+            if (evalParties != null)
+                await _notifications.NotifyAsync(evalParties.StudentUserId, NotificationTypes.Evaluation,
+                    "You have a new evaluation",
+                    $"{evalParties.CompanyName} submitted an evaluation for your placement at \"{evalParties.InternshipTitle}\".",
+                    $"/Student/PlacementDetails/{placementId}");
             return MapEvaluation(evaluation);
         }
 
@@ -524,7 +747,10 @@ namespace InternshipManagement.Application.Services
                 Id = withdrawal.Id,
                 PlacementId = withdrawal.PlacementId,
                 Reason = withdrawal.Reason,
-                Status = withdrawal.Status.ToString(),
+                // a dispute an administrator already decided is final, so the page shows no "dispute" button for it
+                Status = withdrawal.Status == WithdrawalStatus.Rejected && withdrawal.DisputedAt != null
+                    ? "Rejected after review"
+                    : withdrawal.Status.ToString(),
                 EffectiveTerminationDate = withdrawal.EffectiveTerminationDate,
                 CompanyDecisionNotes = withdrawal.CompanyDecisionNotes,
                 ReviewedAt = withdrawal.ReviewedAt

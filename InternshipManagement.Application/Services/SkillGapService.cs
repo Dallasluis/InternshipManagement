@@ -163,7 +163,9 @@ namespace InternshipManagement.Application.Services
                 .Include(i => i.CompanyProfile)
                 .Where(i => ids.Contains(i.Id)
                     && i.Status == InternshipStatus.Published
-                    && i.ModerationStatus == ModerationStatus.Approved
+                    && i.ModerationStatus != ModerationStatus.Flagged
+                    && i.ModerationStatus != ModerationStatus.Removed
+                    && i.ModerationStatus != ModerationStatus.Rejected
                     && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                         || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                             && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))

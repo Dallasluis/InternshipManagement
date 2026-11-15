@@ -13,6 +13,7 @@
         Rejected,
         Withdrawn,
         WithdrawnAcceptedElsewhere,
-        Declined
+        Declined,
+        OfferExpired
     }
 }

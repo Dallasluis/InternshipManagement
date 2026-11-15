@@ -79,6 +79,9 @@ else
                             <i class="fas fa-check-circle me-2"></i>
                             This company is verified.
                         </div>
+                        <button class="btn btn-outline-warning me-2" onclick="warnCompany(@Model.Id)">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Warn Company
+                        </button>
                         <button class="btn btn-warning" onclick="suspendCompany(@Model.Id)">
                             <i class="fas fa-pause me-1"></i> Suspend Company
                         </button>
@@ -142,6 +145,12 @@ else
                     </div>
                 </div>
             }
+            <div class="card mt-3">
+                <div class="card-header bg-white"><h6 class="mb-0">Warnings sent to this company</h6></div>
+                <div class="card-body" id="warning-history">
+                    <p class="text-muted mb-0">Loading...</p>
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -183,6 +192,47 @@ else
                         }
                     });
             }
+        }
+
+        function loadWarnings() {
+            var box = document.getElementById('warning-history');
+            if (!box) return;
+            fetch('/Admin/CompanyWarnings?companyId=@Model.Id')
+                .then(function (r) { return r.json(); })
+                .then(function (list) {
+                    if (!Array.isArray(list)) { box.textContent = (list && list.message) || 'The warnings could not be loaded.'; return; }
+                    if (list.length === 0) { box.innerHTML = '<p class="text-muted mb-0">No warnings have been sent.</p>'; return; }
+                    box.innerHTML = '';
+                    list.forEach(function (w) {
+                        var row = document.createElement('div');
+                        row.className = 'border-bottom pb-2 mb-2';
+                        var when = document.createElement('div');
+                        when.className = 'text-muted small';
+                        when.textContent = new Date(w.createdAt).toLocaleString();
+                        var text = document.createElement('div');
+                        text.textContent = w.message;
+                        row.appendChild(when);
+                        row.appendChild(text);
+                        box.appendChild(row);
+                    });
+                })
+                .catch(function () { box.textContent = 'The warnings could not be loaded.'; });
+        }
+        loadWarnings();
+
+        function warnCompany(id) {
+            var message = prompt('Write the warning for this company. They will see it in their notifications and by email:');
+            if (message === null) return;
+            message = message.trim();
+            if (message.length < 10) { alert('Please write at least 10 characters.'); return; }
+            fetch('/Admin/WarnCompany', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'companyId=' + id + '&message=' + encodeURIComponent(message)
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { alert(d.success ? 'Warning sent.' : (d.message || 'The warning could not be sent.')); if (d.success) loadWarnings(); })
+                .catch(function () { alert('The warning could not be sent.'); });
         }
 
         function suspendCompany(id) {

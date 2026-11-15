@@ -11,15 +11,18 @@ namespace InternshipManagement.Application.Services
         private readonly IApplicationDbContext _context;
         private readonly IInternshipService _internshipService;
         private readonly IInternshipLifecycleService _lifecycleService;
+        private readonly INotificationService _notifications;
 
         public ApplicationService(
             IApplicationDbContext context,
             IInternshipService internshipService,
-            IInternshipLifecycleService lifecycleService)
+            IInternshipLifecycleService lifecycleService,
+            INotificationService notifications)
         {
             _context = context;
             _internshipService = internshipService;
             _lifecycleService = lifecycleService;
+            _notifications = notifications;
         }
 
         public async Task<ApplicationResponse> ApplyAsync(int studentId, ApplyRequest request)
@@ -69,6 +72,22 @@ namespace InternshipManagement.Application.Services
             }
 
             await _context.SaveChangesAsync();
+
+            if (internship != null)
+            {
+                var companyUserId = await _context.CompanyProfiles
+                    .Where(c => c.Id == internship.CompanyProfileId)
+                    .Select(c => c.UserId)
+                    .FirstOrDefaultAsync();
+                await _notifications.NotifyAsync(companyUserId, NotificationTypes.Application,
+                    "New application",
+                    $"{studentProfile.FirstName} {studentProfile.LastName} applied for \"{internship.Title}\".",
+                    $"/Company/ApplicationReview/{application.Id}");
+                await _notifications.NotifyAsync(studentId, NotificationTypes.Application,
+                    "Application submitted",
+                    $"Your application for \"{internship.Title}\" was submitted. You will be told when its status changes.",
+                    $"/Student/ApplicationDetails/{application.Id}");
+            }
 
             return await MapToResponse(application);
         }
@@ -144,6 +163,13 @@ namespace InternshipManagement.Application.Services
             AddStatusHistory(application, previousStatus, newStatus, request.Notes, userId);
 
             await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Application,
+                newStatus == ApplicationStatus.Rejected ? "Update on your application" : "Your application is being reviewed",
+                newStatus == ApplicationStatus.Rejected
+                    ? $"Your application for \"{application.Internship.Title}\" was not successful."
+                    : $"Your application for \"{application.Internship.Title}\" is now under review.",
+                sendEmail: newStatus == ApplicationStatus.Rejected);
             return true;
         }
 
@@ -165,6 +191,11 @@ namespace InternshipManagement.Application.Services
             AddStatusHistory(application, previousStatus, ApplicationStatus.Shortlisted, notes, userId);
 
             await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Application,
+                "You have been shortlisted",
+                $"Good news: you were shortlisted for \"{application.Internship.Title}\".",
+                sendEmail: true);
             return true;
         }
 
@@ -186,6 +217,74 @@ namespace InternshipManagement.Application.Services
             AddStatusHistory(application, previousStatus, ApplicationStatus.InterviewScheduled, request.InterviewNotes, userId);
 
             await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Interview,
+                "Interview scheduled",
+                $"Your interview for \"{application.Internship.Title}\" is on {request.InterviewDateTime:d MMM yyyy 'at' HH:mm}"
+                    + (string.IsNullOrWhiteSpace(request.InterviewLocationOrLink) ? "." : $" ({request.InterviewLocationOrLink}).")
+                    + " Check the application for details.",
+                sendEmail: true);
+            return true;
+        }
+
+        public async Task<bool> RescheduleInterviewAsync(int userId, int applicationId, ScheduleInterviewRequest request)
+        {
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.InterviewScheduled)
+                throw new InvalidOperationException("Only a scheduled interview can be rescheduled.");
+
+            var before = application.InterviewDateTime;
+            application.InterviewDateTime = request.InterviewDateTime;
+            application.InterviewType = request.InterviewType;
+            application.InterviewLocationOrLink = request.InterviewLocationOrLink;
+            application.InterviewNotes = request.InterviewNotes;
+            application.StatusUpdatedAt = DateTime.UtcNow;
+
+            var note = before.HasValue
+                ? $"Interview rescheduled from {before.Value:d MMM yyyy HH:mm} to {request.InterviewDateTime:d MMM yyyy HH:mm}."
+                : $"Interview rescheduled to {request.InterviewDateTime:d MMM yyyy HH:mm}.";
+            AddStatusHistory(application, ApplicationStatus.InterviewScheduled, ApplicationStatus.InterviewScheduled, note, userId);
+
+            await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Interview,
+                "Your interview was rescheduled",
+                $"Your interview for \"{application.Internship.Title}\" is now on {request.InterviewDateTime:d MMM yyyy 'at' HH:mm}.",
+                sendEmail: true);
+            return true;
+        }
+
+        public async Task<bool> CancelInterviewAsync(int userId, int applicationId, string? reason)
+        {
+            var application = await FindCompanyApplicationAsync(userId, applicationId);
+            if (application == null) return false;
+
+            if (application.Status != ApplicationStatus.InterviewScheduled)
+                throw new InvalidOperationException("Only a scheduled interview can be cancelled.");
+
+            var was = application.InterviewDateTime;
+            var why = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+
+            // the candidate goes back to "shortlisted" so a new interview can be set up
+            application.InterviewDateTime = null;
+            application.InterviewType = null;
+            application.InterviewLocationOrLink = null;
+            application.InterviewNotes = null;
+            application.Status = ApplicationStatus.Shortlisted;
+            application.StatusUpdatedAt = DateTime.UtcNow;
+
+            var note = (was.HasValue ? $"Interview on {was.Value:d MMM yyyy HH:mm} cancelled." : "Interview cancelled.")
+                + (why == null ? string.Empty : $" Reason: {why}");
+            AddStatusHistory(application, ApplicationStatus.InterviewScheduled, ApplicationStatus.Shortlisted, note, userId);
+
+            await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Interview,
+                "Your interview was cancelled",
+                $"The interview for \"{application.Internship.Title}\" was cancelled." + (why == null ? string.Empty : $" Reason: {why}") + " The company may contact you about a new time.",
+                sendEmail: true);
             return true;
         }
 
@@ -211,8 +310,12 @@ namespace InternshipManagement.Application.Services
             var application = await FindCompanyApplicationAsync(userId, applicationId);
             if (application == null) return false;
 
-            if (application.Status != ApplicationStatus.InterviewCompleted)
+            var isReoffer = application.Status == ApplicationStatus.OfferExpired;
+            if (application.Status != ApplicationStatus.InterviewCompleted && !isReoffer)
                 throw new Exception("Only interview-completed candidates can receive an offer.");
+
+            if (request.ExpiryDate.Date <= DateTime.UtcNow.Date)
+                throw new Exception("The offer expiry date must be in the future.");
 
             application.OfferStipendAmount = request.StipendAmount;
             application.OfferStartDate = request.StartDate;
@@ -221,9 +324,18 @@ namespace InternshipManagement.Application.Services
             var previousStatus = application.Status;
             application.Status = ApplicationStatus.OfferMade;
             application.StatusUpdatedAt = DateTime.UtcNow;
-            AddStatusHistory(application, previousStatus, ApplicationStatus.OfferMade, request.OfferDetails, userId);
+            AddStatusHistory(application, previousStatus, ApplicationStatus.OfferMade, isReoffer ? "Offer sent again" : request.OfferDetails, userId);
 
             await _context.SaveChangesAsync();
+
+            await NotifyStudentAsync(application, NotificationTypes.Offer,
+                isReoffer ? "Your internship offer was sent again" : "You have an internship offer",
+                $"{application.Internship.CompanyProfile?.CompanyName ?? "A company"} offered you \"{application.Internship.Title}\". "
+                    + (application.OfferStipendAmount.HasValue ? $"Stipend: {application.OfferStipendAmount.Value:N2}. " : "")
+                    + (application.OfferStartDate.HasValue ? $"Start date: {application.OfferStartDate.Value:d MMM yyyy}. " : "")
+                    + $"Please reply by {request.ExpiryDate:d MMM yyyy}.",
+                sendEmail: true,
+                linkPath: $"/Offer/Letter/{application.Id}");
             return true;
         }
 
@@ -265,6 +377,13 @@ namespace InternshipManagement.Application.Services
             AddStatusHistory(application, ApplicationStatus.OfferMade, application.Status, accepted ? "Offer accepted" : "Offer declined", userId);
             await _context.SaveChangesAsync();
 
+            await _notifications.NotifyAsync(application.Internship.CompanyProfile.UserId, NotificationTypes.Offer,
+                accepted ? "Offer accepted" : "Offer declined",
+                $"{application.StudentProfile.FirstName} {application.StudentProfile.LastName} "
+                    + (accepted ? "accepted" : "declined") + $" your offer for \"{application.Internship.Title}\".",
+                $"/Company/ApplicationReview/{application.Id}",
+                sendEmail: true);
+
             if (accepted)
             {
                 await WithdrawOtherOpenApplicationsAsync(application, userId);
@@ -288,7 +407,26 @@ namespace InternshipManagement.Application.Services
             AddStatusHistory(application, previousStatus, ApplicationStatus.Withdrawn, "Application withdrawn", userId);
 
             await _context.SaveChangesAsync();
+
+            await _notifications.NotifyAsync(application.Internship.CompanyProfile.UserId, NotificationTypes.Application,
+                "Application withdrawn",
+                $"{application.StudentProfile.FirstName} {application.StudentProfile.LastName} withdrew their application for \"{application.Internship.Title}\".",
+                $"/Company/ApplicationReview/{application.Id}");
             return true;
+        }
+
+        // Tells the student about a change made by the company.
+        private async Task NotifyStudentAsync(
+            InternshipApplication application, string type, string title, string message, bool sendEmail = false,
+            string? linkPath = null)
+        {
+            var studentUserId = await _context.StudentProfiles
+                .Where(s => s.Id == application.StudentProfileId)
+                .Select(s => s.UserId)
+                .FirstOrDefaultAsync();
+
+            await _notifications.NotifyAsync(studentUserId, type, title, message,
+                linkPath ?? $"/Student/ApplicationDetails/{application.Id}", sendEmail);
         }
 
         private async Task WithdrawOtherOpenApplicationsAsync(InternshipApplication accepted, int userId)

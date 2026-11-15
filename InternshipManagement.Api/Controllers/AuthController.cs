@@ -120,6 +120,59 @@ namespace InternshipManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("two-factor/login")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
+        public async Task<IActionResult> CompleteTwoFactorLogin([FromBody] LoginCodeRequest request)
+        {
+            if (!User.HasClaim("two_factor_login", "true")
+                || !int.TryParse(User.FindFirstValue("userId"), out var userId)
+                || string.IsNullOrWhiteSpace(User.FindFirstValue("login_challenge_id")))
+                return Unauthorized(new { Success = false, Errors = new[] { "This sign-in request has expired. Please sign in again." } });
+
+            var result = await _authService.CompleteTwoFactorLoginAsync(
+                userId,
+                User.FindFirstValue("login_challenge_id")!,
+                request.Code,
+                User.HasClaim("login_remember_me", "true"),
+                HttpContext.Connection.RemoteIpAddress?.ToString());
+            return result.Success ? Ok(result) : Unauthorized(result);
+        }
+
+        [HttpPost("two-factor/resend-login-code")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
+        public async Task<IActionResult> ResendTwoFactorLoginCode()
+        {
+            if (!User.HasClaim("two_factor_login", "true")
+                || !int.TryParse(User.FindFirstValue("userId"), out var userId)
+                || string.IsNullOrWhiteSpace(User.FindFirstValue("login_challenge_id")))
+                return Unauthorized(new { Success = false, Errors = new[] { "This sign-in request has expired. Please sign in again." } });
+
+            var result = await _authService.ResendTwoFactorLoginCodeAsync(
+                userId, User.FindFirstValue("login_challenge_id")!);
+            if (result.Success) return Ok(result);
+            return result.Errors?.Any() == true
+                ? Unauthorized(result)
+                : StatusCode(StatusCodes.Status429TooManyRequests, result);
+        }
+
+        [HttpPost("two-factor/cancel-login")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
+        public async Task<IActionResult> CancelTwoFactorLogin()
+        {
+            if (!User.HasClaim("two_factor_login", "true")
+                || !int.TryParse(User.FindFirstValue("userId"), out var userId)
+                || string.IsNullOrWhiteSpace(User.FindFirstValue("login_challenge_id")))
+                return Unauthorized(new { Success = false, Errors = new[] { "This sign-in request has expired." } });
+
+            return await _authService.CancelTwoFactorLoginAsync(
+                userId, User.FindFirstValue("login_challenge_id")!)
+                ? Ok(new { Success = true })
+                : Unauthorized(new { Success = false, Errors = new[] { "This sign-in request has expired." } });
+        }
+
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
@@ -173,6 +226,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("password-reset")]
         public async Task<IActionResult> ForgotPassword([FromBody] Application.DTOs.Auth.ForgotPasswordRequest request)
         {
             var result = await _authService.RequestPasswordResetAsync(request.Email);
@@ -180,6 +234,7 @@ namespace InternshipManagement.Api.Controllers
         }
 
         [HttpPost("reset-password")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("password-reset")]
         public async Task<IActionResult> ResetPassword([FromBody] Application.DTOs.Auth.ResetPasswordRequest request)
         {
             var result = await _authService.ResetPasswordAsync(request.Email, request.Token, request.NewPassword);
@@ -194,6 +249,13 @@ namespace InternshipManagement.Api.Controllers
         public sealed class EnableTwoFactorRequest
         {
             [System.ComponentModel.DataAnnotations.Required]
+            public string Code { get; set; } = string.Empty;
+        }
+
+        public sealed class LoginCodeRequest
+        {
+            [System.ComponentModel.DataAnnotations.Required]
+            [System.ComponentModel.DataAnnotations.RegularExpression("^\\d{6}$")]
             public string Code { get; set; } = string.Empty;
         }
     }

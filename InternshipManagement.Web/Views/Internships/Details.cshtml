@@ -60,6 +60,10 @@
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body">
+                @if (Model.WorkArrangement == "OnSite" && !string.IsNullOrWhiteSpace(Model.Location))
+                {
+                    <div class="mb-3" data-location-map="@Model.Location"></div>
+                }
                 <dl class="row mb-0">
                     <dt class="col-6">Location</dt>
                     <dd class="col-6">@(Model.WorkArrangement == "OnSite" && !string.IsNullOrWhiteSpace(Model.Location)
@@ -116,6 +120,12 @@
                             <a class="btn btn-outline-secondary" asp-controller="StudentAi" asp-action="SkillGaps" asp-route-internshipId="@Model.Id">
                                 <i class="fas fa-chart-line me-1"></i> What am I missing?
                             </a>
+                            <button type="button" id="save-btn" class="btn btn-outline-secondary" aria-pressed="false"
+                                    data-state-url="@Url.Action("State", "SavedInternships", new { id = Model.Id })"
+                                    data-add-url="@Url.Action("Add", "SavedInternships", new { id = Model.Id })"
+                                    data-remove-url="@Url.Action("Remove", "SavedInternships", new { id = Model.Id })">
+                                <i class="far fa-bookmark me-1"></i> Save for later
+                            </button>
                         </div>
                         <div id="fit-panel" class="fit-panel mt-3" hidden aria-live="polite"></div>
                     </div>
@@ -192,6 +202,41 @@
 </div>
 
 @section Scripts {
+        <script>
+            (function () {
+                var btn = document.getElementById('save-btn');
+                if (!btn) return;
+                var saved = false;
+
+                function paint() {
+                    btn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+                    btn.innerHTML = saved
+                        ? '<i class="fas fa-bookmark me-1"></i> Saved'
+                        : '<i class="far fa-bookmark me-1"></i> Save for later';
+                    btn.classList.toggle('btn-secondary', saved);
+                    btn.classList.toggle('btn-outline-secondary', !saved);
+                }
+
+                fetch(btn.dataset.stateUrl, { credentials: 'same-origin' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (d) { if (d) { saved = !!d.saved; paint(); } })
+                    .catch(function () { });
+
+                btn.addEventListener('click', function () {
+                    btn.disabled = true;
+                    fetch(saved ? btn.dataset.removeUrl : btn.dataset.addUrl, { method: 'POST', credentials: 'same-origin' })
+                        .then(function (r) {
+                            return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; });
+                        })
+                        .then(function (res) {
+                            if (res.ok) { saved = !saved; paint(); }
+                            else alert(res.d.message || 'Could not update your saved list.');
+                        })
+                        .catch(function () { alert('Could not update your saved list.'); })
+                        .finally(function () { btn.disabled = false; });
+                });
+            })();
+        </script>
         <script>
             (function () {
                 var box = document.getElementById('fit-box');

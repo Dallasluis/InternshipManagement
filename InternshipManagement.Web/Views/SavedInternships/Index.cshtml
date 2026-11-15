@@ -1,0 +1,69 @@
+@model List<InternshipManagement.Web.Models.Student.SavedInternshipItem>
+@{
+    ViewData["Title"] = "Saved internships";
+}
+
+<div class="mb-3">
+    <h1 class="h2 mb-1">Saved internships</h1>
+    <p class="text-muted mb-0">Internships you bookmarked to come back to.</p>
+</div>
+
+@if (ViewBag.Error != null) { <div class="alert alert-danger">@ViewBag.Error</div> }
+
+@if (Model.Count == 0 && ViewBag.Error == null)
+{
+    <div class="card"><div class="card-body text-center text-muted py-5">
+        <i class="far fa-bookmark fa-2x mb-2"></i>
+        <div>You have not saved anything yet. Use "Save for later" on an internship's page.</div>
+        <a class="btn btn-primary mt-3" asp-controller="Internships" asp-action="Index">Browse internships</a>
+    </div></div>
+}
+else
+{
+    <div class="row g-3" id="saved-list">
+        @foreach (var item in Model)
+        {
+            var open = item.Status == "Published" && item.ApplicationDeadline >= DateTime.UtcNow;
+            <div class="col-md-6" data-saved-id="@item.InternshipId">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between gap-2">
+                            <h5 class="card-title mb-1">
+                                <a asp-controller="Internships" asp-action="Details" asp-route-id="@item.InternshipId" class="text-decoration-none">@item.Title</a>
+                            </h5>
+                            <span class="badge @(open ? "bg-success" : "bg-secondary") align-self-start">@(open ? "Open" : "Closed")</span>
+                        </div>
+                        <div class="text-muted">@item.CompanyName</div>
+                        <div class="small text-muted mt-2">
+                            @if (!string.IsNullOrWhiteSpace(item.Location)) { <span class="me-3"><i class="fas fa-map-marker-alt me-1"></i>@item.Location</span> }
+                            <span><i class="far fa-calendar me-1"></i>Apply by @item.ApplicationDeadline.ToString("d MMM yyyy")</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between">
+                        <a class="btn btn-sm btn-primary" asp-controller="Internships" asp-action="Details" asp-route-id="@item.InternshipId">View</a>
+                        <button type="button" class="btn btn-sm btn-outline-secondary js-unsave" data-url="@Url.Action("Remove", "SavedInternships", new { id = item.InternshipId })">
+                            <i class="fas fa-bookmark me-1"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.js-unsave').forEach(function (button) {
+            button.addEventListener('click', function () {
+                button.disabled = true;
+                fetch(button.dataset.url, { method: 'POST', credentials: 'same-origin' })
+                    .then(function (r) {
+                        if (!r.ok) throw new Error();
+                        var card = button.closest('[data-saved-id]');
+                        if (card) card.remove();
+                    })
+                    .catch(function () { button.disabled = false; alert('Could not remove it. Please try again.'); });
+            });
+        });
+    </script>
+}

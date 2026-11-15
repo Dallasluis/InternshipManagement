@@ -56,3 +56,4 @@ namespace InternshipManagement.Web.Models.Internship
         public List<string>? EligibleProgrammes { get; set; }
     }
 }
+

@@ -16,6 +16,9 @@ namespace InternshipManagement.Application.Interfaces
         Task<bool> RespondToExtensionAsync(int userId, int extensionRequestId, RespondToExtensionRequest request);
         Task<WithdrawalRequestResponse> RequestWithdrawalAsync(int userId, int placementId, RequestWithdrawalRequest request);
         Task<bool> ReviewWithdrawalAsync(int userId, int withdrawalRequestId, ReviewWithdrawalRequest request);
+        Task<WithdrawalRequestResponse> DisputeWithdrawalAsync(int userId, int withdrawalRequestId, string reason);
+        Task<List<DisputedWithdrawalResponse>> GetDisputedWithdrawalsAsync();
+        Task<bool> ResolveWithdrawalDisputeAsync(int adminUserId, int withdrawalRequestId, ResolveWithdrawalDisputeRequest request);
         Task<bool> CompletePlacementAsync(int userId, int placementId, CompletePlacementRequest request);
         Task<bool> TerminatePlacementAsync(int userId, int placementId, TerminatePlacementRequest request);
         Task<EvaluationResponse> SubmitEvaluationAsync(int userId, int placementId, SubmitEvaluationRequest request);

@@ -224,7 +224,7 @@ namespace InternshipManagement.Web.Controllers
                     return View(request);
                 }
 
-                TempData["SuccessMessage"] = "Internship posted as a draft.";
+                TempData["SuccessMessage"] = "Internship published successfully and is now visible to students.";
                 return RedirectToAction(nameof(ManageInternships));
             }
             catch (Exception ex)

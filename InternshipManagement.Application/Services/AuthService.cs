@@ -14,6 +14,7 @@ namespace InternshipManagement.Application.Services
 {
     public class AuthService : IAuthService
     {
+        private const string LoginChallengeTokenName = "EmailOtp:LoginChallenge";
         private readonly IApplicationDbContext _context;
         private readonly IIdentityService _identityService;
         private readonly IEmailSender _emailSender;
@@ -191,10 +192,17 @@ namespace InternshipManagement.Application.Services
                 if (string.IsNullOrWhiteSpace(request.TwoFactorCode))
                 {
                     var sent = await SendOtpAsync(user, "Login");
+                    var challengeId = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+                    await _identityService.SetUserTokenAsync(user.Id.ToString(), LoginChallengeTokenName, challengeId);
                     return new AuthResponse
                     {
                         Success = false,
                         RequiresTwoFactor = true,
+                        TwoFactorChallengeToken = await _identityService.GenerateJwtTokenAsync(
+                            user.Id.ToString(),
+                            rememberMe: request.RememberMe && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase),
+                            twoFactorLoginOnly: true,
+                            loginChallengeId: challengeId),
                         Message = sent
                             ? $"We emailed a 6-digit code to {MaskEmail(user.Email)}. It is valid for {_loginSecurityOptions.OtpLifetimeMinutes} minutes."
                             : "A code was sent a moment ago. Check your email, or wait a minute before asking for another."
@@ -208,12 +216,67 @@ namespace InternshipManagement.Application.Services
                     {
                         Success = false,
                         RequiresTwoFactor = true,
-                        Errors = new List<string> { "The code is incorrect or has expired. Leave the code empty and sign in again to get a new one." }
+                        Errors = new List<string> { "The code is incorrect or has expired. Request a new code and try again." }
                     };
                 }
             }
 
             var rememberMe = request.RememberMe && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase);
+            return await CreateLoginResponseAsync(user, rememberMe, request.ClientIpAddress);
+        }
+
+        public async Task<AuthResponse> CompleteTwoFactorLoginAsync(int userId, string challengeId, string code, bool rememberMe, string? ipAddress)
+        {
+            var user = await _identityService.FindUserByIdAsync(userId.ToString());
+            var activeChallenge = await _identityService.GetUserTokenAsync(userId.ToString(), LoginChallengeTokenName);
+            if (user == null || !user.IsActive || !IsSameChallenge(activeChallenge, challengeId))
+                return new AuthResponse { Success = false, Errors = new List<string> { "This sign-in request has expired. Please sign in again." } };
+
+            if (!await VerifyOtpAsync(userId, "Login", code))
+            {
+                await RecordSecurityEventAsync(userId, "OtpLoginFailed", ipAddress);
+                return new AuthResponse
+                {
+                    Success = false,
+                    RequiresTwoFactor = true,
+                    Errors = new List<string> { "The code is incorrect or has expired. Request a new code and try again." }
+                };
+            }
+
+            await _identityService.RemoveUserTokenAsync(userId.ToString(), LoginChallengeTokenName);
+            return await CreateLoginResponseAsync(user, rememberMe, ipAddress);
+        }
+
+        public async Task<AuthResponse> ResendTwoFactorLoginCodeAsync(int userId, string challengeId)
+        {
+            var user = await _identityService.FindUserByIdAsync(userId.ToString());
+            var activeChallenge = await _identityService.GetUserTokenAsync(userId.ToString(), LoginChallengeTokenName);
+            if (user == null || !user.IsActive || !IsSameChallenge(activeChallenge, challengeId))
+                return new AuthResponse { Success = false, Errors = new List<string> { "This sign-in request has expired. Please sign in again." } };
+
+            var sent = await SendOtpAsync(user, "Login");
+            return new AuthResponse
+            {
+                Success = sent,
+                Message = sent
+                    ? $"A new code was sent to {MaskEmail(user.Email)}. It expires in {_loginSecurityOptions.OtpLifetimeMinutes} minutes."
+                    : "Please wait a minute before requesting another code. The current code may still be used."
+            };
+        }
+
+        public async Task<bool> CancelTwoFactorLoginAsync(int userId, string challengeId)
+        {
+            var activeChallenge = await _identityService.GetUserTokenAsync(userId.ToString(), LoginChallengeTokenName);
+            if (!IsSameChallenge(activeChallenge, challengeId))
+                return false;
+
+            await _identityService.RemoveUserTokenAsync(userId.ToString(), LoginChallengeTokenName);
+            await _identityService.RemoveUserTokenAsync(userId.ToString(), OtpTokenName("Login"));
+            return true;
+        }
+
+        private async Task<AuthResponse> CreateLoginResponseAsync(IdentityUserDto user, bool rememberMe, string? ipAddress)
+        {
             var now = DateTime.UtcNow;
             var absoluteExpiry = rememberMe
                 ? now.AddDays(_loginSecurityOptions.RememberStudentDays)
@@ -232,7 +295,7 @@ namespace InternshipManagement.Application.Services
             );
             if (!sessionSaved)
                 return new AuthResponse { Success = false, Errors = new List<string> { "Unable to create a session." } };
-            await RecordSecurityEventAsync(user.Id, "LoginSucceeded", request.ClientIpAddress);
+            await RecordSecurityEventAsync(user.Id, "LoginSucceeded", ipAddress);
 
             return new AuthResponse
             {
@@ -249,6 +312,12 @@ namespace InternshipManagement.Application.Services
                 RefreshTokenExpiresAt = refreshExpiry.ToString("O")
             };
         }
+
+        private static bool IsSameChallenge(string? expected, string provided) =>
+            !string.IsNullOrWhiteSpace(expected)
+            && !string.IsNullOrWhiteSpace(provided)
+            && CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(expected), Encoding.UTF8.GetBytes(provided));
 
         public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
         {
@@ -452,10 +521,12 @@ namespace InternshipManagement.Application.Services
             if (user == null) return false;
 
             var token = await _identityService.GeneratePasswordResetTokenAsync(user.Id.ToString());
+            var resetUrl = $"{_emailVerificationOptions.PublicWebBaseUrl.TrimEnd('/')}/Account/ResetPassword"
+                + $"?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
             await _emailSender.SendEmailAsync(
                 user.Email,
                 "Reset your Internship Management password",
-                $"A password reset was requested for your account. Use this token in the password reset form:\n\n{token}\n\nIf you did not request a password reset, you can ignore this email.");
+                $"A password reset was requested for your account. Choose a new password here:\n\n{resetUrl}\n\nIf you did not request a password reset, you can ignore this email.");
             return true;
         }
 
@@ -472,6 +543,12 @@ namespace InternshipManagement.Application.Services
                 token,
                 newPassword
             );
+            if (result.Succeeded)
+            {
+                await _identityService.UpdateRefreshTokenAsync(user.Id.ToString(), null, DateTime.UtcNow);
+                await _identityService.RemoveUserTokenAsync(user.Id.ToString(), OtpTokenName("Login"));
+                await _identityService.RemoveUserTokenAsync(user.Id.ToString(), LoginChallengeTokenName);
+            }
             return result.Succeeded;
         }
 

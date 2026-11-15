@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InternshipManagement.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d1124e96ef51005d2dd2b38b700be010c7cb2daf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31755da14274760f7434c7eb8f987d18a6241026")]
 [assembly: System.Reflection.AssemblyProductAttribute("InternshipManagement.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InternshipManagement.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

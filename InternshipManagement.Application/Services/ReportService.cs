@@ -23,7 +23,9 @@ namespace InternshipManagement.Application.Services
                 i.Id == request.InternshipId &&
                 !i.IsDeleted &&
                 i.Status == InternshipStatus.Published &&
-                i.ModerationStatus == ModerationStatus.Approved &&
+                i.ModerationStatus != ModerationStatus.Flagged &&
+                i.ModerationStatus != ModerationStatus.Removed &&
+                i.ModerationStatus != ModerationStatus.Rejected &&
                 (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                     || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                         && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7))));

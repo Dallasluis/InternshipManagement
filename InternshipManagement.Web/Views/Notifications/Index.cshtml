@@ -1,0 +1,94 @@
+@model List<InternshipManagement.Web.Models.Notifications.NotificationItem>
+@{
+    ViewData["Title"] = "Notifications";
+    var unread = Model.Count(n => !n.IsRead);
+}
+@section Styles { <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" /> }
+
+@functions {
+    private static string Icon(string type) => type switch
+    {
+        "Application" => "fa-file-alt",
+        "Interview" => "fa-calendar-check",
+        "Offer" => "fa-handshake",
+        "Placement" => "fa-briefcase",
+        "Report" => "fa-clipboard-list",
+        "Extension" => "fa-calendar-plus",
+        "Withdrawal" => "fa-door-open",
+        "Verification" => "fa-shield-alt",
+        "Moderation" => "fa-gavel",
+        "Evaluation" => "fa-star",
+        _ => "fa-bell"
+    };
+
+    private static string Ago(DateTime createdUtc)
+    {
+        var span = DateTime.UtcNow - DateTime.SpecifyKind(createdUtc, DateTimeKind.Utc);
+        if (span.TotalMinutes < 1) return "just now";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes} min ago";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours} h ago";
+        if (span.TotalDays < 7) return $"{(int)span.TotalDays} d ago";
+        return DateTime.SpecifyKind(createdUtc, DateTimeKind.Utc).ToString("d MMM yyyy");
+    }
+}
+
+<div class="dash">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="h2 mb-1">Notifications</h1>
+            <p class="text-muted mb-0">@(unread == 0 ? "You are all caught up." : $"{unread} unread")</p>
+        </div>
+        @if (unread > 0)
+        {
+            <form asp-action="MarkAllRead" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-primary btn-sm"><i class="fas fa-check-double me-1"></i> Mark all as read</button>
+            </form>
+        }
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <div class="dash-card" style="height:auto">
+        @if (Model.Count == 0 && ViewBag.Error == null)
+        {
+            <div class="dash-empty"><div class="big"><i class="fas fa-bell-slash"></i></div>Nothing here yet. Updates about your applications, interviews, offers and placements will show up here.</div>
+        }
+        else
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var n in Model)
+                {
+                    <li class="list-group-item notif-item @(n.IsRead ? "" : "notif-unread")">
+                        <a class="d-flex gap-3 text-decoration-none text-reset"
+                           asp-action="Open" asp-route-id="@n.Id" asp-route-to="@n.LinkPath">
+                            <span class="notif-icon"><i class="fas @Icon(n.Type)"></i></span>
+                            <span class="flex-grow-1">
+                                <span class="d-flex justify-content-between gap-2">
+                                    <span class="fw-semibold">@n.Title</span>
+                                    <small class="text-muted text-nowrap" title="@n.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC">@Ago(n.CreatedAt)</small>
+                                </span>
+                                <span class="d-block text-muted small text-break">@n.Message</span>
+                            </span>
+                            @if (!n.IsRead)
+                            {
+                                <span class="notif-dot" aria-label="Unread"></span>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<style>
+    .notif-item { padding: .9rem 1.1rem; transition: background .12s; }
+    .notif-item:hover { background: #f8fafc; }
+    .notif-unread { background: #f0f7ff; }
+    .notif-icon { width: 38px; height: 38px; flex: 0 0 38px; border-radius: 10px; display: grid; place-items: center; background: #eff6ff; color: #2563eb; }
+    .notif-dot { width: 9px; height: 9px; border-radius: 50%; background: #2563eb; align-self: center; flex: 0 0 9px; }
+</style>

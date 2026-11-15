@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h2 mb-1">Internships</h1>
-        <p class="text-muted">Moderate all internship postings</p>
+        <p class="text-muted">Published postings are visible to students immediately. Flag or remove content that breaks platform rules.</p>
     </div>
 </div>
 
@@ -29,8 +29,8 @@
                         <th>Industry</th>
                         <th>Applications</th>
                         <th>Status</th>
+                        <th>Content status</th>
                         <th>Moderation</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,19 +58,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if (internship.ModerationStatus == "Pending" || internship.ModerationStatus == "Flagged")
-                                    {
-                                        <button class="btn btn-sm btn-success" onclick="moderateInternship(@internship.Id, 'Approved')">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="moderateInternship(@internship.Id, 'Rejected')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-warning" onclick="moderateInternship(@internship.Id, 'Flagged')">
-                                            <i class="fas fa-flag"></i>
-                                        </button>
-                                    }
-                                    @if (internship.ModerationStatus == "Approved")
+                                    @if (internship.ModerationStatus is "Pending" or "Approved")
                                     {
                                         <button class="btn btn-sm btn-warning" onclick="moderateInternship(@internship.Id, 'Flagged')">
                                             <i class="fas fa-flag"></i>
@@ -79,10 +67,16 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     }
-                                    @if (internship.ModerationStatus == "Removed")
+                                    @if (internship.ModerationStatus == "Flagged")
                                     {
-                                        <button class="btn btn-sm btn-success" onclick="moderateInternship(@internship.Id, 'Approved')">
-                                            <i class="fas fa-undo"></i>
+                                        <button class="btn btn-sm btn-danger" onclick="moderateInternship(@internship.Id, 'Removed')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    }
+                                    @if (internship.ModerationStatus is "Removed" or "Rejected")
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="moderateInternship(@internship.Id, 'Flagged')">
+                                            <i class="fas fa-flag"></i>
                                         </button>
                                     }
                                 </td>

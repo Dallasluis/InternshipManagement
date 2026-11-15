@@ -119,17 +119,59 @@
 
             @if (application.Status == "InterviewScheduled")
             {
-                <form asp-controller="Company" asp-action="MarkInterviewCompleted" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@application.Id" />
-                    <button type="submit" class="btn btn-success">Mark Interview Completed</button>
-                </form>
+                <div class="d-flex flex-wrap gap-2">
+                    <form asp-controller="Company" asp-action="MarkInterviewCompleted" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@application.Id" />
+                        <button type="submit" class="btn btn-success">Mark Interview Completed</button>
+                    </form>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#reschedule-interview">
+                        <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#cancel-interview">
+                        <i class="fas fa-times me-1"></i> Cancel interview
+                    </button>
+                </div>
+
+                <div class="collapse mt-3" id="reschedule-interview">
+                    <form asp-controller="CompanyInterviews" asp-action="Reschedule" asp-route-id="@application.Id" method="post" class="border rounded p-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">New date and time</label>
+                                <input type="datetime-local" class="form-control" name="InterviewDateTime" required
+                                       value="@(application.InterviewDateTime.HasValue ? application.InterviewDateTime.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Interview type</label>
+                                <input type="text" class="form-control" name="InterviewType" required value="@application.InterviewType" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Location or link</label>
+                                <input type="text" class="form-control" name="InterviewLocationOrLink" value="@application.InterviewLocationOrLink" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes for the candidate</label>
+                                <textarea class="form-control" name="InterviewNotes" rows="2">@application.InterviewNotes</textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Save new time</button>
+                    </form>
+                </div>
+
+                <div class="collapse mt-3" id="cancel-interview">
+                    <form asp-controller="CompanyInterviews" asp-action="Cancel" asp-route-id="@application.Id" method="post" class="border rounded p-3"
+                          onsubmit="return confirm('Cancel this interview? The candidate will be told and goes back to the shortlist.');">
+                        <label class="form-label">Reason (shown to the candidate, optional)</label>
+                        <textarea class="form-control" name="reason" rows="2" maxlength="500"></textarea>
+                        <button type="submit" class="btn btn-danger mt-3">Cancel interview</button>
+                    </form>
+                </div>
             }
         </div>
     </div>
 }
 
-@if (application.Status == "InterviewCompleted" || application.Status == "OfferMade" || application.Status == "Accepted" || application.Status == "OfferDeclined")
+@if (application.Status == "InterviewCompleted" || application.Status == "OfferMade" || application.Status == "OfferExpired" || application.Status == "Accepted" || application.Status == "OfferDeclined")
 {
     <div class="card mb-4">
         <div class="card-header bg-white">
@@ -160,7 +202,7 @@
 
             @if (application.Status == "OfferMade")
             {
-                <div class="alert alert-info mb-0"><i class="fas fa-hourglass-half me-1"></i> Offer sent. Waiting for the student to accept or decline@(application.OfferExpiryDate.HasValue ? $" before {application.OfferExpiryDate.Value:MMM d, yyyy}" : "").</div>
+                <div class="alert alert-info mb-0"><i class="fas fa-hourglass-half me-1"></i> Offer sent. Waiting for the student to accept or decline@(application.OfferExpiryDate.HasValue ? $" before {application.OfferExpiryDate.Value:MMM d, yyyy}" : ""). <a asp-controller="OfferLetters" asp-action="Letter" asp-route-id="@application.Id">View the offer letter or attach a contract</a></div>
             }
             else if (application.Status == "Accepted")
             {
@@ -182,8 +224,12 @@
             {
                 <div class="alert alert-secondary mb-0">The student declined this offer.</div>
             }
+            else if (application.Status == "OfferExpired")
+            {
+                <div class="alert alert-warning"><i class="fas fa-clock me-1"></i> This offer expired before the student replied. You can send it again with a new expiry date.</div>
+            }
 
-            @if (application.Status == "InterviewCompleted")
+            @if (application.Status == "InterviewCompleted" || application.Status == "OfferExpired")
             {
                 <form asp-controller="Company" asp-action="MakeOffer" method="post">
                     @Html.AntiForgeryToken()
@@ -206,7 +252,7 @@
                             <input type="text" class="form-control" name="OfferDetails" placeholder="Optional details" />
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Send Offer</button>
+                    <button type="submit" class="btn btn-primary mt-3">@(application.Status == "OfferExpired" ? "Send Offer Again" : "Send Offer")</button>
                 </form>
             }
         </div>

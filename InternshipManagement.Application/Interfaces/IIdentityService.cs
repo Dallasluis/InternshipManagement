@@ -25,7 +25,9 @@ namespace InternshipManagement.Application.Interfaces
             string userId,
             bool rememberMe = false,
             bool twoFactorSetupOnly = false,
-            DateTime? absoluteSessionExpiresAt = null);
+            DateTime? absoluteSessionExpiresAt = null,
+            bool twoFactorLoginOnly = false,
+            string? loginChallengeId = null);
         string GenerateRefreshToken();
         Task<bool> UpdateRefreshTokenAsync(
             string userId,

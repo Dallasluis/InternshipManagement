@@ -15,5 +15,11 @@ namespace InternshipManagement.Domain.Entities
         public DateTime? ReviewedAt { get; set; }
         public int? ReviewedByUserId { get; set; }
         public string? AdminDecisionNotes { get; set; }
+
+        // set when the intern disputes a rejected request, and when an administrator decides it
+        public string? DisputeReason { get; set; }
+        public DateTime? DisputedAt { get; set; }
+        public int? AdminReviewedByUserId { get; set; }
+        public DateTime? AdminDecidedAt { get; set; }
     }
 }

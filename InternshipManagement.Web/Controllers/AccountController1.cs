@@ -50,13 +50,47 @@ namespace InternshipManagement.Web.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View(new LoginViewModel());
+            return View(new LoginViewModel
+            {
+                RequiresTwoFactor = !string.IsNullOrEmpty(HttpContext.Session.GetString("LoginChallengeToken")),
+                TwoFactorMessage = HttpContext.Session.GetString("LoginChallengeMessage"),
+                RememberMe = HttpContext.Session.GetString("LoginRememberMe") == "true"
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            var challengeToken = HttpContext.Session.GetString("LoginChallengeToken");
+            if (!string.IsNullOrEmpty(challengeToken))
+            {
+                model.RequiresTwoFactor = true;
+                model.TwoFactorMessage = HttpContext.Session.GetString("LoginChallengeMessage");
+                if (string.IsNullOrWhiteSpace(model.TwoFactorCode) || !System.Text.RegularExpressions.Regex.IsMatch(model.TwoFactorCode, "^\\d{6}$"))
+                {
+                    ModelState.AddModelError(nameof(model.TwoFactorCode), "Enter the 6-digit code from your email.");
+                    return View(model);
+                }
+
+                var verified = await _authApiClient.VerifyTwoFactorLoginAsync(challengeToken, model.TwoFactorCode);
+                if (verified.Success)
+                    return FinishLogin(verified);
+
+                if (!verified.RequiresTwoFactor)
+                {
+                    HttpContext.Session.Remove("LoginChallengeToken");
+                    HttpContext.Session.Remove("LoginChallengeMessage");
+                    HttpContext.Session.Remove("LoginRememberMe");
+                    TempData["StatusMessage"] = "Your sign-in request expired. Enter your email and password again.";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                foreach (var error in verified.Errors ?? new List<string> { "The code could not be verified. Try again." })
+                    ModelState.AddModelError(string.Empty, error);
+                return View(model);
+            }
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -66,8 +100,18 @@ namespace InternshipManagement.Web.Controllers
             {
                 if (result.RequiresTwoFactor)
                 {
+                    if (string.IsNullOrWhiteSpace(result.TwoFactorChallengeToken))
+                    {
+                        ModelState.AddModelError(string.Empty, "We could not start the code verification step. Please try signing in again.");
+                        return View(model);
+                    }
+                    HttpContext.Session.SetString("LoginChallengeToken", result.TwoFactorChallengeToken);
+                    HttpContext.Session.SetString("LoginChallengeMessage", result.Message ?? "Enter the 6-digit code sent to your email.");
+                    HttpContext.Session.SetString("LoginRememberMe", model.RememberMe ? "true" : "false");
                     model.RequiresTwoFactor = true;
-                    ModelState.AddModelError(string.Empty, result.Message ?? "Enter the 6-digit code we emailed you.");
+                    model.TwoFactorMessage = result.Message;
+                    model.Password = string.Empty;
+                    model.TwoFactorCode = string.Empty;
                     return View(model);
                 }
 
@@ -85,6 +129,50 @@ namespace InternshipManagement.Web.Controllers
                 return RedirectToAction(nameof(TwoFactorSetup));
             }
 
+            return FinishLogin(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendLoginCode()
+        {
+            var challengeToken = HttpContext.Session.GetString("LoginChallengeToken");
+            if (string.IsNullOrWhiteSpace(challengeToken))
+                return RedirectToAction(nameof(Login));
+
+            var result = await _authApiClient.ResendTwoFactorLoginCodeAsync(challengeToken);
+            if (result.StatusCode == StatusCodes.Status401Unauthorized)
+            {
+                HttpContext.Session.Remove("LoginChallengeToken");
+                HttpContext.Session.Remove("LoginChallengeMessage");
+                HttpContext.Session.Remove("LoginRememberMe");
+                TempData["StatusMessage"] = "Your sign-in request expired. Enter your email and password again.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            HttpContext.Session.SetString("LoginChallengeMessage", result.Message ?? "Check your email for the security code.");
+            TempData[result.Success ? "StatusMessage" : "ErrorMessage"] = result.Message ?? "We could not resend the code. Please try again.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelTwoFactorLogin()
+        {
+            var challengeToken = HttpContext.Session.GetString("LoginChallengeToken");
+            if (!string.IsNullOrWhiteSpace(challengeToken))
+                await _authApiClient.CancelTwoFactorLoginAsync(challengeToken);
+            HttpContext.Session.Remove("LoginChallengeToken");
+            HttpContext.Session.Remove("LoginChallengeMessage");
+            HttpContext.Session.Remove("LoginRememberMe");
+            return RedirectToAction(nameof(Login));
+        }
+
+        private IActionResult FinishLogin(AuthApiResult result)
+        {
+            HttpContext.Session.Remove("LoginChallengeToken");
+            HttpContext.Session.Remove("LoginChallengeMessage");
+            HttpContext.Session.Remove("LoginRememberMe");
             // Store JWT and user info in Session
             HttpContext.Session.SetString("JwtToken", result.Token ?? string.Empty);
             HttpContext.Session.SetString("UserId", result.UserId ?? string.Empty);

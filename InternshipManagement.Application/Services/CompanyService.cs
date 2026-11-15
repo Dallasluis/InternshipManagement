@@ -23,9 +23,12 @@ namespace InternshipManagement.Application.Services
 
         private readonly IApplicationDbContext _context;
 
-        public CompanyService(IApplicationDbContext context)
+        private readonly INotificationService _notifications;
+
+        public CompanyService(IApplicationDbContext context, INotificationService notifications)
         {
             _context = context;
+            _notifications = notifications;
         }
 
         public async Task<CompanyProfileResponse> GetCompanyProfileAsync(int userId)
@@ -171,6 +174,14 @@ namespace InternshipManagement.Application.Services
                 isAppealDecision, request.CriteriaAssessment);
 
             await _context.SaveChangesAsync();
+
+            var verified = decision == CompanyVerificationStatus.Verified;
+            await _notifications.NotifyAsync(profile.UserId, NotificationTypes.Verification,
+                verified ? "Your company is verified" : "Update on your company verification",
+                verified
+                    ? "Your company was verified. You can now publish internships."
+                    : $"Your verification decision is: {decision}. Open the verification page for the details and next steps.",
+                "/Company/Verification", sendEmail: true);
             return true;
         }
 
@@ -294,11 +305,29 @@ namespace InternshipManagement.Application.Services
                     withinTarget++;
             }
 
+            // Appeals must be decided within 5 business days: list the ones that are still waiting past that.
+            var now = DateTimeOffset.UtcNow;
+            var openAppeals = await _context.CompanyProfiles
+                .AsNoTracking()
+                .Where(profile => profile.AppealPending && profile.AppealSubmittedAt != null)
+                .Select(profile => new { profile.Id, profile.CompanyName, profile.AppealSubmittedAt })
+                .ToListAsync();
+            var overdueAppeals = openAppeals
+                .Select(appeal => new OverdueAppealResponse(
+                    appeal.Id,
+                    appeal.CompanyName,
+                    DateTime.SpecifyKind(appeal.AppealSubmittedAt!.Value, DateTimeKind.Utc),
+                    BusinessDaysBetween(DateTime.SpecifyKind(appeal.AppealSubmittedAt!.Value, DateTimeKind.Utc), now)))
+                .Where(appeal => appeal.BusinessDaysWaiting > 5)
+                .OrderByDescending(appeal => appeal.BusinessDaysWaiting)
+                .ToList();
+
             return new VerificationSlaResponse(
                 measured,
                 withinTarget,
                 measured == 0 ? 100 : Math.Round(withinTarget * 100d / measured, 2),
-                90);
+                90,
+                overdueAppeals);
         }
 
         public async Task<int> UpdateAgedVerificationsAsync()

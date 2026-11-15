@@ -70,11 +70,11 @@ else
                                     <span class="badge @GetStatusBadgeClass(internship.Status)">
                                         @InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.Status)
                                     </span>
-                                    @if (!string.IsNullOrEmpty(internship.ModerationStatus) && internship.ModerationStatus != "Approved")
+                                    @if (!string.IsNullOrEmpty(internship.ModerationStatus) && internship.ModerationStatus is "Flagged" or "Removed" or "Rejected")
                                     {
                                         <span class="badge @InternshipManagement.Web.Helpers.StatusDisplay.Badge(internship.ModerationStatus) ms-1"
-                                              title="Admin review status">
-                                            @(internship.ModerationStatus == "Pending" ? "Awaiting moderation" : InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.ModerationStatus))
+                                              title="Content moderation status">
+                                            @InternshipManagement.Web.Helpers.StatusDisplay.Label(internship.ModerationStatus)
                                         </span>
                                     }
                                 </td>

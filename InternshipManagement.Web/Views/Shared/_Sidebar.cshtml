@@ -5,16 +5,17 @@
 
 @if (!string.IsNullOrEmpty(userFullName))
 {
-    <aside class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: 100vh;">
-        <div class="position-sticky pt-3">
-            <div class="d-flex align-items-center mb-4 px-3">
+    <aside class="col-md-3 col-lg-2 d-md-block sidebar collapse" id="workspace-sidebar">
+        <div class="sidebar-inner">
+            <a class="workspace-brand" asp-controller="Home" asp-action="Index"><span class="workspace-brand-mark"><i class="fas fa-briefcase"></i></span><span>Internship<span>Hub</span></span></a>
+            <div class="sidebar-profile">
                 <div class="avatar-circle me-2">@userFullName.FirstOrDefault()</div>
-                <div>
+                <div class="sidebar-profile-copy">
                     <div class="fw-bold">@userFullName</div>
-                    <small class="text-muted">@userType</small>
+                    <small>@userType workspace</small>
                 </div>
             </div>
-            <hr />
+            <div class="sidebar-caption">WORKSPACE</div>
             @if (userType == "Student")
             {
                 <ul class="nav flex-column">
@@ -37,6 +38,11 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Internships" asp-action="Index">
                             <i class="fas fa-search me-2"></i> Browse Internships
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="SavedInternships" asp-action="Index">
+                            <i class="fas fa-bookmark me-2"></i> Saved Internships
                         </a>
                     </li>
                     <li class="nav-item">
@@ -69,6 +75,10 @@
                             <i class="fas fa-cog me-2"></i> Settings
                         </a>
                     </li>
+                </ul>
+                <div class="sidebar-group-label">CAREER TOOLS</div>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Resources" asp-action="Index"><i class="fas fa-compass"></i><span>Career resources</span></a></li>
                 </ul>
             }
             else if (userType == "Company")
@@ -143,7 +153,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="Reports">
-                            <i class="fas fa-file-alt me-2"></i> Applications
+                            <i class="fas fa-flag me-2"></i> Reports
                         </a>
                     </li>
                     <li class="nav-item">
@@ -157,19 +167,40 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="AdminWithdrawals" asp-action="Index">
+                            <i class="fas fa-gavel me-2"></i> Withdrawal Disputes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="AdminAudit" asp-action="Index">
+                            <i class="fas fa-clipboard-list me-2"></i> Audit Log
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Categories" asp-action="Index">
+                            <i class="fas fa-tags me-2"></i> Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Account" asp-action="Settings">
                             <i class="fas fa-cog me-2"></i> Settings
                         </a>
                     </li>
                 </ul>
             }
-            <hr />
-            <form asp-controller="Account" asp-action="Logout" method="post" class="px-3 mt-4">
+            <div class="sidebar-bottom">
+            <div class="px-3 mt-3">
+                <a class="btn btn-sm btn-outline-secondary w-100" asp-controller="MyData" asp-action="Download">
+                    <i class="fas fa-download me-2"></i> Download my data
+                </a>
+            </div>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="px-3 mt-2">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-outline-danger w-100">
                     <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </button>
             </form>
+            </div>
         </div>
     </aside>
 }

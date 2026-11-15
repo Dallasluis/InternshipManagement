@@ -12,11 +12,13 @@ namespace InternshipManagement.Application.Services
     {
         private readonly IApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly INotificationService _notifications;
 
-        public InternshipService(IApplicationDbContext context, IConfiguration configuration)
+        public InternshipService(IApplicationDbContext context, IConfiguration configuration, INotificationService notifications)
         {
             _context = context;
             _configuration = configuration;
+            _notifications = notifications;
         }
 
         public async Task<InternshipResponse> CreateInternshipAsync(int userId, CreateInternshipRequest request)
@@ -26,6 +28,9 @@ namespace InternshipManagement.Application.Services
 
             if (companyProfile == null)
                 throw new Exception("Company profile not found.");
+
+            if (companyProfile.VerificationStatus != CompanyVerificationStatus.Verified)
+                throw new InvalidOperationException("Company verification is required before posting internships.");
 
             if (_configuration.GetValue<bool>("Internships:RequireSubscription") && !companyProfile.IsSubscribed)
                 throw new Exception("Active subscription required.");
@@ -65,8 +70,9 @@ namespace InternshipManagement.Application.Services
                 StipendAmount = request.StipendAmount,
                 Currency = request.Currency,
                 EligibleProgrammes = eligibleProgrammesJson,
-                Status = InternshipStatus.Draft,
-                ModerationStatus = ModerationStatus.Pending
+                Status = InternshipStatus.Published,
+                PublishedAt = DateTime.UtcNow,
+                ModerationStatus = ModerationStatus.Approved
             };
 
             _context.Internships.Add(internship);
@@ -167,6 +173,9 @@ namespace InternshipManagement.Application.Services
                     && !i.CompanyProfile.IsDeleted);
             if (internship == null) return false;
 
+            if (internship.Status != InternshipStatus.Published)
+                throw new Exception("Only published internships can be closed.");
+
             internship.Status = InternshipStatus.Closed;
             internship.UpdatedAt = DateTime.UtcNow;
 
@@ -181,7 +190,9 @@ namespace InternshipManagement.Application.Services
                 .FirstOrDefaultAsync(i => i.Id == id
                     && !i.IsDeleted
                     && ((i.Status == InternshipStatus.Published
-                            && i.ModerationStatus == ModerationStatus.Approved
+                            && i.ModerationStatus != ModerationStatus.Flagged
+                            && i.ModerationStatus != ModerationStatus.Removed
+                            && i.ModerationStatus != ModerationStatus.Rejected
                             && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                                 || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                                     && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
@@ -191,7 +202,9 @@ namespace InternshipManagement.Application.Services
             if (internship == null) return null;
 
             if (internship.Status == InternshipStatus.Published
-                && internship.ModerationStatus == ModerationStatus.Approved
+                && internship.ModerationStatus != ModerationStatus.Flagged
+                && internship.ModerationStatus != ModerationStatus.Removed
+                && internship.ModerationStatus != ModerationStatus.Rejected
                 && (internship.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                     || (internship.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                         && internship.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
@@ -209,24 +222,30 @@ namespace InternshipManagement.Application.Services
             var query = _context.Internships
                 .Include(i => i.CompanyProfile)
                 .Where(i => i.Status == InternshipStatus.Published
-                    && i.ModerationStatus == ModerationStatus.Approved
+                    && i.ModerationStatus != ModerationStatus.Flagged
+                    && i.ModerationStatus != ModerationStatus.Removed
+                    && i.ModerationStatus != ModerationStatus.Rejected
                     && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                         || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                             && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
                     && !i.IsDeleted
                     && i.ApplicationDeadline >= DateTime.UtcNow);
 
-            if (!string.IsNullOrEmpty(request.Keyword))
+            // every word typed must appear somewhere in the posting (in any field)
+            var terms = SearchTerms.Parse(request.Keyword);
+            foreach (var term in terms)
             {
+                var stem = term.Stem;
                 query = query.Where(i =>
-                    i.Title.Contains(request.Keyword) ||
-                    i.Description.Contains(request.Keyword) ||
-                    (i.Skills != null && i.Skills.Contains(request.Keyword)) ||
-                    (i.RequiredSkills != null && i.RequiredSkills.Contains(request.Keyword)) ||
-                    (i.PreferredSkills != null && i.PreferredSkills.Contains(request.Keyword)) ||
-                    (i.RequiredQualifications != null && i.RequiredQualifications.Contains(request.Keyword)) ||
-                    (i.PreferredQualifications != null && i.PreferredQualifications.Contains(request.Keyword)) ||
-                    i.Industry.Contains(request.Keyword));
+                    i.Title.Contains(stem) ||
+                    i.Description.Contains(stem) ||
+                    (i.Skills != null && i.Skills.Contains(stem)) ||
+                    (i.RequiredSkills != null && i.RequiredSkills.Contains(stem)) ||
+                    (i.PreferredSkills != null && i.PreferredSkills.Contains(stem)) ||
+                    (i.RequiredQualifications != null && i.RequiredQualifications.Contains(stem)) ||
+                    (i.PreferredQualifications != null && i.PreferredQualifications.Contains(stem)) ||
+                    i.Industry.Contains(stem) ||
+                    i.CompanyProfile.CompanyName.Contains(stem));
             }
 
             if (!string.IsNullOrEmpty(request.Location))
@@ -276,10 +295,16 @@ namespace InternshipManagement.Application.Services
 
             var totalCount = await query.CountAsync();
 
-            var items = await query
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+            // with search words and no other sort chosen, the best matches come first
+            var byRelevance = terms.Count > 0
+                && (string.IsNullOrWhiteSpace(request.SortBy) || request.SortBy == "relevance");
+
+            var items = byRelevance
+                ? await GetRelevancePageAsync(query, terms, request)
+                : await query
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync();
 
             var responses = new List<InternshipResponse>();
             foreach (var item in items)
@@ -300,6 +325,63 @@ namespace InternshipManagement.Application.Services
             }
 
             return (responses, totalCount);
+        }
+
+        // Ranks the newest matching postings (up to 500) by where the words were found, then returns one page.
+        private async Task<List<Internship>> GetRelevancePageAsync(
+            IQueryable<Internship> query, List<SearchTerm> terms, InternshipSearchRequest request)
+        {
+            const int CandidateLimit = 500;
+
+            var candidates = await query
+                .OrderByDescending(i => i.CreatedAt)
+                .Take(CandidateLimit)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.CreatedAt,
+                    i.Title,
+                    i.Skills,
+                    i.RequiredSkills,
+                    i.PreferredSkills,
+                    i.Industry,
+                    Company = i.CompanyProfile.CompanyName
+                })
+                .ToListAsync();
+
+            static bool Has(string? text, string stem) =>
+                !string.IsNullOrEmpty(text) && text.Contains(stem, StringComparison.OrdinalIgnoreCase);
+
+            var phrase = string.Join(' ', terms.Select(t => t.Word));
+
+            var pageIds = candidates
+                .Select(c =>
+                {
+                    var score = Has(c.Title, phrase) ? 5 : 0; // the whole search typed as one phrase, in the title
+                    foreach (var t in terms)
+                    {
+                        if (Has(c.Title, t.Stem)) score += 5;
+                        if (Has(c.RequiredSkills, t.Stem) || Has(c.Skills, t.Stem)) score += 4;
+                        else if (Has(c.PreferredSkills, t.Stem)) score += 2;
+                        if (Has(c.Industry, t.Stem) || Has(c.Company, t.Stem)) score += 2;
+                        score += 1; // it matched somewhere, even if only in the description
+                    }
+
+                    return new { c.Id, c.CreatedAt, Score = score };
+                })
+                .OrderByDescending(c => c.Score)
+                .ThenByDescending(c => c.CreatedAt)
+                .Skip((Math.Max(request.PageNumber, 1) - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(c => c.Id)
+                .ToList();
+
+            var items = await _context.Internships
+                .Include(i => i.CompanyProfile)
+                .Where(i => pageIds.Contains(i.Id))
+                .ToListAsync();
+
+            return items.OrderBy(i => pageIds.IndexOf(i.Id)).ToList();
         }
 
         public async Task<List<InternshipResponse>> GetCompanyInternshipsAsync(int companyProfileId)
@@ -330,6 +412,22 @@ namespace InternshipManagement.Application.Services
             internship.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            if (status != ModerationStatus.Pending)
+            {
+                var companyUserId = await _context.CompanyProfiles
+                    .Where(c => c.Id == internship.CompanyProfileId)
+                    .Select(c => c.UserId)
+                    .FirstOrDefaultAsync();
+                var approved = status == ModerationStatus.Approved;
+                await _notifications.NotifyAsync(companyUserId, NotificationTypes.Moderation,
+                    approved ? "Internship approved" : "Internship needs attention",
+                    approved
+                        ? $"\"{internship.Title}\" was approved."
+                        : $"\"{internship.Title}\" was marked {status}." + (string.IsNullOrWhiteSpace(notes) ? string.Empty : $" Note: {notes}"),
+                    "/Company/ManageInternships", sendEmail: !approved);
+            }
+
             return true;
         }
 
@@ -354,10 +452,12 @@ namespace InternshipManagement.Application.Services
             var internship = await _context.Internships
                 .FirstOrDefaultAsync(i => i.Id == internshipId &&
                     i.Status == InternshipStatus.Published &&
-                    i.ModerationStatus == ModerationStatus.Approved &&
-                    (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
-                        || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
-                            && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7))) &&
+                    i.ModerationStatus != ModerationStatus.Flagged &&
+                    i.ModerationStatus != ModerationStatus.Removed &&
+                    i.ModerationStatus != ModerationStatus.Rejected &&
+                    (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified ||
+                        (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired &&
+                            i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7))) &&
                     !i.IsDeleted);
 
             if (internship == null) return false;

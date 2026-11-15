@@ -31,7 +31,9 @@ namespace InternshipManagement.Application.Services
             var internships = await _context.Internships
                 .Include(i => i.CompanyProfile)
                 .Where(i => i.Status == InternshipStatus.Published
-                    && i.ModerationStatus == ModerationStatus.Approved
+                    && i.ModerationStatus != ModerationStatus.Flagged
+                    && i.ModerationStatus != ModerationStatus.Removed
+                    && i.ModerationStatus != ModerationStatus.Rejected
                     && (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.Verified
                         || (i.CompanyProfile.VerificationStatus == CompanyVerificationStatus.ReverificationRequired
                             && i.CompanyProfile.ReverificationRequiredAt >= DateTime.UtcNow.AddDays(-7)))
@@ -78,6 +80,39 @@ namespace InternshipManagement.Application.Services
                 .ThenBy(r => r.Title)
                 .Take(Math.Clamp(maxResults, 1, 50))
                 .ToList();
+        }
+
+        public async Task<List<StudentMatchScore>> ScoreStudentsForInternshipAsync(int internshipId, int minScore, CancellationToken cancellationToken = default)
+        {
+            var internship = await _context.Internships
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == internshipId && !i.IsDeleted, cancellationToken);
+            if (internship == null)
+                return new List<StudentMatchScore>();
+
+            var students = await _context.StudentProfiles
+                .AsNoTracking()
+                .Include(s => s.Education)
+                .Include(s => s.WorkExperience)
+                .Include(s => s.Skills)
+                .Include(s => s.Certifications)
+                .Include(s => s.Projects)
+                .Where(s => !s.IsDeleted)
+                .ToListAsync(cancellationToken);
+
+            var result = new List<StudentMatchScore>();
+            foreach (var student in students)
+            {
+                var score = CalculateScore(student, internship, out var skills, out var qualifications, out _);
+
+                // A posting with no stated requirements scores high for everyone; only real overlap counts.
+                if (score < minScore || (skills.Count == 0 && qualifications.Count == 0))
+                    continue;
+
+                result.Add(new StudentMatchScore { UserId = student.UserId, Score = score, MatchingSkills = skills });
+            }
+
+            return result;
         }
 
         private static MatchRecommendationResponse ScoreInternshipForStudent(StudentProfile student, Internship internship)
@@ -178,7 +213,7 @@ namespace InternshipManagement.Application.Services
 
         private static string Normalize(string value)
         {
-            return value.Trim().ToLowerInvariant();
+            return SkillAliases.Normalize(value);
         }
 
         private static string BuildReasons(

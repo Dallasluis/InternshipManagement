@@ -21,6 +21,7 @@ namespace InternshipManagement.Application.DTOs.Auth
         public string? ProfilePictureUrl { get; set; }
         public bool EmailConfirmed { get; set; }
         public bool RequiresTwoFactor { get; set; }
+        public string? TwoFactorChallengeToken { get; set; }
         public bool RequiresTwoFactorSetup { get; set; }
         public string? RefreshTokenExpiresAt { get; set; }
         public List<string>? Errors { get; set; }

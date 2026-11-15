@@ -19,7 +19,15 @@ builder.Services.AddSmtpEmail(builder.Configuration);
 builder.Services.AddHostedService<InternshipManagement.Api.Jobs.EmailVerificationHousekeepingService>();
 builder.Services.AddHostedService<InternshipManagement.Api.Jobs.InternshipDeadlineService>();
 builder.Services.AddValidation();
-builder.Services.AddCorsPolicy();
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+builder.Services.AddCors(options => options.AddPolicy("Web", policy =>
+{
+    if (allowedOrigins.Length > 0)
+        policy.WithOrigins(allowedOrigins)
+              .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+              .WithHeaders("Authorization", "Content-Type", "Accept");
+}));
+
 builder.Services.AddOpenApiDocumentation();  // ✅ Using new OpenAPI
 
 // n8n automation (AI workflows run in n8n; the API stays in control of rules and data)
@@ -49,12 +57,28 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
+    options.AddPolicy("password-reset", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(15),
+                QueueLimit = 0
+            }));
 });
 
+// A limit on every request, a clear 429 answer, and the real visitor address from the Web project or a proxy.
+// Must come after AddRateLimiter.
+builder.Services.AddPlatformProtection(builder.Configuration);
+
 // Add controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers(o => o.Filters.Add<InternshipManagement.Api.Filters.AuditActionFilter>());
 
 var app = builder.Build();
+
+// Must be first, so everything after it sees the real visitor address.
+app.UseForwardedHeaders();
 
 // ✅ NEW: .NET 10 OpenAPI with Scalar UI
 if (app.Environment.IsDevelopment())
@@ -71,7 +95,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("Web");
 app.UseAuthentication();
 app.UseMiddleware<SessionSecurityMiddleware>();
 app.UseMiddleware<UnverifiedAccountMiddleware>();
@@ -88,7 +112,7 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
         await dbContext.Database.MigrateAsync();
-        await SeedDatabaseAsync(services);
+        await SeedDatabaseAsync(services, builder.Configuration);
     }
     catch (Exception ex)
     {
@@ -99,10 +123,11 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-async Task SeedDatabaseAsync(IServiceProvider services)
+async Task SeedDatabaseAsync(IServiceProvider services, IConfiguration configuration)
 {
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
 
     string[] roles = { "Student", "Company", "Admin" };
     foreach (var role in roles)
@@ -113,10 +138,20 @@ async Task SeedDatabaseAsync(IServiceProvider services)
         }
     }
 
-    var adminEmail = "admin@internshipmanagement.com";
+    // The first administrator. The password is never kept in a file: set it with
+    //   dotnet user-secrets set "Seed:AdminPassword" "<a strong password>" --project InternshipManagement.Api
+    // (on a server, use the environment variable Seed__AdminPassword). It is only used when the account does not exist yet.
+    var adminEmail = configuration["Seed:AdminEmail"] ?? "admin@internshipmanagement.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
+        var adminPassword = configuration["Seed:AdminPassword"];
+        if (string.IsNullOrWhiteSpace(adminPassword))
+        {
+            logger.LogWarning("No administrator exists and Seed:AdminPassword is not set, so none was created.");
+            return;
+        }
+
         var admin = new ApplicationUser
         {
             UserName = adminEmail,
@@ -129,10 +164,15 @@ async Task SeedDatabaseAsync(IServiceProvider services)
             CreatedAt = DateTime.UtcNow
         };
 
-        var result = await userManager.CreateAsync(admin, "Admin@123456");
+        var result = await userManager.CreateAsync(admin, adminPassword);
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(admin, "Admin");
+        }
+        else
+        {
+            logger.LogError("The administrator could not be created: {Errors}",
+                string.Join("; ", result.Errors.Select(e => e.Description)));
         }
     }
 }

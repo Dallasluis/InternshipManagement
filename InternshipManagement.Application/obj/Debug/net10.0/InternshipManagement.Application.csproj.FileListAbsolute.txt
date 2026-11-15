@@ -41,3 +41,9 @@ C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Application.runtimeconfig.json
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Application.dll
 C:\Users\Lenovo\AppData\Local\Temp\InternshipManagement-build-out\Debug\net10.0\InternshipManagement.Application.pdb
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Application.deps.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Application.runtimeconfig.json
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Application.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Application.pdb
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Domain.dll
+C:\Users\Lenovo\source\repos\Dallasluis\InternshipManagement\InternshipManagement.Application\obj\serial-audit\Debug\net10.0\InternshipManagement.Domain.pdb

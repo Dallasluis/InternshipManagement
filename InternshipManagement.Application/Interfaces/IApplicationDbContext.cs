@@ -32,6 +32,7 @@ namespace InternshipManagement.Application.Interfaces
         DbSet<PrivateDocument> PrivateDocuments { get; }
         DbSet<DocumentAccessToken> DocumentAccessTokens { get; }
         DbSet<DocumentAccessAudit> DocumentAccessAudits { get; }
+           DbSet<Notification> Notifications { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

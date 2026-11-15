@@ -1,0 +1,78 @@
+@* The bell in the sidebar header. New notifications arrive live over SignalR; a slow poll is the fallback. *@
+<a class="notif-bell" asp-controller="Notifications" asp-action="Index" aria-label="Notifications" title="Notifications">
+    <i class="fas fa-bell"></i>
+    <span id="notif-count" class="notif-badge d-none" aria-live="polite">0</span>
+</a>
+<div id="notif-toasts" class="notif-toasts" aria-live="polite"></div>
+
+<style>
+    .notif-bell { position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: #475569; text-decoration: none; transition: background .12s; }
+    .notif-bell:hover { background: #e2e8f0; color: #0f172a; }
+    .notif-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #dc2626; color: #fff; font-size: .7rem; font-weight: 700; line-height: 18px; text-align: center; }
+    .notif-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, calc(100vw - 32px)); }
+    .notif-toast { display: block; padding: 12px 14px; border-radius: 12px; background: #fff; color: #0f172a; text-decoration: none; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; box-shadow: 0 8px 24px rgba(15, 23, 42, .15); animation: notif-in .2s ease-out; }
+    .notif-toast:hover { color: #0f172a; background: #f8fafc; }
+    .notif-toast strong { display: block; font-size: .9rem; }
+    .notif-toast span { display: block; font-size: .82rem; color: #64748b; margin-top: 2px; overflow-wrap: anywhere; }
+    @@keyframes notif-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+<script>
+    (function () {
+        var badge = document.getElementById('notif-count');
+        var toasts = document.getElementById('notif-toasts');
+        if (!badge) return;
+
+        var countUrl = '@Url.Action("Count", "Notifications")';
+        var openUrl = '@Url.Action("Open", "Notifications")';
+        var timer = null;
+
+        function show(count) {
+            if (count > 0) { badge.textContent = count > 99 ? '99+' : String(count); badge.classList.remove('d-none'); }
+            else { badge.classList.add('d-none'); }
+        }
+
+        function check() {
+            fetch(countUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+                .then(function (d) { show(Number(d.count) || 0); })
+                .catch(function () { /* keep the last number; try again next time */ });
+        }
+
+        function toast(n) {
+            if (!toasts) return;
+            var a = document.createElement('a');
+            a.className = 'notif-toast';
+            a.href = openUrl + '?id=' + encodeURIComponent(n.id) + (n.linkPath ? '&to=' + encodeURIComponent(n.linkPath) : '');
+            var t = document.createElement('strong'); t.textContent = n.title || 'Notification';
+            var m = document.createElement('span'); m.textContent = n.message || '';
+            a.appendChild(t); a.appendChild(m);
+            toasts.appendChild(a);
+            while (toasts.children.length > 3) toasts.removeChild(toasts.firstChild);
+            setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 8000);
+        }
+
+        function startPolling() { if (!timer) { check(); timer = setInterval(check, 60000); } }
+        function stopPolling() { if (timer) { clearInterval(timer); timer = null; } }
+        document.addEventListener('visibilitychange', function () { document.hidden ? stopPolling() : startPolling(); });
+        if (!document.hidden) startPolling();
+
+        // live connection; if it cannot be made the page keeps working with the poll above
+        if (window.signalR) {
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl('/hubs/notifications')
+                .withAutomaticReconnect([0, 2000, 10000, 30000])
+                .build();
+
+            connection.on('notification', function (n) {
+                show(Number(n.unreadCount) || 0);
+                toast(n);
+            });
+            connection.onreconnected(check);
+
+            connection.start().catch(function () { /* polling covers it */ });
+            window.addEventListener('beforeunload', function () { connection.stop(); });
+        }
+    })();
+</script>

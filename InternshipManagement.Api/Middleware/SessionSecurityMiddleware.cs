@@ -15,7 +15,8 @@ namespace InternshipManagement.Api.Middleware
         public async Task InvokeAsync(HttpContext context, IIdentityService identityService)
         {
             if (context.User.Identity?.IsAuthenticated == true
-                && !context.User.HasClaim("two_factor_setup", "true"))
+                && !context.User.HasClaim("two_factor_setup", "true")
+                && !context.User.HasClaim("two_factor_login", "true"))
             {
                 var userId = context.User.FindFirstValue("userId")
                     ?? context.User.FindFirstValue(ClaimTypes.NameIdentifier);

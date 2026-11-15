@@ -1,11 +1,12 @@
 ﻿using InternshipManagement.Application.Interfaces;
-using InternshipManagement.Domain.Configurations; // Add this using
+using InternshipManagement.Domain.Configurations;
 using InternshipManagement.Domain.Entities;
 using InternshipManagement.Domain.Enums;
 using InternshipManagement.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using InternshipManagement.Infrastructure.Persistence.Configurations;
 
 namespace InternshipManagement.Infrastructure.Persistence
 {
@@ -41,6 +42,12 @@ namespace InternshipManagement.Infrastructure.Persistence
         public DbSet<PrivateDocument> PrivateDocuments { get; set; }
         public DbSet<DocumentAccessToken> DocumentAccessTokens { get; set; }
         public DbSet<DocumentAccessAudit> DocumentAccessAudits { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<SavedInternship> SavedInternships { get; set; }
+        public DbSet<CompanyWarning> CompanyWarnings { get; set; }
+        public DbSet<InternshipCategory> InternshipCategories { get; set; }
+           public DbSet<OfferContract> OfferContracts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,11 +55,17 @@ namespace InternshipManagement.Infrastructure.Persistence
 
             // Apply all configurations from the Configurations folder
             modelBuilder.ApplyConfiguration(new StudentProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.NotificationConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyProfileConfiguration());
             modelBuilder.ApplyConfiguration(new InternshipConfiguration());
             modelBuilder.ApplyConfiguration(new ApplicationConfiguration());
             modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.InternshipDraftConfiguration());
             modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.AiJobConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.AuditLogConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.SavedInternshipConfiguration());
+               modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.OfferContractConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.CompanyWarningConfiguration());
+            modelBuilder.ApplyConfiguration(new InternshipManagement.Infrastructure.Persistence.Configurations.InternshipCategoryConfiguration());
             ConfigureLifecycleEntities(modelBuilder);
             modelBuilder.Entity<AccountSecurityEvent>(builder =>
             {

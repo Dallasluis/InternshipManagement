@@ -1,0 +1,53 @@
+@{
+    ViewData["Title"] = "AI assistant";
+    var embedded = Context.Request.Query["embed"] == "1";
+}
+@section Styles { <link rel="stylesheet" href="~/css/student-ai.css" asp-append-version="true" /> }
+
+<div id="ai-root" data-page="assistant"
+     data-login-url="@Url.Action("Login", "Account")"
+     data-chat-url="@Url.Action("Chat", "CompanyAssistant")"
+     data-greeting="Hi! I can look at your internships and applicants and help with hiring: who looks like a good fit, what to improve in a listing, interview questions, or wording for a message to a candidate. What would you like to know?">
+    @Html.AntiForgeryToken()
+
+    @if (embedded)
+    {
+        <style>.chat-log { height: calc(100vh - 290px); min-height: 160px; }</style>
+        <div class="text-end mb-2">
+            <button id="chat-reset" type="button" class="btn btn-outline-secondary btn-sm">New conversation</button>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="h2 mb-1">AI assistant</h1>
+                <p class="text-muted mb-0">Ask about your internships and applicants. It can read your listings and applications (applicants appear by application number only) but cannot change anything or contact anyone.</p>
+            </div>
+            <button id="chat-reset" type="button" class="btn btn-outline-secondary btn-sm">New conversation</button>
+        </div>
+    }
+
+    <div id="chat-log" class="chat-log mb-3" aria-live="polite"></div>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="Give me an overview of my internships and what needs my attention.">What needs my attention?</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="Who are the strongest applicants for my newest internship, and why?">Strongest applicants</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="Suggest five interview questions for my newest internship.">Interview questions</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-prompt="Help me write a polite message declining an applicant.">Draft a decline message</button>
+    </div>
+
+    <form id="chat-form" class="d-flex gap-2 align-items-end">
+        <div class="flex-grow-1">
+            <textarea id="chat-input" class="form-control" rows="2" maxlength="1000" placeholder="Type your question…"></textarea>
+            <div class="small text-muted text-end"><span id="chat-count">0 / 1000</span></div>
+        </div>
+        <div class="d-flex flex-column gap-1">
+            <button id="chat-send" type="submit" class="btn btn-primary">Send</button>
+            <button id="chat-stop" type="button" class="btn btn-outline-secondary btn-sm d-none">Stop</button>
+        </div>
+    </form>
+    <p class="small text-muted mt-2 mb-0">AI answers can be wrong. Match scores are rough guides. You make every hiring decision, so check anything important yourself.</p>
+</div>
+
+@section Scripts { <script src="~/js/student-ai.js" asp-append-version="true"></script> }

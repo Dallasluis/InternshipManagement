@@ -94,6 +94,8 @@ namespace InternshipManagement.Api.Extensions
                     "EmailVerification:SecurityEventRetentionMonths must be positive.")
                 .Validate(options => Uri.TryCreate(options.PublicApiBaseUrl, UriKind.Absolute, out _),
                     "EmailVerification:PublicApiBaseUrl must be absolute.")
+                .Validate(options => Uri.TryCreate(options.PublicWebBaseUrl, UriKind.Absolute, out _),
+                    "EmailVerification:PublicWebBaseUrl must be absolute.")
                 .ValidateOnStart();
 
             services.AddHttpClient<IPasswordBreachChecker, PwnedPasswordChecker>(client =>
@@ -178,6 +180,15 @@ namespace InternshipManagement.Api.Extensions
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IAdminService, AdminService>();
+               services.AddScoped<INotificationService, NotificationService>();
+               services.AddScoped<INotificationService, NotificationService>();
+services.AddScoped<IRecommendationNotifier, RecommendationNotifier>();
+   services.AddScoped<ICompanyChatService, CompanyChatService>();
+   services.AddScoped<ICompanyAgentToolsService, CompanyAgentToolsService>();
+services.AddSingleton<INotificationPublisher, InternshipManagement.Api.Services.HttpNotificationPublisher>();
+services.AddHttpClient("NotificationPush");
+services.AddHostedService<InternshipManagement.Api.Jobs.RecommendationNotificationService>();
+   services.AddHostedService<InternshipManagement.Api.Jobs.MaintenanceService>();
 
             // matching, CV analysis, skill gaps, career assistant, internship drafts
             services.AddScoped<IMatchingService, MatchingService>();

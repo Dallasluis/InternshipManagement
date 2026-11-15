@@ -98,6 +98,19 @@
             {
                 <p class="mb-0">Company notes: @withdrawal.CompanyDecisionNotes</p>
             }
+            @if (withdrawal.Status == "Rejected")
+            {
+                <form asp-controller="StudentWithdrawals" asp-action="Dispute" asp-route-id="@withdrawal.Id" method="post" class="mt-2">
+                    <input type="hidden" name="placementId" value="@placement.Id" />
+                    <label class="form-label mb-1">Disagree with this decision? Tell an administrator why.</label>
+                    <textarea name="reason" class="form-control" rows="2" required minlength="5" maxlength="1000"></textarea>
+                    <button type="submit" class="btn btn-sm btn-outline-primary mt-2">Dispute decision</button>
+                </form>
+            }
+            else if (withdrawal.Status == "Disputed")
+            {
+                <p class="mb-0 text-muted">An administrator is reviewing your dispute.</p>
+            }
         }
     </div>
 }

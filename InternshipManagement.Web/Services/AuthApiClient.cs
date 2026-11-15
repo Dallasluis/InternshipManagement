@@ -64,6 +64,57 @@ namespace InternshipManagement.Web.Services
             }
         }
 
+        public async Task<AuthApiResult> VerifyTwoFactorLoginAsync(string challengeToken, string code)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, "api/Auth/two-factor/login")
+                {
+                    Content = JsonContent.Create(new { Code = code })
+                };
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", challengeToken);
+                return await ReadResultAsync(await _httpClient.SendAsync(request));
+            }
+            catch (HttpRequestException)
+            {
+                return ApiUnavailable();
+            }
+        }
+
+        public async Task<AuthApiResult> ResendTwoFactorLoginCodeAsync(string challengeToken)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, "api/Auth/two-factor/resend-login-code");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", challengeToken);
+                return await ReadResultAsync(await _httpClient.SendAsync(request));
+            }
+            catch (HttpRequestException)
+            {
+                return ApiUnavailable();
+            }
+        }
+
+        public async Task<AuthApiResult> CancelTwoFactorLoginAsync(string challengeToken)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, "api/Auth/two-factor/cancel-login");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", challengeToken);
+                return await ReadResultAsync(await _httpClient.SendAsync(request));
+            }
+            catch (HttpRequestException)
+            {
+                return ApiUnavailable();
+            }
+        }
+
+        private static AuthApiResult ApiUnavailable() => new()
+        {
+            Success = false,
+            Errors = new List<string> { "The API is not available. Please try again in a moment." }
+        };
+
         public async Task<AuthApiResult> ChangePasswordAsync(string token, ChangePasswordViewModel model)
         {
             AddAuthorization(token);
@@ -141,6 +192,8 @@ namespace InternshipManagement.Web.Services
                 ProfilePictureUrl = GetString(root, "profilePictureUrl"),
                 EmailConfirmed = GetBoolean(root, "emailConfirmed") ?? false,
                 RequiresTwoFactor = GetBoolean(root, "requiresTwoFactor") ?? false,
+                TwoFactorChallengeToken = GetString(root, "twoFactorChallengeToken"),
+                StatusCode = (int)response.StatusCode,
                 RequiresTwoFactorSetup = GetBoolean(root, "requiresTwoFactorSetup") ?? false,
                 RefreshTokenExpiresAt = GetString(root, "refreshTokenExpiresAt"),
                 Message = GetString(root, "message"),

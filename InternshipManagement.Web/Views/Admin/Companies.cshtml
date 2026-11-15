@@ -70,6 +70,7 @@
                                     }
                                     @if (company.VerificationStatus == "Verified")
                                     {
+                                        <button class="btn btn-sm btn-outline-warning" onclick="warnCompany(@company.Id)" title="Send a warning" aria-label="Send a warning"><i class="fas fa-exclamation-triangle"></i></button>
                                         <button class="btn btn-sm btn-warning" onclick="suspendCompany(@company.Id)">
                                             <i class="fas fa-pause"></i>
                                         </button>
@@ -118,6 +119,21 @@
                         alert('Failed to update verification status.');
                     });
             }
+        }
+
+        function warnCompany(id) {
+            var message = prompt('Write the warning for this company. They will see it in their notifications and by email:');
+            if (message === null) return;
+            message = message.trim();
+            if (message.length < 10) { alert('Please write at least 10 characters.'); return; }
+            fetch('/Admin/WarnCompany', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'companyId=' + id + '&message=' + encodeURIComponent(message)
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { alert(d.success ? 'Warning sent.' : (d.message || 'The warning could not be sent.')); })
+                .catch(function () { alert('The warning could not be sent.'); });
         }
 
         function suspendCompany(id) {

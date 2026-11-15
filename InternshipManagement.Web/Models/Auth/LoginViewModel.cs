@@ -15,5 +15,6 @@ namespace InternshipManagement.Web.Models.Auth
         public bool RememberMe { get; set; }
         public string? TwoFactorCode { get; set; }
         public bool RequiresTwoFactor { get; set; }
+        public string? TwoFactorMessage { get; set; }
     }
 }

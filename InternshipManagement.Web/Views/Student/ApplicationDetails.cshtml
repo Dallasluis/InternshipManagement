@@ -68,6 +68,7 @@
                 @if (application.Status == "OfferMade")
                 {
                     <h6>Offer</h6>
+                           <a asp-controller="OfferLetters" asp-action="Letter" asp-route-id="@application.Id" class="btn btn-outline-primary mb-3">View offer letter</a>
                     <div class="border rounded p-3 bg-light mb-3">
                         @if (application.OfferStipendAmount.HasValue)
                         {

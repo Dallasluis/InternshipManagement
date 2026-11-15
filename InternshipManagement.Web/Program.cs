@@ -30,6 +30,11 @@ builder.Services.AddScoped<IReportApiClient, ReportApiClient>();
 builder.Services.AddScoped<IAiApiClient, AiApiClient>();
 builder.Services.AddScoped<ILifecycleApiClient, LifecycleApiClient>();
 builder.Services.AddSingleton<UploadedFileStorage>();
+// with the other services
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, InternshipManagement.Web.Hubs.SessionUserIdProvider>();
+
+// after app.UseAuthorization(), next to MapControllerRoute
 
 // Session storage for JWT token
 builder.Services.AddDistributedMemoryCache();
@@ -68,7 +73,7 @@ app.UseRouting();
 app.UseSession();
 app.UseMiddleware<InternshipManagement.Web.Middleware.SessionTokenMiddleware>();
 app.UseAuthorization();
-
+app.MapHub<InternshipManagement.Web.Hubs.NotificationHub>("/hubs/notifications");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

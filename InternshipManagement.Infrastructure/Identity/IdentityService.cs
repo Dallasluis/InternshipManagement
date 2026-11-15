@@ -248,7 +248,9 @@ namespace InternshipManagement.Infrastructure.Identity
             string userId,
             bool rememberMe = false,
             bool twoFactorSetupOnly = false,
-            DateTime? absoluteSessionExpiresAt = null)
+            DateTime? absoluteSessionExpiresAt = null,
+            bool twoFactorLoginOnly = false,
+            string? loginChallengeId = null)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return null;
@@ -264,6 +266,12 @@ namespace InternshipManagement.Infrastructure.Identity
             };
             if (twoFactorSetupOnly)
                 claims.Add(new Claim("two_factor_setup", "true"));
+            if (twoFactorLoginOnly && !string.IsNullOrWhiteSpace(loginChallengeId))
+            {
+                claims.Add(new Claim("two_factor_login", "true"));
+                claims.Add(new Claim("login_challenge_id", loginChallengeId));
+                claims.Add(new Claim("login_remember_me", rememberMe ? "true" : "false"));
+            }
 
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -277,7 +285,7 @@ namespace InternshipManagement.Infrastructure.Identity
             var duration = user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase)
                 ? TimeSpan.FromHours(_loginSecurityOptions.StudentIdleTimeoutHours)
                 : TimeSpan.FromMinutes(_loginSecurityOptions.AdminCompanyIdleTimeoutMinutes);
-            var expires = twoFactorSetupOnly ? now.AddMinutes(10) : now.Add(duration);
+            var expires = twoFactorSetupOnly || twoFactorLoginOnly ? now.AddMinutes(10) : now.Add(duration);
             var absoluteExpiry = absoluteSessionExpiresAt
                 ?? (rememberMe && user.UserType.Equals("Student", StringComparison.OrdinalIgnoreCase)
                     ? now.AddDays(_loginSecurityOptions.RememberStudentDays)

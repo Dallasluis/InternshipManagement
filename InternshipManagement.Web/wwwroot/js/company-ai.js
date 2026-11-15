@@ -133,6 +133,29 @@
 
         prompt.addEventListener('input', function () { count.textContent = prompt.value.length + ' / 4000'; });
 
+        // "Delete this draft" under whatever draft is on screen (a draft stays saved until it is deleted; the limit is 20).
+        function addDeleteButton(draft) {
+            if (!draft || !draft.id || !root.dataset.deleteUrl) return;
+            var row = el('div', 'mt-3');
+            var del = el('button', 'btn btn-outline-danger btn-sm', 'Delete this draft');
+            del.type = 'button';
+            del.addEventListener('click', async function () {
+                if (!window.confirm('Delete this saved draft? This cannot be undone.')) return;
+                del.disabled = true;
+                try {
+                    await api(root.dataset.deleteUrl + '?id=' + encodeURIComponent(draft.id), { method: 'POST' });
+                    clear(result);
+                    result.appendChild(el('div', 'text-muted small', 'Draft deleted.'));
+                    loadSaved();
+                } catch (e) {
+                    del.disabled = false;
+                    showError(errors, e.message);
+                }
+            });
+            row.appendChild(del);
+            result.appendChild(row);
+        }
+
         function loadSaved() {
             api(root.dataset.draftsUrl).then(function (list) {
                 if (!Array.isArray(list)) return;
@@ -161,6 +184,7 @@
                     body: JSON.stringify({ prompt: text })
                 });
                 applyDraft(draft, result);
+                addDeleteButton(draft);
                 loadSaved();
             } catch (e) {
                 showError(errors, e.message);
@@ -176,6 +200,7 @@
             try {
                 var draft = await api(root.dataset.draftUrl + '?id=' + encodeURIComponent(saved.value));
                 applyDraft(draft, result);
+                addDeleteButton(draft);
             } catch (e) {
                 showError(errors, e.message);
             } finally {

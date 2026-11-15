@@ -7,17 +7,16 @@
 @section Styles { <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" /> }
 
 <div class="dash">
-    <div class="dash-hero dash-in">
-        <div>
+    <section class="student-welcome dash-in">
+        <div class="student-welcome-copy">
             <div class="dash-date" id="dash-date"></div>
-            <h1><span id="dash-greeting">Welcome back</span>, @(Model.Profile?.FirstName ?? "there")</h1>
-            <p>@(Model.TotalApplications == 0 ? "Find your first internship and apply in a few clicks." : $"You have {Model.PendingApplications} application{(Model.PendingApplications == 1 ? "" : "s")} under review.")</p>
+            <h1><span id="dash-greeting">Welcome back</span>, @(Model.Profile?.FirstName ?? "there") <span aria-hidden="true">👋</span></h1>
+            <p>@(Model.TotalApplications == 0 ? "Your next opportunity is just a click away. Find an internship that fits your goals." : $"You have {Model.PendingApplications} application{(Model.PendingApplications == 1 ? "" : "s")} under review. Keep building your next opportunity.")</p>
+            <a asp-controller="Internships" asp-action="Index" class="btn btn-light"><i class="fas fa-compass me-2"></i>Explore internships <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-            <a asp-controller="StudentAi" asp-action="Matches" class="btn btn-ghost"><i class="fas fa-bullseye me-1"></i> Recommended for you</a>
-            <a asp-controller="Internships" asp-action="Index" class="btn btn-light"><i class="fas fa-search me-1"></i> Find internships</a>
-        </div>
-    </div>
+        <div class="student-welcome-art" aria-hidden="true"><i class="fas fa-briefcase"></i><span class="art-spark spark-one">✦</span><span class="art-spark spark-two">✦</span><span class="art-orbit"></span></div>
+        <a asp-controller="StudentAi" asp-action="Matches" class="student-match-link"><i class="fas fa-bullseye me-1"></i>My matches <i class="fas fa-arrow-right ms-1"></i></a>
+    </section>
 
     @if (Model.Profile == null)
     {
@@ -25,6 +24,7 @@
             <a asp-controller="Student" asp-action="Profile" class="alert-link">Update profile</a></div>
     }
 
+    <div class="dash-section-label dash-in"><span>Your journey at a glance</span><span>Application snapshot</span></div>
     <div class="row g-3 mb-3">
         <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#2563eb" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-paper-plane"></i></span><span><div class="num" data-count="@Model.TotalApplications">@Model.TotalApplications</div><div class="lbl">Applications</div></span></a></div>
         <div class="col-md-3 col-6 dash-in"><a class="dash-tile" style="--tile:#d97706" asp-controller="Student" asp-action="Applications"><span class="ico"><i class="fas fa-hourglass-half"></i></span><span><div class="num" data-count="@Model.PendingApplications">@Model.PendingApplications</div><div class="lbl">Under review</div></span></a></div>
@@ -36,8 +36,8 @@
         <div class="col-lg-8 d-flex flex-column gap-3">
             @if (Model.TotalApplications > 0)
             {
-                <div class="dash-card dash-in" style="height:auto">
-                    <div class="head"><h2>Where your applications stand</h2></div>
+                <div class="dash-card dash-in student-progress" style="height:auto">
+                    <div class="head"><h2><i class="fas fa-chart-simple me-2 text-success"></i>Application progress</h2><span class="small text-muted">@Model.TotalApplications total</span></div>
                     <div class="body">
                         <div class="pipe" role="img" aria-label="Application status breakdown">
                             <span data-w="@Pct(Model.PendingApplications).ToString(System.Globalization.CultureInfo.InvariantCulture)" style="background:#f59e0b"></span>
@@ -87,7 +87,7 @@
         </div>
 
         <div class="col-lg-4 d-flex flex-column gap-3">
-            <div class="dash-card dash-in" style="height:auto">
+            <div class="dash-card dash-in student-profile-card" style="height:auto">
                 <div class="body d-flex align-items-center gap-3">
                     <div class="ring" data-p="@Model.ProfileCompletion"><span>@Model.ProfileCompletion%</span></div>
                     <div>
@@ -97,7 +97,7 @@
                     </div>
                 </div>
             </div>
-            <div class="dash-card dash-in" style="height:auto">
+            <div class="dash-card dash-in student-tools" style="height:auto">
                 <div class="head"><h2>Do more with AI</h2></div>
                 <div class="body p-2">
                     <a class="dash-action" asp-controller="StudentAi" asp-action="CvAnalysis"><span class="ico"><i class="fas fa-file-alt"></i></span><span>Analyse my CV<small>Fill your profile from your CV</small></span></a>

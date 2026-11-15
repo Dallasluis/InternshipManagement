@@ -1,0 +1,157 @@
+{
+  "name": "Internship - MCP tools (company assistant)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "company-chat-tools",
+        "instructions": "Read-only tools for the company assistant. Every tool needs the runToken from your instructions."
+      },
+      "id": "e1000000-0000-4000-8000-000000000001",
+      "name": "MCP Server Trigger",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "e2000000-0000-4000-8000-000000000001",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": null,
+          "name": "MCP server key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the company's name, industry, verification status and counts of its internships, applications and placements by status. Parameters: reason = one short sentence on why you call it; runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/company-chat/overview",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "e1000000-0000-4000-8000-000000000002",
+      "name": "get_company_overview",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the company's newest internships: internshipId, title, status, applicationDeadline, positions, views, totalApplications and newApplications (not yet reviewed). Parameters: reason = one short sentence on why you call it; runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/company-chat/internships",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "e1000000-0000-4000-8000-000000000003",
+      "name": "get_my_internships",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Returns the applicants for ONE of the company's internships, newest 25, best match first: applicationId, status, appliedOn, programme, yearOfStudy, skills, matchScore (0 to 100 or null) and matchingSkills. No names or contact details. Parameters: reason = one short sentence on why you call it; internshipId = the internshipId from get_my_internships; runToken = Pass the runToken from your instructions, copied exactly.",
+        "method": "GET",
+        "url": "http://host.docker.internal:5003/api/agent-tools/company-chat/applicants",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "reason",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "internshipId",
+              "valueProvider": "modelRequired"
+            },
+            {
+              "name": "runToken",
+              "valueProvider": "modelRequired"
+            }
+          ]
+        }
+      },
+      "id": "e1000000-0000-4000-8000-000000000004",
+      "name": "get_internship_applicants",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "get_company_overview": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_my_internships": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_internship_applicants": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

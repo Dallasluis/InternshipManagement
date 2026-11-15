@@ -49,7 +49,7 @@ namespace InternshipManagement.Application.Services
         public async Task<InternshipDraftResponse> GenerateDraftAsync(
             int userId, GenerateInternshipDraftRequest request, CancellationToken cancellationToken = default)
         {
-            // Same gate as CreateInternshipAsync: only companies that may post can spend AI quota.
+            // Only verified company accounts may prepare posting drafts.
             var company = await _context.CompanyProfiles
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
@@ -58,7 +58,7 @@ namespace InternshipManagement.Application.Services
                 throw new InvalidOperationException("Company profile not found.");
 
             if (company.VerificationStatus != CompanyVerificationStatus.Verified)
-                throw new InvalidOperationException("Company must be verified to create internships.");
+                throw new InvalidOperationException("Company verification is required before preparing internships.");
 
             if (_configuration.GetValue<bool>("Internships:RequireSubscription") && !company.IsSubscribed)
                 throw new InvalidOperationException("Active subscription required.");

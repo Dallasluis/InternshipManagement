@@ -1,0 +1,41 @@
+@* Floating AI assistant for companies, aligned with the student assistant at bottom-right. *@
+@if (Context.Session.GetString("UserType") == "Company")
+{
+    <style>
+        .cca-fab { position: fixed; right: 24px; bottom: 24px; z-index: 1050; width: 60px; height: 60px; border-radius: 50%;
+                  border: 0; background: linear-gradient(145deg, #0c9294, #087f8c); color: #fff; font-size: 1.4rem; box-shadow: 0 9px 24px rgba(8,127,140,.34); cursor: pointer; transition: transform .18s, box-shadow .18s; }
+        .cca-fab:hover { background: linear-gradient(145deg, #087f8c, #066b76); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(8,127,140,.4); }
+        .cca-panel { position: fixed; right: 24px; bottom: 98px; z-index: 1050; width: 400px; max-width: calc(100vw - 32px);
+                    height: 600px; max-height: calc(100vh - 126px); background: #fff; border-radius: 20px; overflow: hidden;
+                    box-shadow: 0 18px 55px rgba(15,42,39,.22); display: none; flex-direction: column; border: 1px solid #e2eae7; }
+        .cca-panel.open { display: flex; }
+        .cca-head { background: linear-gradient(110deg, #087f8c, #179d94); color: #fff; padding: .85rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .cca-head button { background: transparent; border: 0; color: #fff; font-size: 1.1rem; cursor: pointer; }
+        .cca-panel iframe { border: 0; width: 100%; flex: 1 1 auto; }
+        @@media (max-width: 480px) { .cca-panel { right: 8px; bottom: 88px; } .cca-fab { right: 16px; bottom: 16px; } }
+    </style>
+    <button type="button" id="cca-fab" class="cca-fab" aria-label="Open AI assistant" aria-expanded="false" aria-controls="cca-panel" title="AI assistant">
+        <i class="fas fa-robot"></i>
+    </button>
+    <div id="cca-panel" class="cca-panel" role="dialog" aria-label="AI assistant">
+        <div class="cca-head">
+            <strong><i class="fas fa-robot me-2"></i>AI assistant</strong>
+            <button type="button" id="cca-close" aria-label="Close">&times;</button>
+        </div>
+        <iframe id="cca-frame" title="AI assistant" data-src="@Url.Action("Index", "CompanyAssistant", new { embed = 1 })"></iframe>
+    </div>
+    <script>
+        (function () {
+            var fab = document.getElementById('cca-fab'), panel = document.getElementById('cca-panel'),
+                frame = document.getElementById('cca-frame'), close = document.getElementById('cca-close');
+            function setOpen(open) {
+                panel.classList.toggle('open', open);
+                fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (open && !frame.getAttribute('src')) frame.setAttribute('src', frame.getAttribute('data-src'));
+            }
+            fab.addEventListener('click', function () { setOpen(!panel.classList.contains('open')); });
+            close.addEventListener('click', function () { setOpen(false); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+        })();
+    </script>
+}

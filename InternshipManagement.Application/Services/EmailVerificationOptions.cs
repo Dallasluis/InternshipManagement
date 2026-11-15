@@ -9,5 +9,6 @@ namespace InternshipManagement.Application.Services
         public int DeleteAfterDays { get; set; } = 30;
         public int SecurityEventRetentionMonths { get; set; } = 12;
         public string PublicApiBaseUrl { get; set; } = "http://localhost:49162";
+        public string PublicWebBaseUrl { get; set; } = "http://localhost:5133";
     }
 }

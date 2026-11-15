@@ -1,0 +1,120 @@
+@model InternshipManagement.Web.Models.Offer.OfferLetterModel
+@{
+    ViewData["Title"] = "Offer letter";
+    var userType = ViewBag.UserType as string;
+    var isStudent = userType == "Student";
+}
+
+<style>
+    .offer-paper { max-width: 760px; margin: 0 auto; }
+    .offer-head { border-bottom: 2px solid #0d6efd; padding-bottom: .75rem; margin-bottom: 1.25rem; }
+    .offer-terms td { padding: .5rem 0; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+    .offer-terms td:first-child { color: #6c757d; width: 40%; }
+    @@media print {
+        .no-print, nav, aside, .sidebar, footer { display: none !important; }
+        .offer-paper { max-width: 100%; border: 0 !important; box-shadow: none !important; }
+        body { background: #fff !important; }
+    }
+</style>
+
+<div class="offer-paper">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">Back</a>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.print()">
+            <i class="fas fa-file-pdf me-1"></i> Download PDF
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-4">
+            <div class="offer-head d-flex justify-content-between flex-wrap gap-2">
+                <div>
+                    <div class="h4 mb-0">@Model.CompanyName</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.CompanyAddress))
+                    {
+                        <div class="text-muted small">@Model.CompanyAddress</div>
+                    }
+                </div>
+                @if (Model.SentAt.HasValue)
+                {
+                    <div class="text-muted small text-end">Offer sent<br />@Model.SentAt.Value.ToLocalTime().ToString("d MMM yyyy")</div>
+                }
+            </div>
+
+            <h1 class="h4 mb-3">Internship offer</h1>
+            <p>Dear @Model.StudentName,</p>
+            <p>Congratulations. Following your interview, we are pleased to offer you the internship below.</p>
+
+            <table class="offer-terms w-100 mb-3">
+                <tr><td>Position</td><td><strong>@Model.InternshipTitle</strong></td></tr>
+                @if (Model.StartDate.HasValue)
+                {
+                    <tr><td>Start date</td><td>@Model.StartDate.Value.ToString("d MMM yyyy")</td></tr>
+                }
+                @if (Model.StipendAmount.HasValue)
+                {
+                    <tr><td>Stipend</td><td>@Model.StipendAmount.Value.ToString("C")</td></tr>
+                }
+                @if (Model.ExpiryDate.HasValue)
+                {
+                    <tr><td>Please reply by</td><td><strong>@Model.ExpiryDate.Value.ToString("d MMM yyyy")</strong></td></tr>
+                }
+            </table>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Details))
+            {
+                <div class="alert alert-warning py-2"><strong>Note from the company:</strong> @Model.Details</div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ContractFileName))
+            {
+                <div class="d-flex justify-content-between align-items-center border rounded p-2 px-3 mb-3 no-print">
+                    <span>Attached contract: <strong>@Model.ContractFileName</strong></span>
+                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Contract", "OfferLetters", new { id = Model.ApplicationId })">Open</a>
+                </div>
+                <p class="d-none d-print-block">Attached contract: @Model.ContractFileName</p>
+            }
+
+            @switch (Model.Status)
+            {
+                case "OfferMade":
+                    <p class="text-muted small">If you do not reply by the date above, this offer expires.</p>
+                    break;
+                case "Accepted":
+                    <div class="alert alert-success mb-0">This offer was accepted.</div>
+                    break;
+                case "OfferDeclined":
+                    <div class="alert alert-secondary mb-0">This offer was declined.</div>
+                    break;
+                case "OfferExpired":
+                    <div class="alert alert-warning mb-0">This offer expired before it was answered.</div>
+                    break;
+            }
+
+            @if (isStudent && Model.Status == "OfferMade")
+            {
+                <form asp-controller="Student" asp-action="RespondToOffer" method="post" class="mt-3 no-print">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.ApplicationId" />
+                    <button type="submit" name="accepted" value="true" class="btn btn-success me-2">Accept offer</button>
+                    <button type="submit" name="accepted" value="false" class="btn btn-outline-danger">Decline offer</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (Model.CanAttachContract)
+    {
+        <div class="card mt-3 no-print">
+            <div class="card-body">
+                <h2 class="h6">@(string.IsNullOrEmpty(Model.ContractFileName) ? "Attach a contract (optional)" : "Replace the contract")</h2>
+                <p class="text-muted small mb-2">PDF or Word, up to 5 MB. The student is told and can read it before answering.</p>
+                <form asp-controller="OfferLetters" asp-action="Attach" asp-route-id="@Model.ApplicationId" method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap">
+                    @Html.AntiForgeryToken()
+                    <input type="file" name="file" class="form-control" style="max-width:360px" accept=".pdf,.doc,.docx" required />
+                    <button type="submit" class="btn btn-primary">Attach</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
