@@ -1,0 +1,165 @@
+.app-main:not(:has(.dash)) {
+    --workspace-ink: #162b2a;
+    --workspace-muted: #70817e;
+    --workspace-line: #e5ece8;
+    color: var(--workspace-ink);
+}
+
+.app-main:not(:has(.dash)) h1,
+.app-main:not(:has(.dash)) h2,
+.app-main:not(:has(.dash)) h3 {
+    color: #162b2a;
+    letter-spacing: -.035em;
+}
+
+.app-main:not(:has(.dash)) h1 {
+    font-weight: 750;
+}
+
+.app-main:not(:has(.dash)) .text-muted {
+    color: var(--workspace-muted) !important;
+}
+
+.app-main:not(:has(.dash)) .card {
+    border: 1px solid var(--workspace-line);
+    border-radius: 17px;
+    box-shadow: 0 8px 26px rgba(22, 43, 42, .045);
+    overflow: hidden;
+}
+
+.app-main:not(:has(.dash)) .card-header {
+    padding: 1rem 1.25rem;
+    border-bottom-color: #edf1ef;
+    color: var(--workspace-ink);
+}
+
+.app-main:not(:has(.dash)) .form-label,
+.app-main:not(:has(.dash)) legend {
+    color: #334844;
+    font-size: .88rem;
+    font-weight: 650;
+}
+
+.app-main:not(:has(.dash)) .form-control,
+.app-main:not(:has(.dash)) .form-select {
+    border-color: #dce6e1;
+    border-radius: 10px;
+    color: var(--workspace-ink);
+}
+
+.app-main:not(:has(.dash)) input.form-control:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.app-main:not(:has(.dash)) select.form-select {
+    min-height: 44px;
+}
+
+.app-main:not(:has(.dash)) textarea.form-control {
+    min-height: 100px;
+}
+
+.app-main:not(:has(.dash)) .form-control:focus,
+.app-main:not(:has(.dash)) .form-select:focus {
+    border-color: #45a69c;
+    box-shadow: 0 0 0 .2rem rgba(8, 127, 140, .12);
+}
+
+.app-main:not(:has(.dash)) .btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+.app-main:not(:has(.dash)) .btn-primary {
+    border-color: #087f8c;
+    background-color: #087f8c;
+}
+
+.app-main:not(:has(.dash)) .btn-primary:hover {
+    border-color: #066b76;
+    background-color: #066b76;
+}
+
+.app-main:not(:has(.dash)) .btn-outline-primary {
+    border-color: #168a91;
+    color: #087f8c;
+}
+
+.app-main:not(:has(.dash)) .btn-outline-primary:hover {
+    border-color: #087f8c;
+    background-color: #087f8c;
+    color: #fff;
+}
+
+.app-main:not(:has(.dash)) .btn:focus-visible,
+.app-main:not(:has(.dash)) a:focus-visible {
+    outline: 3px solid rgba(8, 127, 140, .35);
+    outline-offset: 2px;
+}
+
+.app-main:not(:has(.dash)) .table {
+    --bs-table-bg: transparent;
+    margin-bottom: 0;
+}
+
+.app-main:not(:has(.dash)) .table thead th {
+    background: #f7faf8;
+    border-bottom-color: var(--workspace-line);
+    color: #71817c;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.app-main:not(:has(.dash)) .table td,
+.app-main:not(:has(.dash)) .table th {
+    padding: .8rem 1rem;
+    vertical-align: middle;
+}
+
+.app-main:not(:has(.dash)) .table tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.app-main:not(:has(.dash)) > .text-center.py-5 {
+    border: 1px solid var(--workspace-line);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(22, 43, 42, .04);
+}
+
+.app-main:not(:has(.dash)) .alert {
+    border-radius: 12px;
+}
+
+#app-global-loader .app-global-loader-inner {
+    background: linear-gradient(120deg, #102747, #087f8c);
+}
+
+@media (max-width: 767.98px) {
+    .app-main:not(:has(.dash)) {
+        padding-right: 1rem !important;
+        padding-left: 1rem !important;
+    }
+
+    .app-main:not(:has(.dash)) > .d-flex.justify-content-between {
+        align-items: flex-start !important;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .app-main:not(:has(.dash)) .card-header {
+        padding: .9rem 1rem;
+    }
+
+    .app-main:not(:has(.dash)) .table td,
+    .app-main:not(:has(.dash)) .table th {
+        padding: .7rem .75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-main:not(:has(.dash)) .btn {
+        transition: none;
+    }
+}

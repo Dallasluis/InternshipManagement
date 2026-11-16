@@ -50,7 +50,8 @@ All Web-to-API addresses and HTTP verbs match the API once the two route lines f
 models match the API's classes; every link in the views points to an existing action; document upload, download and
 access links match the API.
 
-## Still open (nothing is broken, these have no screen yet)
-- Admin: "trigger re-verification" and the verification-time (SLA) report exist in the API but have no admin page.
-- Company: its own verification history (GET api/Companies/verification/history) is not shown on the company page.
-- Subscriptions (post-MVP, as agreed).
+## Follow-up status
+- Admin verification turnaround/SLA and re-verification controls are available at `/Admin/Verification`.
+- Company verification history is available at `/Company/VerificationHistory`.
+- Admin company details include verification decisions and evidence. A decision can only be recorded for a pending submission; rejected or re-verification-required companies must submit an appeal or updated evidence first.
+- Subscription/payment work remains out of scope until requested.

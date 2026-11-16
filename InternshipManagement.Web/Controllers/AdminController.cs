@@ -96,6 +96,7 @@ namespace InternshipManagement.Web.Controllers
         // ---- AJAX action endpoints used by the views' JS (calls the API server-side, using the session JWT) ----
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyCompany(
             int id,
             string status,

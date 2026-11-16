@@ -8,6 +8,8 @@ namespace InternshipManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Route("api/Student")]
+    [Route("api/Students")]
     [Authorize(Roles = "Student")]
     public class StudentsController : ControllerBase
     {

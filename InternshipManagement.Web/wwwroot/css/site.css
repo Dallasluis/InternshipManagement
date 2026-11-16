@@ -5,6 +5,32 @@ body {
     min-height: 100vh;
 }
 
+.app-global-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.16);
+    display: grid;
+    place-items: center;
+    z-index: 2000;
+    pointer-events: all;
+}
+
+.app-global-loader-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .8rem 1rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.9);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+}
+
+.toast-container {
+    z-index: 2100;
+}
+
 /* Authenticated workspace top bar: account and live notifications stay together. */
 .app-main { min-width: 0; }
 .app-topbar { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 1.35rem; padding: 0 .15rem; }

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -21,6 +22,13 @@
     }
     else
     {
+    <div id="app-global-loader" class="app-global-loader d-none" role="status" aria-live="polite" aria-busy="true">
+        <div class="app-global-loader-inner">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span>Loading...</span>
+        </div>
+    </div>
+    <div id="app-toast-container" class="toast-container position-fixed top-0 end-0 p-3" aria-live="polite" aria-atomic="true"></div>
     <div class="d-flex flex-column min-vh-100">
         @if (!isAuthenticated)
         {

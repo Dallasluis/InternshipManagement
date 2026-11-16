@@ -41,6 +41,7 @@ else
                     <h6 class="mb-0">Verification Actions</h6>
                 </div>
                 <div class="card-body">
+                    @Html.AntiForgeryToken()
                     @if (Model.VerificationStatus == "Pending" || Model.VerificationStatus == "Unverified"
                         || Model.VerificationStatus == "UnderReview" || Model.VerificationStatus == "PendingReview")
                     {
@@ -100,16 +101,14 @@ else
                     {
                         <div class="alert alert-danger">
                             <i class="fas fa-times-circle me-2"></i>
-                            This company was rejected.
+                            This company was rejected. It must submit an appeal or updated verification evidence before another review.
                         </div>
-                        <button class="btn btn-warning" onclick="verifyCompany(@Model.Id, 'Verified')">
-                            <i class="fas fa-undo me-1"></i> Reconsider
-                        </button>
                     }
                     else if (Model.VerificationStatus == "ReverificationRequired")
                     {
-                        <div class="alert alert-warning">Re-verification is required. Existing listings remain visible for seven days.</div>
-                        <button class="btn btn-primary" onclick="verifyCompany(@Model.Id, 'Verified')">Review re-verification</button>
+                        <div class="alert alert-warning">
+                            Re-verification is required. The company must submit updated evidence before an administrator can review it.
+                        </div>
                     }
                 </div>
             </div>
@@ -171,7 +170,8 @@ else
             const addressReviewed = confirm('Have you checked the company address?');
             const latestEvent = document.querySelector('tbody tr:last-child td:nth-child(5)')?.textContent?.trim();
             const isAppeal = latestEvent === 'Yes';
-            const query = new URLSearchParams({
+            const request = new URLSearchParams({
+                __RequestVerificationToken: document.querySelector('input[name="__RequestVerificationToken"]').value,
                 id: id,
                 status: status,
                 reasonCode: reasonCode,
@@ -182,7 +182,11 @@ else
                 isAppeal: isAppeal
             });
             if (confirm(`Are you sure you want to record ${status} for this company?`)) {
-                fetch(`/Admin/VerifyCompany?${query}`, { method: 'POST' })
+                fetch('/Admin/VerifyCompany', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: request
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -190,7 +194,8 @@ else
                         } else {
                             alert(data.message || 'The verification decision could not be saved.');
                         }
-                    });
+                    })
+                    .catch(() => alert('The verification decision could not be saved. Please try again.'));
             }
         }
 

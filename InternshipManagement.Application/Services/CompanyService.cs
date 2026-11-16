@@ -92,8 +92,13 @@ namespace InternshipManagement.Application.Services
                 .FirstOrDefaultAsync(c => c.UserId == userId && !c.IsDeleted);
 
             if (profile == null) return false;
-            if (profile.VerificationStatus is CompanyVerificationStatus.Verified or CompanyVerificationStatus.Suspended)
-                throw new InvalidOperationException("This company cannot submit verification evidence in its current status.");
+            if (profile.VerificationStatus is not (
+                CompanyVerificationStatus.Unverified
+                or CompanyVerificationStatus.Rejected
+                or CompanyVerificationStatus.MoreInformationRequested
+                or CompanyVerificationStatus.ReverificationRequired))
+                throw new InvalidOperationException(
+                    "Verification is already under review or this company cannot submit evidence in its current status.");
 
             var evidenceIds = request.EvidenceDocumentIds.Distinct().ToList();
             if (evidenceIds.Count == 0)
@@ -187,6 +192,11 @@ namespace InternshipManagement.Application.Services
 
         public async Task<bool> SubmitVerificationAppealAsync(int userId, SubmitVerificationAppealRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.Reason) || request.Reason.Trim().Length < 20)
+                throw new ArgumentException("Please provide at least 20 characters explaining your appeal.", nameof(request));
+            if (request.Reason.Trim().Length > 2000)
+                throw new ArgumentException("The appeal reason cannot exceed 2000 characters.", nameof(request));
+
             var profile = await _context.CompanyProfiles
                 .FirstOrDefaultAsync(c => c.UserId == userId && !c.IsDeleted);
             if (profile == null)

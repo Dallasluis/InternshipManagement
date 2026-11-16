@@ -100,17 +100,24 @@ namespace InternshipManagement.Api.Controllers
             int companyId,
             [FromBody] AdminReviewVerificationRequest request)
         {
-            var result = await _companyService.ReviewVerificationAppealAsync(
-                companyId,
-                int.Parse(User.FindFirst("userId")?.Value ?? "0"),
-                new ReviewVerificationAppealRequest
-                {
-                    Approved = request.Approved,
-                    ReasonCode = request.ReasonCode,
-                    Notes = request.Notes,
-                    CriteriaAssessment = request.CriteriaAssessment
-                });
-            return Ok(new { Success = result });
+            try
+            {
+                var result = await _companyService.ReviewVerificationAppealAsync(
+                    companyId,
+                    int.Parse(User.FindFirst("userId")?.Value ?? "0"),
+                    new ReviewVerificationAppealRequest
+                    {
+                        Approved = request.Approved,
+                        ReasonCode = request.ReasonCode,
+                        Notes = request.Notes,
+                        CriteriaAssessment = request.CriteriaAssessment
+                    });
+                return result ? Ok(new { Success = true }) : NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
 
         [HttpPost("companies/verification/reverification")]

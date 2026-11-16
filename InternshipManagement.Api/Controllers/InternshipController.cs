@@ -8,6 +8,7 @@ namespace InternshipManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Route("api/Internship")]
     public class InternshipsController : ControllerBase
     {
         private readonly IInternshipService _internshipService;
