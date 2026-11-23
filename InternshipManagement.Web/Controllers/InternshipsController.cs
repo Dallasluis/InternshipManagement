@@ -1,6 +1,7 @@
 ﻿using InternshipManagement.Web.Models.Internship;
 using InternshipManagement.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace InternshipManagement.Web.Controllers
 {
@@ -9,24 +10,46 @@ namespace InternshipManagement.Web.Controllers
         private readonly IInternshipApiClient _internshipApiClient;
         private readonly IReportApiClient _reportApiClient;
         private readonly IDocumentApiClient _documentApiClient;
+        private readonly IAiApiClient _aiApiClient;
 
         public InternshipsController(
             IInternshipApiClient internshipApiClient,
             IReportApiClient reportApiClient,
-            IDocumentApiClient documentApiClient)
+            IDocumentApiClient documentApiClient,
+            IAiApiClient aiApiClient)
         {
             _internshipApiClient = internshipApiClient;
             _reportApiClient = reportApiClient;
             _documentApiClient = documentApiClient;
+            _aiApiClient = aiApiClient;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(InternshipSearchViewModel filters)
+        public async Task<IActionResult> Index(InternshipSearchViewModel filters, CancellationToken cancellationToken)
         {
             if (filters.PageNumber < 1) filters.PageNumber = 1;
             if (filters.PageSize < 1) filters.PageSize = 12;
 
             var result = await _internshipApiClient.SearchAsync(filters);
+
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (HttpContext.Session.GetString("UserType") == "Student" && !string.IsNullOrWhiteSpace(token))
+            {
+                var savedResult = await _aiApiClient.SendAsync(token, HttpMethod.Get, "api/students/saved-internships/ids", cancellationToken: cancellationToken);
+                if (savedResult.StatusCode == StatusCodes.Status200OK)
+                {
+                    try
+                    {
+                        var savedIds = JsonSerializer.Deserialize<HashSet<int>>(savedResult.Body, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? new HashSet<int>();
+                        foreach (var internship in result.Items)
+                            internship.IsSaved = savedIds.Contains(internship.Id);
+                    }
+                    catch (JsonException)
+                    {
+                        // Keep browsing available if the saved-state response is malformed.
+                    }
+                }
+            }
 
             ViewBag.Filters = filters;
             return View(result);

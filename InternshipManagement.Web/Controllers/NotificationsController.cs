@@ -60,6 +60,38 @@ namespace InternshipManagement.Web.Controllers
             };
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Preview(CancellationToken ct)
+        {
+            var token = GetToken();
+            if (token == null)
+                return Unauthorized(new { message = "Please sign in again to view notifications." });
+
+            var result = await _api.SendAsync(token, HttpMethod.Get, "api/Notifications?take=6", null, ct);
+            if (result.StatusCode == StatusCodes.Status401Unauthorized)
+                return Unauthorized(new { message = "Please sign in again to view notifications." });
+            if (result.StatusCode != StatusCodes.Status200OK)
+                return StatusCode(StatusCodes.Status502BadGateway, new { message = "Notifications could not be loaded. Please try again." });
+
+            try
+            {
+                var items = JsonSerializer.Deserialize<List<NotificationItem>>(result.Body, JsonOptions) ?? new List<NotificationItem>();
+                return Json(items.Select(item => new
+                {
+                    item.Id,
+                    item.Title,
+                    item.Message,
+                    item.LinkPath,
+                    item.IsRead,
+                    item.CreatedAt
+                }));
+            }
+            catch (JsonException)
+            {
+                return StatusCode(StatusCodes.Status502BadGateway, new { message = "Notifications could not be read. Please try again." });
+            }
+        }
+
         // Marks one notification as read, then goes to the page it points to.
         [HttpGet]
         public async Task<IActionResult> Open(long id, string? to, CancellationToken ct)

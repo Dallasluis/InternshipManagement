@@ -2,123 +2,90 @@
     ViewData["Title"] = "Resources";
 }
 
-<div class="container py-5">
-    <h1 class="display-5 fw-bold mb-4"> Resources</h1>
-    <p class="lead text-muted mb-5">Your guide to finding and securing the perfect internship.</p>
+<div class="container public-page resources-page py-5">
+    <header class="public-page-heading mb-5">
+        <span class="public-eyebrow">INTERLANE CAREER LIBRARY</span>
+        <h1 class="display-5 fw-bold mb-2">Resources to move you forward</h1>
+        <p class="lead text-muted mb-0">Practical guidance for finding, applying for, and making the most of your internship.</p>
+    </header>
 
     <div class="row g-4">
         <!-- Internship Guide -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-primary mb-3">
-                        <i class="fas fa-book fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Internship Guide</h5>
+            <div class="card resource-card h-100">
+                <img src="~/images/landing-teamwork.jpg" class="resource-card-image" alt="Students planning their next career steps together" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">GETTING STARTED</span>
+                    <h2 class="card-title fw-bold">Internship Guide</h2>
                     <p class="card-text text-muted">Learn what an internship is, how to find one, and what to expect.</p>
-                    <a asp-controller="Resources" asp-action="InternshipGuide" class="btn btn-outline-primary btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    <a asp-controller="Resources" asp-action="InternshipGuide" class="resource-link mt-auto">Read the guide <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- Internship Tips -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-success mb-3">
-                        <i class="fas fa-lightbulb fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Internship Tips</h5>
+            <div class="card resource-card h-100">
+                <img src="~/images/internship-team.png" class="resource-card-image" alt="An internship team working together" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">ON THE JOB</span>
+                    <h2 class="card-title fw-bold">Internship Tips</h2>
                     <p class="card-text text-muted">Practical tips for making the most of your internship experience.</p>
-                    <a asp-controller="Resources" asp-action="InternshipTips" class="btn btn-outline-success btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    <a asp-controller="Resources" asp-action="InternshipTips" class="resource-link mt-auto">Explore tips <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- CV & Resume Tips -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-warning mb-3">
-                        <i class="fas fa-file-alt fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">CV & Resume Tips</h5>
+            <div class="card resource-card h-100">
+                <img src="~/images/landing-career-success.jpg" class="resource-card-image" alt="A student preparing for a professional opportunity" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">YOUR APPLICATION</span>
+                    <h2 class="card-title fw-bold">CV &amp; Resume Tips</h2>
                     <p class="card-text text-muted">What to include, how to structure your CV, and common mistakes.</p>
-                    <a asp-controller="Resources" asp-action="CVTips" class="btn btn-outline-warning btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    <a asp-controller="Resources" asp-action="CVTips" class="resource-link mt-auto">Improve your CV <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- Application Tips -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-danger mb-3">
-                        <i class="fas fa-pen-fancy fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Application Tips</h5>
-                    <p class="card-text text-muted">Write a good application and understand what employers look for.</p>
-                    <a asp-controller="Resources" asp-action="ApplicationTips" class="btn btn-outline-danger btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+            <div class="card resource-card h-100">
+                <img src="~/images/landing-career-success.jpg" class="resource-card-image" alt="A candidate getting ready to apply for an opportunity" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">STAND OUT</span>
+                    <h2 class="card-title fw-bold">Application Tips</h2>
+                    <p class="card-text text-muted">Write a strong application and understand what employers look for.</p>
+                    <a asp-controller="Resources" asp-action="ApplicationTips" class="resource-link mt-auto">Prepare your application <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- Interview Tips -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-info mb-3">
-                        <i class="fas fa-handshake fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Interview Tips</h5>
+            <div class="card resource-card h-100">
+                <img src="~/images/landing-teamwork.jpg" class="resource-card-image" alt="A team sharing ideas in a professional setting" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">MEET EMPLOYERS</span>
+                    <h2 class="card-title fw-bold">Interview Tips</h2>
                     <p class="card-text text-muted">Prepare for interviews, common questions, and how to present yourself.</p>
-                    <a asp-controller="Resources" asp-action="InterviewTips" class="btn btn-outline-info btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    <a asp-controller="Resources" asp-action="InterviewTips" class="resource-link mt-auto">Get interview ready <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- Career Advice -->
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="resource-icon text-secondary mb-3">
-                        <i class="fas fa-rocket fa-2x"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Career Advice</h5>
-                    <p class="card-text text-muted">Choosing the right internship, building skills, and networking.</p>
-                    <a asp-controller="Resources" asp-action="CareerAdvice" class="btn btn-outline-secondary btn-sm">
-                        Read More <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+            <div class="card resource-card h-100">
+                <img src="~/images/internship-team.png" class="resource-card-image" alt="Early career professionals collaborating" />
+                <div class="card-body d-flex flex-column">
+                    <span class="resource-category">BUILD YOUR FUTURE</span>
+                    <h2 class="card-title fw-bold">Career Advice</h2>
+                    <p class="card-text text-muted">Choose the right internship, build skills, and grow your network.</p>
+                    <a asp-controller="Resources" asp-action="CareerAdvice" class="resource-link mt-auto">Explore career advice <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .resource-icon {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f1f5f9;
-        border-radius: 12px;
-    }
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-4px);
-    }
-</style>

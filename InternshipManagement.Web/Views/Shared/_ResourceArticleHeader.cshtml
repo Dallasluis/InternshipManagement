@@ -1,0 +1,15 @@
+@{
+    var title = ViewData["ResourceTitle"]?.ToString() ?? "Career resources";
+    var image = ViewData["ResourceImage"]?.ToString() ?? "landing-teamwork.jpg";
+    var description = ViewData["ResourceDescription"]?.ToString() ?? "Practical guidance for your next career step.";
+}
+
+<header class="resource-article-hero">
+    <img src="~/images/@image" alt="" aria-hidden="true" />
+    <div class="resource-article-shade"></div>
+    <div class="resource-article-hero-content">
+        <span class="resource-article-kicker"><i class="fas fa-book-open me-2" aria-hidden="true"></i>INTERLANE CAREER LIBRARY</span>
+        <h1>@title</h1>
+        <p>@description</p>
+    </div>
+</header>

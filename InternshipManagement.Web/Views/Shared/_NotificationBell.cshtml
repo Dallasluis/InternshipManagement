@@ -1,14 +1,35 @@
 @* The bell in the sidebar header. New notifications arrive live over SignalR; a slow poll is the fallback. *@
-<a class="notif-bell" asp-controller="Notifications" asp-action="Index" aria-label="Notifications" title="Notifications">
-    <i class="fas fa-bell"></i>
-    <span id="notif-count" class="notif-badge d-none" aria-live="polite">0</span>
-</a>
+<div class="dropdown notif-dropdown">
+    <button class="notif-bell" id="notif-bell" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifications">
+        <i class="fas fa-bell" aria-hidden="true"></i>
+        <span id="notif-count" class="notif-badge d-none" aria-live="polite">0</span>
+    </button>
+    <div class="dropdown-menu dropdown-menu-end notif-menu" aria-labelledby="notif-bell">
+        <div class="notif-menu-heading">
+            <strong>Notifications</strong>
+            <a asp-controller="Notifications" asp-action="Index">View all</a>
+        </div>
+        <div id="notif-preview" class="notif-preview" role="status" aria-live="polite">Open to check for updates.</div>
+    </div>
+</div>
 <div id="notif-toasts" class="notif-toasts" aria-live="polite"></div>
 
 <style>
-    .notif-bell { position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: #475569; text-decoration: none; transition: background .12s; }
+    .notif-dropdown { position: relative; }
+    .notif-bell { position: relative; display: inline-grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 10px; color: #475569; background: transparent; transition: background .12s; }
     .notif-bell:hover { background: #e2e8f0; color: #0f172a; }
     .notif-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #dc2626; color: #fff; font-size: .7rem; font-weight: 700; line-height: 18px; text-align: center; }
+    .notif-menu { width: min(380px, calc(100vw - 24px)); padding: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 14px 36px rgba(15,23,42,.16); }
+    .notif-menu-heading { display: flex; justify-content: space-between; align-items: center; padding: .85rem 1rem; border-bottom: 1px solid #e2e8f0; }
+    .notif-menu-heading a { color: #087f8c; font-size: .8rem; font-weight: 600; text-decoration: none; }
+    .notif-preview { max-height: min(390px, 60vh); overflow-y: auto; }
+    .notif-preview-state { padding: 1.25rem 1rem; color: #64748b; text-align: center; font-size: .85rem; }
+    .notif-preview-item { display: block; padding: .8rem 1rem; color: #0f172a; text-decoration: none; border-bottom: 1px solid #f1f5f9; }
+    .notif-preview-item:hover { color: #0f172a; background: #f8fafc; }
+    .notif-preview-item.is-unread { background: #f0f7ff; }
+    .notif-preview-item strong, .notif-preview-item span { display: block; }
+    .notif-preview-item strong { font-size: .84rem; }
+    .notif-preview-item span { margin-top: .2rem; color: #64748b; font-size: .78rem; overflow-wrap: anywhere; }
     .notif-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, calc(100vw - 32px)); }
     .notif-toast { display: block; padding: 12px 14px; border-radius: 12px; background: #fff; color: #0f172a; text-decoration: none; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; box-shadow: 0 8px 24px rgba(15, 23, 42, .15); animation: notif-in .2s ease-out; }
     .notif-toast:hover { color: #0f172a; background: #f8fafc; }
@@ -22,9 +43,12 @@
     (function () {
         var badge = document.getElementById('notif-count');
         var toasts = document.getElementById('notif-toasts');
+        var preview = document.getElementById('notif-preview');
+        var bell = document.getElementById('notif-bell');
         if (!badge) return;
 
         var countUrl = '@Url.Action("Count", "Notifications")';
+        var previewUrl = '@Url.Action("Preview", "Notifications")';
         var openUrl = '@Url.Action("Open", "Notifications")';
         var timer = null;
 
@@ -38,6 +62,44 @@
                 .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
                 .then(function (d) { show(Number(d.count) || 0); })
                 .catch(function () { /* keep the last number; try again next time */ });
+        }
+
+        function showPreviewState(message) {
+            preview.replaceChildren();
+            var state = document.createElement('div');
+            state.className = 'notif-preview-state';
+            state.textContent = message;
+            preview.appendChild(state);
+        }
+
+        function loadPreview() {
+            if (!preview) return;
+            showPreviewState('Loading notifications...');
+            fetch(previewUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                .then(function (r) {
+                    if (!r.ok) return r.json().then(function (d) { throw new Error(d.message || 'Notifications could not be loaded.'); });
+                    return r.json();
+                })
+                .then(function (items) {
+                    preview.replaceChildren();
+                    if (!items.length) {
+                        showPreviewState('You are all caught up.');
+                        return;
+                    }
+                    items.forEach(function (item) {
+                        var link = document.createElement('a');
+                        link.className = 'notif-preview-item' + (item.isRead ? '' : ' is-unread');
+                        link.href = openUrl + '?id=' + encodeURIComponent(item.id) + (item.linkPath ? '&to=' + encodeURIComponent(item.linkPath) : '');
+                        var title = document.createElement('strong');
+                        title.textContent = item.title || 'Notification';
+                        var message = document.createElement('span');
+                        message.textContent = item.message || '';
+                        link.appendChild(title);
+                        link.appendChild(message);
+                        preview.appendChild(link);
+                    });
+                })
+                .catch(function (error) { showPreviewState(error.message); });
         }
 
         function toast(n) {
@@ -57,6 +119,7 @@
         function stopPolling() { if (timer) { clearInterval(timer); timer = null; } }
         document.addEventListener('visibilitychange', function () { document.hidden ? stopPolling() : startPolling(); });
         if (!document.hidden) startPolling();
+        if (bell) bell.addEventListener('shown.bs.dropdown', loadPreview);
 
         // live connection; if it cannot be made the page keeps working with the poll above
         if (window.signalR) {

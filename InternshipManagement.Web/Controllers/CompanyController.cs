@@ -280,10 +280,10 @@ namespace InternshipManagement.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ShortlistApplication(int id, string? notes)
+        public async Task<IActionResult> ShortlistApplication(int id, string? notes, bool returnToReview = false)
         {
             return await UpdateApplication(id, () => _applicationApiClient.ShortlistAsync(
-                GetToken(), id, notes), "shortlisted");
+                GetToken(), id, notes), "shortlisted", returnToReview);
         }
 
         [HttpPost]
@@ -356,7 +356,7 @@ namespace InternshipManagement.Web.Controllers
 
         private string GetToken() => HttpContext.Session.GetString("JwtToken") ?? string.Empty;
 
-        private async Task<IActionResult> UpdateApplication(int id, Func<Task<bool>> update, string status)
+        private async Task<IActionResult> UpdateApplication(int id, Func<Task<bool>> update, string status, bool returnToReview = false)
         {
             if (string.IsNullOrEmpty(GetToken()))
                 return RedirectToAction("Login", "Account");
@@ -373,7 +373,9 @@ namespace InternshipManagement.Web.Controllers
                 TempData["ErrorMessage"] = $"Unable to update application: {ex.Message}";
             }
 
-            return RedirectToAction(nameof(Applications));
+            return returnToReview
+                ? RedirectToAction(nameof(ApplicationReview), new { id })
+                : RedirectToAction(nameof(Applications));
         }
 
         [HttpGet]

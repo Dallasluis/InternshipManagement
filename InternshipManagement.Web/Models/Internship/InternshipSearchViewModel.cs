@@ -9,6 +9,7 @@
         public string? WorkArrangement { get; set; }
         public decimal? MinStipend { get; set; }
         public bool? IsRemote { get; set; }
+        public string? SortBy { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 12;
     }

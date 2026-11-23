@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InternshipManagement.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa5db74bf7eb3c3965cc8f85fa92b9d0eb2475b1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0922feaec4607c24f84d4e225ea486fa232aac93")]
 [assembly: System.Reflection.AssemblyProductAttribute("InternshipManagement.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InternshipManagement.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -21,7 +21,11 @@
     </div>
 
     <div id="sections-errors"></div>
-    <div id="sections-root"><div class="text-muted py-4 text-center">Loading your profile…</div></div>
+    <div id="sections-root">
+        <div class="text-muted py-4 text-center" role="status" aria-live="polite">
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading your profile…
+        </div>
+    </div>
 </div>
 
 @section Scripts { <script src="~/js/profile-sections.js" asp-append-version="true"></script> }

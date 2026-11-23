@@ -1,5 +1,5 @@
 .app-main:not(:has(.dash)) {
-    --workspace-ink: #162b2a;
+    --workspace-ink: #102747;
     --workspace-muted: #70817e;
     --workspace-line: #e5ece8;
     color: var(--workspace-ink);
@@ -8,7 +8,7 @@
 .app-main:not(:has(.dash)) h1,
 .app-main:not(:has(.dash)) h2,
 .app-main:not(:has(.dash)) h3 {
-    color: #162b2a;
+    color: var(--brand-navy);
     letter-spacing: -.035em;
 }
 
@@ -35,7 +35,7 @@
 
 .app-main:not(:has(.dash)) .form-label,
 .app-main:not(:has(.dash)) legend {
-    color: #334844;
+    color: #344a63;
     font-size: .88rem;
     font-weight: 650;
 }
@@ -58,8 +58,8 @@
 
 .app-main:not(:has(.dash)) .form-control:focus,
 .app-main:not(:has(.dash)) .form-select:focus {
-    border-color: #45a69c;
-    box-shadow: 0 0 0 .2rem rgba(8, 127, 140, .12);
+    border-color: #58a9ae;
+    box-shadow: 0 0 0 .2rem rgba(8, 127, 140, .15);
 }
 
 .app-main:not(:has(.dash)) .btn {
@@ -69,23 +69,23 @@
 }
 
 .app-main:not(:has(.dash)) .btn-primary {
-    border-color: #087f8c;
-    background-color: #087f8c;
+    border-color: var(--brand-teal);
+    background-color: var(--brand-teal);
 }
 
 .app-main:not(:has(.dash)) .btn-primary:hover {
-    border-color: #066b76;
-    background-color: #066b76;
+    border-color: var(--brand-teal-dark);
+    background-color: var(--brand-teal-dark);
 }
 
 .app-main:not(:has(.dash)) .btn-outline-primary {
-    border-color: #168a91;
-    color: #087f8c;
+    border-color: var(--brand-teal);
+    color: var(--brand-teal);
 }
 
 .app-main:not(:has(.dash)) .btn-outline-primary:hover {
-    border-color: #087f8c;
-    background-color: #087f8c;
+    border-color: var(--brand-teal);
+    background-color: var(--brand-teal);
     color: #fff;
 }
 
@@ -133,7 +133,7 @@
 }
 
 #app-global-loader .app-global-loader-inner {
-    background: linear-gradient(120deg, #102747, #087f8c);
+    background: linear-gradient(120deg, var(--brand-navy), var(--brand-teal));
 }
 
 @media (max-width: 767.98px) {
@@ -163,3 +163,17 @@
         transition: none;
     }
 }
+
+html[data-theme="dark"] .app-main:not(:has(.dash)) { --workspace-ink: #e2e8f0; --workspace-muted: #a3b2c5; --workspace-line: #374151; color: var(--workspace-ink); }
+html[data-theme="dark"] .app-main:not(:has(.dash)) h1,
+html[data-theme="dark"] .app-main:not(:has(.dash)) h2,
+html[data-theme="dark"] .app-main:not(:has(.dash)) h3,
+html[data-theme="dark"] .app-main:not(:has(.dash)) .form-label,
+html[data-theme="dark"] .app-main:not(:has(.dash)) legend { color: #e2e8f0; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) .card-header { border-color: #374151; background: #273449 !important; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) .table thead th { color: #a3b2c5; background: #273449; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) .table td,
+html[data-theme="dark"] .app-main:not(:has(.dash)) .table th { border-color: #374151; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) > .text-center.py-5 { background: #1f2937; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) .btn-outline-primary { color: #76c9d3; border-color: #318b98; }
+html[data-theme="dark"] .app-main:not(:has(.dash)) .btn-outline-primary:hover { color: #fff; }

@@ -1,8 +1,11 @@
 @{
     ViewData["Title"] = "Internship Guide";
+    ViewData["ResourceTitle"] = "Internship Guide";
+    ViewData["ResourceImage"] = "landing-teamwork.jpg";
+    ViewData["ResourceDescription"] = "A practical introduction to finding a placement and making the most of it.";
 }
 
-<div class="container py-5">
+<div class="container resource-article-page py-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Resources" asp-action="Index">Resources</a></li>
@@ -10,7 +13,7 @@
         </ol>
     </nav>
 
-    <h1 class="display-5 fw-bold mb-4"> Internship Guide</h1>
+    <partial name="_ResourceArticleHeader" />
 
     <div class="row">
         <div class="col-lg-8">

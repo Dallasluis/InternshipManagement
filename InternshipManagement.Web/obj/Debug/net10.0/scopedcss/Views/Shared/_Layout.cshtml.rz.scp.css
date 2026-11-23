@@ -7,20 +7,14 @@ a.navbar-brand[b-33tzj4dg8d] {
   word-break: break-all;
 }
 
-a[b-33tzj4dg8d] {
-  color: #0077cc;
-}
+a[b-33tzj4dg8d] { color: var(--brand-teal, #087f8c); }
 
-.btn-primary[b-33tzj4dg8d] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
+.btn-primary[b-33tzj4dg8d] { color: #fff; background-color: var(--brand-teal, #087f8c); border-color: var(--brand-teal, #087f8c); }
 
 .nav-pills .nav-link.active[b-33tzj4dg8d], .nav-pills .show > .nav-link[b-33tzj4dg8d] {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--brand-teal, #087f8c);
+  border-color: var(--brand-teal, #087f8c);
 }
 
 .border-top[b-33tzj4dg8d] {

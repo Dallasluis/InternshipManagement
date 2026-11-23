@@ -297,6 +297,20 @@
     </div>
 </div>
 
+@if (application.Status == "Applied" || application.Status == "UnderReview")
+{
+    <div class="d-flex justify-content-end mt-4">
+        <form asp-controller="Company" asp-action="ShortlistApplication" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@application.Id" />
+            <input type="hidden" name="returnToReview" value="true" />
+            <button type="submit" class="btn btn-success" onclick="return confirm('Shortlist this applicant?')">
+                <i class="fas fa-star me-1"></i> Shortlist applicant
+            </button>
+        </form>
+    </div>
+}
+
 @functions {
     private string GetStatusBadgeClass(string status) => InternshipManagement.Web.Helpers.StatusDisplay.Badge(status);
 }

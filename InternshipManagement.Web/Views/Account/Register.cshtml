@@ -1,27 +1,14 @@
 ﻿@model InternshipManagement.Web.Models.Auth.RegisterViewModel
 @{
     ViewData["Title"] = "Register";
-    Layout = null;
+    ViewData["MinimalAuthPage"] = true;
 }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - InternshipHub</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-</head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
+<div class="auth-container public-auth-page">
+        <div class="auth-card register-auth-card">
             <div class="text-center mb-4">
-                <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                <a class="auth-brand" asp-controller="Home" asp-action="Index" aria-label="Interlane Internships home"><img src="~/images/interlane-logo.png" alt="Interlane Internships" /></a>
                 <h2 class="auth-title">Create Account</h2>
-                <p class="auth-subtitle">Join the Internship Management Platform</p>
+                <p class="auth-subtitle">Join Interlane and take your next step.</p>
             </div>
 
             <form asp-action="Register" method="post">
@@ -86,10 +73,9 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+@section Scripts {
     <script>
             const userTypeSelect = document.querySelector('#UserType');
             const companyFields = document.querySelector('#companyFields');
@@ -101,6 +87,5 @@
             userTypeSelect.addEventListener('change', toggleCompanyFields);
             toggleCompanyFields();
     </script>
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-</body>
-</html>
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -38,6 +38,8 @@ namespace InternshipManagement.Web.Services
                 query.Add($"MinStipend={filters.MinStipend.Value}");
             if (filters.IsRemote.HasValue)
                 query.Add($"IsRemote={filters.IsRemote.Value}");
+            if (!string.IsNullOrWhiteSpace(filters.SortBy))
+                query.Add($"SortBy={Uri.EscapeDataString(filters.SortBy)}");
 
             var url = "api/Internships?" + string.Join("&", query);
 

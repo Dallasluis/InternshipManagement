@@ -1,15 +1,34 @@
 ﻿@{
     var isAuthenticated = !string.IsNullOrEmpty(Context.Session.GetString("JwtToken"));
+    var minimalAuthPage = ViewData["MinimalAuthPage"] as bool? == true;
     var embed = isAuthenticated && Context.Request.Query["embed"] == "1";   // page shown inside the assistant panel
+    var userType = Context.Session.GetString("UserType");
+    var profileController = userType == "Company" ? "Company" : userType == "Student" ? "Student" : "Account";
+    var profileAction = userType == "Company" ? "Profile" : userType == "Student" ? "Profile" : "Settings";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - InternshipHub</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta name="description" content="Interlane Internships connects students with verified companies offering internship placements, with personalized matching and easy applicant tracking." />
+    <title>@ViewData["Title"] - Interlane Internships</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+    <script>
+        (function () {
+            try {
+                document.documentElement.dataset.theme = localStorage.getItem('internshiphub-theme') === 'dark' ? 'dark' : 'light';
+            } catch (error) {
+                document.documentElement.dataset.theme = 'light';
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/workspace-pages.css" asp-append-version="true" />
@@ -30,7 +49,7 @@
     </div>
     <div id="app-toast-container" class="toast-container position-fixed top-0 end-0 p-3" aria-live="polite" aria-atomic="true"></div>
     <div class="d-flex flex-column min-vh-100">
-        @if (!isAuthenticated)
+        @if (!isAuthenticated && !minimalAuthPage)
         {
             <partial name="_Navbar" />
         }
@@ -45,7 +64,32 @@
                                 <button class="mobile-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#workspace-sidebar" aria-controls="workspace-sidebar" aria-expanded="false" aria-label="Open navigation"><i class="fas fa-bars"></i></button>
                                 <div class="app-topbar-context"><span class="app-topbar-dot"></span>@(Context.Session.GetString("UserType") ?? "Workspace") workspace</div>
                             </div>
-                            <div class="app-topbar-actions"><partial name="_NotificationBell" /><span class="app-topbar-user" title="@(Context.Session.GetString("UserFullName"))">@(Context.Session.GetString("UserFullName")?.FirstOrDefault())</span></div>
+                            <div class="app-topbar-actions">
+                                <partial name="_NotificationBell" />
+                                <div class="dropdown">
+                                    <button class="app-account-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                                        <span class="app-topbar-user" aria-hidden="true">@(Context.Session.GetString("UserFullName")?.FirstOrDefault())</span>
+                                        <span class="app-account-name">@Context.Session.GetString("UserFullName")</span>
+                                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end app-account-menu">
+                                        <li class="app-account-heading">
+                                            <strong>@Context.Session.GetString("UserFullName")</strong>
+                                            <small>@userType workspace</small>
+                                        </li>
+                                        <li><a class="dropdown-item" href="@Url.Action(profileAction, profileController)"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                        <li><button class="dropdown-item" id="theme-toggle" type="button"><i class="fas fa-moon me-2" aria-hidden="true"></i><span>Dark mode</span></button></li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li>
+                                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button class="dropdown-item text-danger" type="submit"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <partial name="_VerifyEmailBanner" />
                         @RenderBody()
@@ -59,16 +103,19 @@
                 }
             </div>
         </div>
-        @if (!isAuthenticated)
+        @if (!isAuthenticated && !minimalAuthPage)
         {
             <partial name="_Footer" />
         }
     </div>
-    <partial name="_AssistantWidget" />
-    <partial name="_CompanyAssistantWidget" />
+    @if (!minimalAuthPage)
+    {
+        <partial name="_AssistantWidget" />
+        <partial name="_CompanyAssistantWidget" />
     }
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    }
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/location-picker.js" asp-append-version="true"></script>
     <script src="~/js/categories.js" asp-append-version="true"></script>

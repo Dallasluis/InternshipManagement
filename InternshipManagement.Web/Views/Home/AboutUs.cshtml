@@ -2,99 +2,79 @@
     ViewData["Title"] = "About Us";
 }
 
-<div class="container py-5">
-    <h1 class="display-5 fw-bold mb-4">About Us</h1>
+<section class="about-hero">
+    <img src="~/images/landing-teamwork.jpg" alt="Students collaborating and planning their futures" class="about-hero-image" />
+    <div class="about-hero-shade"></div>
+    <div class="container about-hero-content">
+        <span class="landing-slide-kicker">ABOUT INTERLANE</span>
+        <h1>Opening doors to<br />meaningful experience.</h1>
+        <p>We bring ambitious students and forward-thinking companies together to make the first step into work more accessible.</p>
+        <a asp-controller="Internships" asp-action="Index" class="btn btn-light landing-slide-cta">Explore opportunities <i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+</section>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Who We Are -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">Who We Are</h4>
-                    <p>InternshipHub is a leading platform dedicated to connecting students with meaningful internship opportunities. Founded by a team of professionals passionate about education and career development, we believe that internships are a vital stepping stone in building a successful career.</p>
-                    <p>Our mission is to bridge the gap between talented students and companies looking for fresh perspectives and motivated individuals. Whether you are a student seeking hands-on experience or a company looking to nurture future talent, InternshipHub is here to make the connection seamless.</p>
-                </div>
-            </div>
+<section class="about-intro container py-5">
+    <div class="about-intro-mark"><i class="fas fa-compass" aria-hidden="true"></i></div>
+    <div>
+        <span class="public-eyebrow">OUR PURPOSE</span>
+        <h2>Talent is everywhere.<br />Opportunity should be too.</h2>
+        <p>Interlane helps students find practical experience where they can learn, contribute, and grow. We give companies a simple way to meet emerging talent and build their future teams.</p>
+    </div>
+</section>
 
-            <!-- Our Mission -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">Our Mission</h4>
-                    <p>To empower students by providing access to quality internship opportunities and helping companies find the next generation of leaders.</p>
-                    <ul>
-                        <li><strong>Empower Students:</strong> Give students the tools, resources, and opportunities to succeed.</li>
-                        <li><strong>Support Companies:</strong> Help businesses discover and nurture emerging talent.</li>
-                        <li><strong>Build Community:</strong> Foster a network of students, professionals, and organizations.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- How It Works -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">How It Works</h4>
-                    <ol>
-                        <li><strong>Students</strong> create a profile, upload their CV, and browse internships.</li>
-                        <li><strong>Companies</strong> post internships, review applicants, and shortlist candidates.</li>
-                        <li><strong>Matches</strong> happen when students apply and companies review applications.</li>
-                        <li><strong>Hiring</strong> begins when companies shortlist, interview, and offer internships.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <!-- Who It's For -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">Who It's For</h4>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6><i class="fas fa-user-graduate text-primary me-2"></i> Students</h6>
-                            <p class="text-muted">Undergraduates, graduates, and anyone looking for internship experience.</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><i class="fas fa-building text-primary me-2"></i> Companies</h6>
-                            <p class="text-muted">Startups, SMEs, and large corporations seeking talented interns.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<section class="about-journey-section">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <span class="public-eyebrow">HOW IT WORKS</span>
+            <h2 class="about-section-title">A clearer path from learning to doing</h2>
         </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="fw-bold">Our Values</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong>Integrity:</strong> We operate with honesty and transparency.
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong>Innovation:</strong> We strive for continuous improvement.
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong>Community:</strong> We believe in the power of connection.
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong>Empowerment:</strong> We help students and companies achieve their goals.
-                        </li>
-                    </ul>
-                </div>
+        <div class="row g-4 about-steps">
+            <div class="col-md-4">
+                <article class="about-step-card">
+                    <span class="about-step-number">01</span>
+                    <span class="about-step-icon"><i class="fas fa-user-graduate" aria-hidden="true"></i></span>
+                    <h3>Students show their strengths</h3>
+                    <p>Create a profile, share your skills, and discover opportunities that fit your goals.</p>
+                </article>
             </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="fw-bold">Get in Touch</h5>
-                    <p class="text-muted">Have questions or want to collaborate?</p>
-                    <a href="mailto:info@internshiphub.com" class="btn btn-primary w-100">
-                        <i class="fas fa-envelope me-2"></i> Contact Us
-                    </a>
-                </div>
+            <div class="col-md-4">
+                <article class="about-step-card">
+                    <span class="about-step-number">02</span>
+                    <span class="about-step-icon"><i class="fas fa-building" aria-hidden="true"></i></span>
+                    <h3>Companies meet new talent</h3>
+                    <p>Share meaningful placements and connect with motivated future professionals.</p>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="about-step-card">
+                    <span class="about-step-number">03</span>
+                    <span class="about-step-icon"><i class="fas fa-handshake" aria-hidden="true"></i></span>
+                    <h3>Good matches get moving</h3>
+                    <p>Students apply, employers connect, and hands-on experience begins.</p>
+                </article>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<section class="about-values container py-5">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <img src="~/images/landing-career-success.jpg" alt="Students celebrating a new opportunity together" class="about-values-image" />
+        </div>
+        <div class="col-lg-6">
+            <span class="public-eyebrow">WHAT GUIDES US</span>
+            <h2 class="about-section-title mb-4">Built around people and possibility</h2>
+            <div class="about-value"><span><i class="fas fa-shield-heart" aria-hidden="true"></i></span><div><h3>Trust</h3><p>We aim to make every connection clear, respectful, and reliable.</p></div></div>
+            <div class="about-value"><span><i class="fas fa-lightbulb" aria-hidden="true"></i></span><div><h3>Growth</h3><p>We value practical learning that helps people build confidence and skills.</p></div></div>
+            <div class="about-value"><span><i class="fas fa-people-group" aria-hidden="true"></i></span><div><h3>Opportunity</h3><p>We believe strong careers can begin with one meaningful experience.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="about-contact">
+    <div class="container about-contact-inner">
+        <div><span class="public-eyebrow">LET'S CONNECT</span><h2>Have a question or want to work with us?</h2></div>
+        <a href="mailto:info@interlane.com" class="btn btn-light">Contact Interlane <i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+</section>
