@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-lg-8">
         <h1 class="mb-1">@Model.Title</h1>
-        <h5 class="text-muted mb-3">@Model.CompanyName</h5>
+        <h5 class="text-muted mb-3">@Model.CompanyName @if (Model.CompanyIsVerified) { <span class="internship-verified-badge"><i class="fas fa-circle-check" aria-hidden="true"></i> Verified employer</span> }</h5>
 
         <div class="mb-4">
             <span class="badge bg-light text-dark border me-1">Full-time</span>
@@ -85,16 +85,26 @@
                     <dt class="col-6">Apply by</dt>
                     <dd class="col-6">@Model.ApplicationDeadline.ToString("MMM d, yyyy")</dd>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Compensation))
-                    {
-                        <dt class="col-6">Compensation</dt>
-                        <dd class="col-6">
+                    <dt class="col-6">Compensation</dt>
+                    <dd class="col-6">
+                        @if (Model.StipendAmount.HasValue)
+                        {
+                            <text>@Model.Currency @Model.StipendAmount.Value.ToString("N0") stipend</text>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.Compensation))
+                        {
                             @Model.Compensation
-                            @if (Model.StipendAmount.HasValue)
-                            {
-                                <text> &mdash; @Model.Currency @Model.StipendAmount.Value.ToString("N0")</text>
-                            }
-                        </dd>
+                        }
+                        else
+                        {
+                            <span>Not specified</span>
+                        }
+                    </dd>
+
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        <dt class="col-6">Last updated</dt>
+                        <dd class="col-6"><time datetime="@Model.UpdatedAt.Value.ToString("O")">@Model.UpdatedAt.Value.ToLocalTime().ToString("MMM d, yyyy")</time></dd>
                     }
                 </dl>
 

@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InternshipManagement.Domain\InternshipManagement.Domain.csproj" />
+    <ProjectReference Include="..\InternshipManagement.Application\InternshipManagement.Application.csproj" />
+    <ProjectReference Include="..\InternshipManagement.Infrastructure\InternshipManagement.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

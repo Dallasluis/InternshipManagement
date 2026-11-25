@@ -526,6 +526,7 @@ namespace InternshipManagement.Application.Services
                 CompanyProfileId = internship.CompanyProfileId,
                 CompanyName = internship.CompanyProfile?.CompanyName ?? "Unknown Company",
                 CompanyLogoUrl = internship.CompanyProfile?.LogoUrl,
+                CompanyIsVerified = internship.CompanyProfile?.VerificationStatus == CompanyVerificationStatus.Verified,
                 Title = internship.Title,
                 Description = internship.Description,
                 Responsibilities = internship.Responsibilities,
@@ -552,6 +553,7 @@ namespace InternshipManagement.Application.Services
                 EligibleProgrammes = eligibleProgrammes ?? new List<string>(),
                 Status = internship.Status.ToString(),
                 PublishedAt = internship.PublishedAt,
+                UpdatedAt = internship.UpdatedAt,
                 Views = internship.Views,
                 ApplicationsCount = internship.ApplicationsCount,
                 ModerationStatus = internship.ModerationStatus.ToString()

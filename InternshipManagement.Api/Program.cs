@@ -1,5 +1,7 @@
 using InternshipManagement.Api.Extensions;
+using InternshipManagement.Api.Jobs;
 using InternshipManagement.Api.Middleware;
+using InternshipManagement.Infrastructure.Documents;
 using InternshipManagement.Infrastructure.Integrations.N8n;
 using InternshipManagement.Infrastructure.Identity;
 using InternshipManagement.Infrastructure.Persistence;
@@ -15,9 +17,17 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
+builder.Services.AddPrivateDocumentStorage(builder.Configuration);
+builder.Services.AddMalwareScanning(builder.Configuration);
 builder.Services.AddSmtpEmail(builder.Configuration);
 builder.Services.AddHostedService<InternshipManagement.Api.Jobs.EmailVerificationHousekeepingService>();
 builder.Services.AddHostedService<InternshipManagement.Api.Jobs.InternshipDeadlineService>();
+builder.Services.AddOptions<DeletedDocumentPurgeOptions>()
+    .Bind(builder.Configuration.GetSection("DocumentRetention"))
+    .Validate(options => options.AfterDays is null or > 0,
+        "DocumentRetention:AfterDays must be a positive number or omitted to disable automatic purge.")
+    .ValidateOnStart();
+builder.Services.AddHostedService<DeletedDocumentPurgeService>();
 builder.Services.AddValidation();
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options => options.AddPolicy("Web", policy =>
@@ -101,6 +111,23 @@ app.UseMiddleware<SessionSecurityMiddleware>();
 app.UseMiddleware<UnverifiedAccountMiddleware>();
 app.UseAuthorization();
 app.UseRateLimiter();
+
+app.MapGet("/health/live", () => Results.Ok(new { status = "ok" }))
+    .AllowAnonymous();
+
+app.MapGet("/health/ready", async (ApplicationDbContext db, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        return await db.Database.CanConnectAsync(cancellationToken)
+            ? Results.Ok(new { status = "ready" })
+            : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+    catch
+    {
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+}).AllowAnonymous();
 
 app.MapControllers();
 

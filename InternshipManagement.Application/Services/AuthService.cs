@@ -804,32 +804,6 @@ namespace InternshipManagement.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        // Helper methods
-        private static string GenerateJwtToken(string userId, string email, string userType)
-        {
-            // This should be in IdentityService but kept here for completeness
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Email, email),
-                new Claim("userId", userId),
-                new Claim("userType", userType)
-            };
-
-            // In real implementation, this would use configuration
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKeyHere1234567890!"));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: "InternshipManagementAPI",
-                audience: "InternshipManagementClient",
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
         private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];

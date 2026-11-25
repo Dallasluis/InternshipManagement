@@ -11,6 +11,16 @@
         ("Certificates", Model?.CertificatesDocumentId),
         ("Other supporting documents", Model?.OtherSupportingDocumentsId)
     };
+    var completionItems = new[]
+    {
+        ("Add a short bio", !string.IsNullOrWhiteSpace(Model?.Bio)),
+        ("Add your location", !string.IsNullOrWhiteSpace(Model?.Location)),
+        ("Add your university and programme", !string.IsNullOrWhiteSpace(Model?.University) && !string.IsNullOrWhiteSpace(Model?.Programme)),
+        ("Upload your CV / resume", Model?.ResumeDocumentId.HasValue == true),
+        ("Add education history", Model?.Education?.Any() == true),
+        ("Add at least one skill", Model?.Skills?.Any() == true)
+    };
+    var completion = (int)Math.Round(completionItems.Count(item => item.Item2) * 100d / completionItems.Length);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -19,6 +29,22 @@
         <p class="text-muted">Manage your personal and academic information</p>
     </div>
 </div>
+
+<section class="card mb-4" aria-labelledby="profile-progress-title">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+            <div><h2 id="profile-progress-title" class="h5 mb-1">Profile strength</h2><p class="text-muted small mb-0">A complete profile helps employers understand your experience and improves match relevance.</p></div>
+            <strong class="text-primary fs-5">@completion%</strong>
+        </div>
+        <div class="progress mb-3" role="progressbar" aria-label="Profile strength" aria-valuenow="@completion" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:@completion%"></div></div>
+        <ul class="profile-completion-list mb-0">
+            @foreach (var item in completionItems)
+            {
+                <li class="@(item.Item2 ? "is-complete" : "")"><i class="fas @(item.Item2 ? "fa-circle-check" : "fa-circle")" aria-hidden="true"></i><span>@item.Item1</span><span class="visually-hidden">@(item.Item2 ? "Complete" : "Incomplete")</span></li>
+            }
+        </ul>
+    </div>
+</section>
 
 @if (TempData["SuccessMessage"] != null)
 {

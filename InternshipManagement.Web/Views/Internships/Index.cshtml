@@ -87,8 +87,8 @@ else
                         </div>
                     </div>
                     <div class="internship-card-main">
-                    <div class="internship-card-top">
-                        <div class="internship-company-copy"><strong>@internship.CompanyName</strong><small>Company</small></div>
+                        <div class="internship-card-top">
+                        <div class="internship-company-copy"><strong>@internship.CompanyName @if (internship.CompanyIsVerified) { <span class="internship-verified-badge" title="Employer identity verified"><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span> }</strong><small>Employer</small></div>
                         @if (isStudent)
                         {
                             <button type="button" class="internship-save-button js-internship-save @(internship.IsSaved ? "is-saved" : "")" aria-label="@(internship.IsSaved ? "Remove saved internship" : "Save internship for later")" title="@(internship.IsSaved ? "Remove saved internship" : "Save for later")" aria-pressed="@(internship.IsSaved ? "true" : "false")" data-saved="@(internship.IsSaved ? "true" : "false")" data-add-url="@Url.Action("Add", "SavedInternships", new { id = internship.Id })" data-remove-url="@Url.Action("Remove", "SavedInternships", new { id = internship.Id })"><i class="@(internship.IsSaved ? "fas" : "far") fa-bookmark" aria-hidden="true"></i></button>
@@ -108,12 +108,16 @@ else
                             <span><i class="fas fa-laptop-house" aria-hidden="true"></i>@SplitWords(internship.WorkArrangement)</span>
                             @if (!string.IsNullOrWhiteSpace(internship.Duration)) { <span><i class="far fa-clock" aria-hidden="true"></i>@SplitWords(internship.Duration)</span> }
                             @if (internship.StipendAmount.HasValue) { <span class="internship-paid-chip"><i class="fas fa-circle-dollar-to-slot" aria-hidden="true"></i>Paid</span> }
+                            else if (!string.IsNullOrWhiteSpace(internship.Compensation)) { <span><i class="fas fa-coins" aria-hidden="true"></i>@internship.Compensation</span> }
+                            else { <span class="internship-pay-unspecified"><i class="fas fa-circle-question" aria-hidden="true"></i>Pay not specified</span> }
                         </div>
                         <p class="internship-description">@internship.Description</p>
                         <div class="internship-card-footer">
                             <div><small>Apply by</small><strong>@internship.ApplicationDeadline.ToString("MMM d, yyyy")</strong></div>
-                            @if (internship.StipendAmount.HasValue) { <div class="internship-pay"><small>Stipend</small><strong>@internship.Currency @internship.StipendAmount.Value.ToString("N0")</strong></div> }
+                            <div class="internship-pay"><small>Compensation</small><strong>@(internship.StipendAmount.HasValue ? $"{internship.Currency} {internship.StipendAmount.Value:N0} stipend" : string.IsNullOrWhiteSpace(internship.Compensation) ? "Not specified" : internship.Compensation)</strong></div>
                         </div>
+                        @{ var lastUpdated = internship.UpdatedAt ?? internship.PublishedAt; }
+                        <div class="internship-updated-note">@(lastUpdated.HasValue ? $"Updated {lastUpdated.Value.ToLocalTime():MMM d, yyyy}" : "Recently posted")</div>
                     </div>
                     <a asp-action="Details" asp-route-id="@internship.Id" class="internship-card-action">View opportunity <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     </div>

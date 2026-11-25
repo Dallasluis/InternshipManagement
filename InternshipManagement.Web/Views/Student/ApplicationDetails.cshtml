@@ -132,20 +132,28 @@
                             <span class="badge @GetStatusBadgeClass(application.Status)">@InternshipManagement.Web.Helpers.StatusDisplay.Label(application.Status)</span>
                         </p>
                         <hr />
-                        <h6>Timeline</h6>
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>
-                                Applied: @application.AppliedAt.ToString("MMM dd, yyyy")
-                            </li>
-                            @if (application.StatusUpdatedAt.HasValue && application.StatusUpdatedAt != application.AppliedAt)
+                        <h6>Progress timeline</h6>
+                        <ol class="application-progress-timeline">
+                            @if (Model.StatusHistory.Any())
                             {
-                                <li class="mb-2">
-                                    <i class="fas fa-clock text-warning me-2"></i>
-                                    Status Updated: @application.StatusUpdatedAt.Value.ToString("MMM dd, yyyy")
-                                </li>
+                                @foreach (var item in Model.StatusHistory.OrderBy(h => h.ChangedAt))
+                                {
+                                    <li class="@(item.NewStatus == application.Status ? "is-current" : "")">
+                                        <strong>@InternshipManagement.Web.Helpers.StatusDisplay.Label(item.NewStatus)</strong>
+                                        <time datetime="@item.ChangedAt.ToString("O")">@item.ChangedAt.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</time>
+                                        @if (!string.IsNullOrWhiteSpace(item.Notes)) { <span>@item.Notes</span> }
+                                    </li>
+                                }
                             }
-                        </ul>
+                            else
+                            {
+                                <li class="is-current"><strong>Applied</strong><time datetime="@application.AppliedAt.ToString("O")">@application.AppliedAt.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</time></li>
+                                @if (application.StatusUpdatedAt.HasValue && application.StatusUpdatedAt != application.AppliedAt)
+                                {
+                                    <li class="is-current"><strong>@InternshipManagement.Web.Helpers.StatusDisplay.Label(application.Status)</strong><time datetime="@application.StatusUpdatedAt.Value.ToString("O")">@application.StatusUpdatedAt.Value.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</time></li>
+                                }
+                            }
+                        </ol>
                     </div>
                 </div>
             </div>

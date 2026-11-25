@@ -21,9 +21,13 @@ namespace InternshipManagement.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Register(string? userType = null)
         {
-            return View(new RegisterViewModel());
+            var model = new RegisterViewModel();
+            if (string.Equals(userType, "Company", StringComparison.OrdinalIgnoreCase))
+                model.UserType = "Company";
+
+            return View(model);
         }
 
         [HttpPost]

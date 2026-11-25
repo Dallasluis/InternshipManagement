@@ -6,6 +6,7 @@
         public int CompanyProfileId { get; set; }
         public string CompanyName { get; set; } = string.Empty;
         public string? CompanyLogoUrl { get; set; }
+        public bool CompanyIsVerified { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string? Responsibilities { get; set; }
@@ -32,6 +33,7 @@
         public List<string>? EligibleProgrammes { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime? PublishedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public int Views { get; set; }
         public int ApplicationsCount { get; set; }
         public string ModerationStatus { get; set; } = string.Empty;

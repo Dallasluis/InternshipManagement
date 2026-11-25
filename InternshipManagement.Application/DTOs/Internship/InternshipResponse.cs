@@ -9,6 +9,7 @@ namespace InternshipManagement.Application.DTOs.Internship
         public int CompanyProfileId { get; set; }
         public string CompanyName { get; set; }
         public string? CompanyLogoUrl { get; set; }
+        public bool CompanyIsVerified { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string? Responsibilities { get; set; }
@@ -35,6 +36,7 @@ namespace InternshipManagement.Application.DTOs.Internship
         public List<string>? EligibleProgrammes { get; set; }
         public string Status { get; set; }
         public DateTime? PublishedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public int Views { get; set; }
         public int ApplicationsCount { get; set; }
         public string ModerationStatus { get; set; }

@@ -24,11 +24,16 @@ namespace InternshipManagement.Application.Services
 
         private readonly IApplicationDbContext _context;
         private readonly IPrivateDocumentStorage _storage;
+        private readonly IFileMalwareScanner _malwareScanner;
 
-        public PrivateDocumentService(IApplicationDbContext context, IPrivateDocumentStorage storage)
+        public PrivateDocumentService(
+            IApplicationDbContext context,
+            IPrivateDocumentStorage storage,
+            IFileMalwareScanner malwareScanner)
         {
             _context = context;
             _storage = storage;
+            _malwareScanner = malwareScanner;
         }
 
         public async Task<PrivateDocumentResponse> UploadAsync(
@@ -83,6 +88,8 @@ namespace InternshipManagement.Application.Services
                     throw new InvalidDataException("The selected file does not match its file type.");
             }
 
+            content.Position = 0;
+            await _malwareScanner.ScanAsync(content, cancellationToken);
             content.Position = 0;
             var document = new PrivateDocument
             {

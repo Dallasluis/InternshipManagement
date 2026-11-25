@@ -129,8 +129,7 @@ namespace InternshipManagement.Api.Extensions
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
-            var key = jwtSettings["Key"] ?? "SuperSecretKeyHere1234567890!@#$%";
+            var jwtSettings = JwtConfiguration.From(configuration);
 
             services.AddAuthentication(options =>
             {
@@ -148,9 +147,9 @@ namespace InternshipManagement.Api.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SigningKey),
                     ClockSkew = TimeSpan.Zero
                 };
 
@@ -213,7 +212,6 @@ services.AddHostedService<InternshipManagement.Api.Jobs.RecommendationNotificati
             // documents and reports
             services.AddScoped<IPrivateDocumentService, PrivateDocumentService>();
             services.AddScoped<IReportService, ReportService>();
-            services.AddSingleton<IPrivateDocumentStorage, PrivateDocumentStorage>();
             services.AddSingleton<IPdfTextExtractor, PdfPigTextExtractor>();
 
             return services;

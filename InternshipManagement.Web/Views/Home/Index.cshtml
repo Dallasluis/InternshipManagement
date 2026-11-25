@@ -14,9 +14,9 @@
                 <img src="~/images/landing-career-success.jpg" class="landing-slide-image" alt="Two students excitedly looking at a laptop together" />
                 <div class="landing-slide-shade"></div>
                 <div class="container landing-slide-content">
-                    <span class="landing-slide-kicker">Your next chapter starts here</span>
-                    <h1>Find an opportunity<br />that moves you forward.</h1>
-                    <p>Discover internships, grow your skills, and take your first step into the world of work.</p>
+                    <span class="landing-slide-kicker">Built for Namibia’s next generation</span>
+                    <h1>Find an internship<br />that moves you forward.</h1>
+                    <p>Discover opportunities across Namibia, build practical skills, and take your first step into the world of work.</p>
                     <a asp-controller="Internships" asp-action="Index" class="btn btn-light landing-slide-cta">Explore internships <i class="fas fa-arrow-right ms-2"></i></a>
                 </div>
             </div>
@@ -24,10 +24,10 @@
                 <img src="~/images/landing-teamwork.jpg" class="landing-slide-image" alt="A diverse group of students collaborating around a table" />
                 <div class="landing-slide-shade"></div>
                 <div class="container landing-slide-content">
-                    <span class="landing-slide-kicker">Learn by doing</span>
-                    <h2>Build experience.<br />Meet your future team.</h2>
-                    <p>Connect with companies and find a placement where your ideas can make a difference.</p>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-light landing-slide-cta">Get started <i class="fas fa-arrow-right ms-2"></i></a>
+                    <span class="landing-slide-kicker">For Namibian employers</span>
+                    <h2>Grow local talent.<br />Build your future team.</h2>
+                    <p>Share a meaningful internship and connect with students ready to contribute and learn.</p>
+                    <a asp-controller="Account" asp-action="Register" asp-route-userType="Company" class="btn btn-light landing-slide-cta">Hire an intern <i class="fas fa-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
         <form asp-controller="Internships" asp-action="Index" method="get" class="landing-search">
             <div class="landing-search-heading">
                 <span class="landing-search-icon"><i class="fas fa-search" aria-hidden="true"></i></span>
-                <span><strong>Find your next internship</strong><small>Search by role, location, industry, or work style</small></span>
+                <span><strong>Find your next internship</strong><small>Explore placements across Namibia by role, location, industry, or work style</small></span>
             </div>
             <div class="landing-search-controls">
                 <label class="landing-search-field">
@@ -118,32 +118,32 @@
 
 <section class="why-section">
     <div class="container">
-        <h2 class="text-center mb-5">Why Choose Our Platform?</h2>
+        <div class="marketplace-heading"><span class="public-eyebrow">MADE FOR THE LOCAL JOURNEY</span><h2>More than a list of internships</h2><p>Interlane brings students and Namibian employers together, with tools to make each step clearer.</p></div>
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="why-card">
-                    <div class="why-card-img"><i class="fas fa-bullseye" aria-hidden="true"></i></div>
+                    <div class="why-card-img"><i class="fas fa-map-location-dot" aria-hidden="true"></i></div>
                     <div class="why-card-body">
-                        <h6>Personalized Internship Matches</h6>
-                        <p class="text-muted small mb-0">Recommendations tailored to your profile and interests.</p>
+                        <h6>Find placements that fit</h6>
+                        <p class="text-muted small mb-0">Explore opportunities by field, location, work style, and stipend, then see matches tailored to your profile.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="why-card">
-                    <div class="why-card-img"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+                    <div class="why-card-img"><i class="fas fa-route" aria-hidden="true"></i></div>
                     <div class="why-card-body">
-                        <h6>Verified Students and Recruiters</h6>
-                        <p class="text-muted small mb-0">Every profile is reviewed before it goes live.</p>
+                        <h6>Keep your search moving</h6>
+                        <p class="text-muted small mb-0">Save internships, prepare your documents, apply, and follow application updates from one place.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="why-card">
-                    <div class="why-card-img"><i class="fas fa-clipboard-list" aria-hidden="true"></i></div>
+                    <div class="why-card-img"><i class="fas fa-people-group" aria-hidden="true"></i></div>
                     <div class="why-card-body">
-                        <h6>Easy Posting for Recruiters</h6>
-                        <p class="text-muted small mb-0">Post a role and start reviewing applicants in minutes.</p>
+                        <h6>Help local talent get started</h6>
+                        <p class="text-muted small mb-0">Employers can present their company, share clear internship roles, and manage candidate applications.</p>
                     </div>
                 </div>
             </div>
@@ -152,14 +152,14 @@
 </section>
 
 <section class="cta-banner">
-    <h2 class="mb-3">Ready to Get Started?</h2>
-    <p class="mb-4">Join students and recruiters shaping the future together.</p>
+    <h2 class="mb-3">Your next step starts here</h2>
+    <p class="mb-4">Find a placement or help grow Namibia’s next generation of talent.</p>
     @if (!string.IsNullOrEmpty(userFullName))
     {
         <a asp-controller="Internships" asp-action="Index" class="btn btn-light">Browse Internships</a>
     }
     else
     {
-        <a asp-controller="Account" asp-action="Register" class="btn btn-light">Get started</a>
+        <div class="landing-cta-actions"><a asp-controller="Account" asp-action="Register" asp-route-userType="Student" class="btn btn-light">I’m looking for an internship</a><a asp-controller="Account" asp-action="Register" asp-route-userType="Company" class="btn btn-outline-light">I’m hiring interns</a></div>
     }
 </section>

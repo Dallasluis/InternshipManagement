@@ -3,7 +3,7 @@
     var userType = Context.Session.GetString("UserType");
 }
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm public-navbar @(ViewContext.RouteData.Values["controller"]?.ToString() == "Internships" ? "internship-sticky-nav" : "")">
+<nav class="navbar navbar-expand-lg navbar-light public-navbar @(ViewContext.RouteData.Values["controller"]?.ToString() == "Internships" ? "internship-sticky-nav" : "")">
     <div class="container-fluid px-4">
         <a class="navbar-brand public-brand" asp-controller="Home" asp-action="Index" aria-label="Interlane Internships home">
             <img src="~/images/interlane-logo.png" alt="Interlane Internships" />

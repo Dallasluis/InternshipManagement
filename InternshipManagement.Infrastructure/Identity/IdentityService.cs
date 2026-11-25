@@ -27,6 +27,7 @@ namespace InternshipManagement.Infrastructure.Identity
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly LoginSecurityOptions _loginSecurityOptions;
+        private readonly JwtConfiguration _jwtConfiguration;
 
         public IdentityService(
             UserManager<ApplicationUser> userManager,
@@ -42,6 +43,7 @@ namespace InternshipManagement.Infrastructure.Identity
             _configuration = configuration;
             _context = context;
             _loginSecurityOptions = loginSecurityOptions.Value;
+            _jwtConfiguration = JwtConfiguration.From(configuration);
         }
 
         public async Task<IdentityResult> CreateUserAsync(string email, string password, string firstName, string lastName, string userType)
@@ -276,9 +278,7 @@ namespace InternshipManagement.Infrastructure.Identity
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                jwtSettings["Key"] ?? "SuperSecretKeyHere1234567890!@#$%"));
+            var key = new SymmetricSecurityKey(_jwtConfiguration.SigningKey);
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var now = DateTime.UtcNow;
@@ -294,8 +294,8 @@ namespace InternshipManagement.Infrastructure.Identity
                 expires = absoluteExpiry;
 
             var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
+                issuer: _jwtConfiguration.Issuer,
+                audience: _jwtConfiguration.Audience,
                 claims: claims,
                 expires: expires,
                 signingCredentials: creds

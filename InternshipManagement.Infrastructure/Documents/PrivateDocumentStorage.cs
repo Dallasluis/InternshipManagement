@@ -1,5 +1,6 @@
 using InternshipManagement.Application.Interfaces;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace InternshipManagement.Infrastructure.Documents
 {
@@ -7,9 +8,27 @@ namespace InternshipManagement.Infrastructure.Documents
     {
         private readonly string _storageRoot;
 
-        public PrivateDocumentStorage(IHostEnvironment environment)
+        public PrivateDocumentStorage(IWebHostEnvironment environment, IOptions<PrivateDocumentStorageOptions> options)
         {
-            _storageRoot = Path.Combine(environment.ContentRootPath, "App_Data", "PrivateDocuments");
+            var configuredPath = options.Value.RootPath;
+            if (string.IsNullOrWhiteSpace(configuredPath))
+                throw new InvalidOperationException("PrivateDocumentStorage:RootPath must not be empty.");
+
+            _storageRoot = Path.GetFullPath(Path.IsPathRooted(configuredPath)
+                ? configuredPath
+                : Path.Combine(environment.ContentRootPath, configuredPath));
+
+            if (!string.IsNullOrWhiteSpace(environment.WebRootPath))
+            {
+                var webRoot = Path.GetFullPath(environment.WebRootPath)
+                    .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                var webRootPrefix = webRoot + Path.DirectorySeparatorChar;
+                if (string.Equals(_storageRoot, webRoot, StringComparison.OrdinalIgnoreCase)
+                    || _storageRoot.StartsWith(webRootPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Private document storage must be outside the public web root.");
+                }
+            }
         }
 
         public async Task SaveAsync(Guid documentId, Stream content, CancellationToken cancellationToken)
